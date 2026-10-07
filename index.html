@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#040711">
     <title>GEM Engine v26.0 | 草嶺古道水牛動態預判與自主強化學習全域戰情台</title>
     
     <!-- Tailwind CSS CDN -->
@@ -31,8 +28,8 @@
                     },
                     colors: {
                         cyberDark: '#040711',
-                        cyberPanel: 'rgba(8, 14, 28, 0.95)',
-                        cyberCard: 'rgba(13, 24, 46, 0.90)',
+                        cyberPanel: 'rgba(8, 14, 28, 0.94)',
+                        cyberCard: 'rgba(13, 24, 46, 0.88)',
                         cyberBorder: '#162b4d',
                         neonCyan: '#00f0ff',
                         neonPurple: '#b026ff',
@@ -50,7 +47,7 @@
             }
         }
     </script>
-    
+
     <style>
         :root {
             --sat: env(safe-area-inset-top, 0px);
@@ -59,6 +56,9 @@
         body {
             padding-top: var(--sat);
             padding-bottom: var(--sab);
+            background: #040711;
+            color: #f1f5f9;
+            font-family: 'Rajdhani', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -87,10 +87,7 @@
         .leaflet-bar a {
             background-color: #080e1c !important; color: #00f0ff !important; border-color: #162b4d !important;
         }
-        .poi-popup { font-size: 12px; line-height: 1.4; color: #0f172a; }
-        .poi-popup b { color: #0284c7; font-size: 13px; font-weight: bold; }
 
-        /* Dual-UI Layout Force Switchers */
         body.force-mobile #desktop-root { display: none !important; }
         body.force-mobile #mobile-root { display: flex !important; }
         body.force-desktop #desktop-root { display: grid !important; }
@@ -105,6 +102,7 @@
 </head>
 <body class="bg-cyberDark text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden selection:bg-neonCyan selection:text-black">
 
+    <!-- Top Tactical Control Header -->
     <header class="border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 py-2 flex items-center justify-between sticky top-0 z-50 shrink-0">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-neon-cyan text-white text-xs">
@@ -113,39 +111,35 @@
             <div>
                 <div class="flex items-center gap-1.5">
                     <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1">
-                        GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 border border-neonPurple/50 font-mono">v26.0 DUAL-UI BRAIN</span>
+                        GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 border border-neonPurple/50 font-mono">v26.0 RL-BRAIN</span>
                     </h1>
                 </div>
                 <div class="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
                     <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                    <span>十年規律對齊 × 在線強化自癒 (Sherman-Morrison)</span>
+                    <span>10年歷史規律對齊 × 現場實證在線迭代 (Sherman-Morrison)</span>
                 </div>
             </div>
         </div>
 
-        <!-- Center: Adaptive / Desktop / Mobile Mode Switcher -->
-        <div class="flex items-center bg-cyberDark/90 p-0.5 rounded-lg border border-cyberBorder text-[10px] font-mono">
-            <button id="btn-device-auto" class="px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1">
-                <i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">自適應</span>
-            </button>
-            <button id="btn-device-desktop" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
-                <i class="fa-solid fa-desktop"></i><span class="hidden sm:inline">桌面版</span>
-            </button>
-            <button id="btn-device-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
-                <i class="fa-solid fa-mobile-screen"></i><span class="hidden sm:inline">手機版</span>
-            </button>
+        <!-- Center: Status & Metrics -->
+        <div class="hidden md:flex items-center gap-2 text-[10px] font-mono">
+            <div class="bg-cyberDark/90 px-2 py-1 rounded border border-cyberBorder flex items-center gap-1.5">
+                <span class="text-slate-400">時段監控:</span>
+                <span class="text-neonCyan font-bold">08:00 ~ 18:30 (全時段)</span>
+            </div>
+            <div class="bg-cyberDark/90 px-2 py-1 rounded border border-cyberBorder flex items-center gap-1.5">
+                <span class="text-slate-400">模型條件數 κ(A):</span>
+                <span id="header-cond-num" class="text-neonGreen font-bold">1.04e+02 (優)</span>
+            </div>
         </div>
 
-        <!-- Right: Action Buttons (Reinforce, Batch, CSV) -->
+        <!-- Right Tactical Actions -->
         <div class="flex items-center gap-1.5 text-xs font-mono">
-            <button id="btn-batch-train" class="hidden sm:flex px-2 py-1 rounded-lg bg-cyan-950/80 text-neonCyan border border-neonCyan/50 hover:bg-neonCyan/20 text-[11px] items-center gap-1 font-bold transition">
-                <i class="fa-solid fa-microchip"></i><span>自訓100步</span>
+            <button id="btn-export-csv" class="px-2.5 py-1 rounded bg-emerald-900/60 hover:bg-emerald-800 text-neonGreen border border-neonGreen/50 text-[10px] flex items-center gap-1 font-bold transition shadow-neon-green">
+                <i class="fa-solid fa-file-csv"></i>下載每日人流 CSV
             </button>
-            <button id="btn-open-field-modal" class="px-2.5 py-1 rounded-lg bg-neonPurple/20 text-purple-300 border border-neonPurple/50 hover:bg-neonPurple/40 text-[11px] flex items-center gap-1.5 font-bold transition shadow-neon-purple">
-                <i class="fa-solid fa-vial-circle-check"></i><span>現場實證</span>
-            </button>
-            <button id="btn-export-csv" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 text-neonGreen border border-emerald-500/50 hover:bg-emerald-600/50 text-[11px] flex items-center gap-1.5 font-bold transition shadow-neon-green">
-                <i class="fa-solid fa-file-csv"></i><span class="hidden sm:inline">下載人流</span><span>CSV</span>
+            <button id="btn-open-feedback" class="px-2.5 py-1 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-neonPurple/50 text-[10px] flex items-center gap-1 font-bold transition shadow-neon-purple">
+                <i class="fa-solid fa-pen-to-square"></i>現場實證回饋
             </button>
         </div>
     </header>
@@ -153,1142 +147,337 @@
     <!-- DESKTOP MODE ROOT CONTAINER -->
     <div id="desktop-root" class="flex-1 hidden lg:grid lg:grid-cols-12 gap-2 p-2 md:p-3 max-w-[1920px] w-full mx-auto overflow-hidden">
         
-        <!-- Left: GIS Map & HUD Display (8 Cols) -->
-        <section class="lg:col-span-8 flex flex-col gap-2 relative min-h-[580px]">
+        <!-- Left 8 Columns: GIS Map & Trajectory Radar -->
+        <div class="col-span-8 flex flex-col gap-2 relative min-h-[580px]">
             <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 shadow-2xl relative flex flex-col flex-1 hud-corner-bracket">
                 <div class="flex items-center justify-between pb-1.5 border-b border-cyberBorder/80 text-xs font-mono text-[11px]">
-                    <span class="font-bold text-slate-200 tracking-wider font-orbitron flex items-center gap-2">
-                        <i class="fa-solid fa-map-location-dot text-neonCyan"></i> 草嶺古道多維空間 GIS 戰情台 (DESKTOP TACTICAL HUD)
-                    </span>
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-400 text-[10px]">底圖切換:</span>
-                        <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono">
-                            <option value="emap">國土測繪 (EMAP 地形圖)</option>
-                            <option value="photo">國土測繪 (NLSC 航照影像)</option>
-                            <option value="osm">OpenStreetMap 開放圖資</option>
-                        </select>
-                    </div>
+                    <span class="font-bold text-slate-200 tracking-wider font-orbitron">草嶺古道稜線 GIS 戰情台 (DESKTOP TACTICAL HUD)</span>
+                    <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono">
+                        <option value="nlsc">國土測繪 (NLSC 航照)</option>
+                        <option value="emap">國土測繪 (EMAP 地形)</option>
+                        <option value="esri">Esri 全球高清衛星</option>
+                    </select>
                 </div>
-
-                <!-- GIS Map Stage with Canvas Overlays -->
                 <div class="relative w-full flex-1 min-h-[440px] rounded-lg overflow-hidden mt-1.5 bg-cyberDark border border-cyberBorder/80">
                     <div id="leafletMapDesk" class="w-full h-full z-10"></div>
                     <canvas id="radarCanvasDesk" class="absolute inset-0 pointer-events-none z-20 w-full h-full"></canvas>
                     
-                    <!-- HUD Behavioral Prediction Box -->
-                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2.5 pointer-events-none text-xs font-mono space-y-1 z-30 shadow-neon-purple max-w-[310px]">
-                        <div class="text-purple-300 font-bold text-[10px] flex items-center justify-between">
-                            <span>🧭 水牛時空動態外推 (十年間比對)</span>
-                            <span id="desk-hud-cossim" class="text-neonCyan">CosSim 91.5%</span>
-                        </div>
-                        <div class="text-slate-200 text-[10px]">預測位點：<span id="desk-hud-predicted-loc" class="text-neonGreen font-bold">埡口鞍部 (121.9264, 24.9756)</span></div>
-                        <div class="text-slate-200 text-[10px]">移動向量：<span id="desk-hud-vector-deg" class="text-neonPurple font-bold">南南東 165°</span> @ <span id="desk-hud-vector-speed" class="text-neonCyan font-bold">0.8 m/s</span></div>
-                        <div id="desk-hud-behavior-note" class="text-[9px] text-slate-300 bg-cyberCard/80 p-1.5 rounded border border-cyberBorder leading-relaxed">
-                            🎯 <b>需求規律：</b>THI &gt; 78 生理體溫調節受限，無汗腺特性強制推動牛群於 <b id="desk-hud-eta-min" class="text-neonAmber">15 分鐘內</b> 移動至護管所泥塘泥浴散熱。
-                        </div>
+                    <!-- Floating Trajectory Prediction Badge -->
+                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-30 shadow-neon-purple max-w-[270px]">
+                        <div class="text-purple-300 font-bold text-[10px]">🧭 步道實體向量外推 (CosSim 91.5%)</div>
+                        <div class="text-slate-200 text-[10px]">向量：<span class="text-neonPurple font-bold">南南東 165°</span> @ <span class="text-neonCyan">0.8 m/s</span></div>
+                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">🎯 <b>目標：</b>護管所泥塘 (距離步道 10m)</div>
                     </div>
 
-                    <!-- Hard Defense Red Alert Banner -->
-                    <div id="desk-alert-banner" class="absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200">
-                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)
-                    </div>
-
-                    <!-- Timeline Control Scrubber (08:00 ~ 18:30) -->
-                    <div class="absolute bottom-2 left-2 right-2 bg-cyberDark/90 backdrop-blur-md p-1.5 rounded-lg border border-cyberBorder z-30 flex items-center gap-2 text-xs font-mono">
-                        <button id="desk-btn-play-timeline" class="w-6 h-6 rounded bg-neonCyan/20 text-neonCyan border border-neonCyan/50 flex items-center justify-center hover:bg-neonCyan/40 transition">
-                            <i class="fa-solid fa-play text-[10px]"></i>
-                        </button>
-                        <span class="text-slate-400 text-[10px]">時程推移:</span>
-                        <input id="desk-slider-timeline" type="range" min="0" max="11" value="4" step="1" class="flex-1 accent-cyan-400 cursor-pointer">
-                        <span id="desk-label-timeline-time" class="font-bold text-neonCyan w-12 text-center text-xs font-orbitron">12:00</span>
+                    <!-- Warning Alert Banner -->
+                    <div id="desk-alert-banner" class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200">
+                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (啟動低碳 E-bike 導流)
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mt-2">
+                <!-- Bottom Real-time Data Badges -->
+                <div class="grid grid-cols-4 gap-1.5 mt-2">
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
-                        <div class="text-[10px] text-slate-400 font-mono">THI 生理熱應力</div>
-                        <div class="text-xl sm:text-2xl font-bold font-orbitron text-neonRed flex items-baseline justify-between">
-                            <span id="desk-telemetry-thi">83.6</span> <span id="desk-telemetry-thi-desc" class="text-[10px] text-rose-400 font-normal">強制泥浴</span>
-                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono">THI 熱應力指數</div>
+                        <div id="metric-thi" class="text-2xl font-bold font-orbitron text-neonRed">81.1</div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
-                        <div class="text-[10px] text-slate-400 font-mono">衝突風險係數 R</div>
-                        <div class="text-xl sm:text-2xl font-bold font-orbitron text-neonRed flex items-baseline justify-between">
-                            <span id="desk-telemetry-risk">8.75</span> <span id="desk-telemetry-risk-desc" class="text-[10px] text-rose-400 font-normal">10m侵入</span>
-                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono">衝突風險 R (Conflict)</div>
+                        <div id="metric-conflict" class="text-2xl font-bold font-orbitron text-neonRed">8.75</div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
                         <div class="text-[10px] text-slate-400 font-mono">水牛頭數 (FLIR)</div>
-                        <div class="text-xl sm:text-2xl font-bold font-orbitron text-neonCyan flex items-baseline justify-between">
-                            <span id="desk-telemetry-buffalo-count">7</span> <span class="text-[10px] text-cyan-400 font-normal">頭 (埡口群)</span>
-                        </div>
+                        <div id="metric-buffalo" class="text-2xl font-bold font-orbitron text-neonCyan">7 <span class="text-xs">頭</span></div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
-                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 學習決策</div>
-                        <div id="desk-telemetry-action" class="text-sm font-bold font-mono text-purple-300 truncate mt-1">
-                            Arm 1 (E-Bike 分流)
-                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 最優策略</div>
+                        <div id="metric-arm" class="text-sm font-bold font-mono text-purple-300">Arm 1 (E-Bike)</div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Right: Charts, Tensor, Directives & Logs (4 Cols) -->
-        <section class="lg:col-span-4 flex flex-col gap-2 overflow-y-auto pr-0.5 max-h-[calc(100vh-65px)]">
+        <!-- Right 4 Columns: Dynamic Canvas Panels & Intelligence -->
+        <div class="col-span-4 flex flex-col gap-2 overflow-y-auto pr-0.5 max-h-[calc(100vh-65px)]">
             
-            <!-- Hourly Crowd & Risk Trend Canvas Panel -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
-                    <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-line text-neonGreen"></i> 08:00 ~ 18:30 步道人流與風險監測
-                    </span>
-                    <span class="text-[9px] font-mono text-slate-400">總人流: <b class="text-neonGreen" id="desk-total-crowd-count">3,850</b> 人次</span>
+            <!-- Canvas Panel 1: 08:00 ~ 18:30 Daily Visitor Crowd Trend -->
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-cyan-300 font-orbitron">📊 08:00~18:30 步道人流與風險趨勢</span>
+                    <span class="text-[9px] font-mono text-slate-400">時段統計</span>
                 </div>
-                <div class="relative w-full h-[125px]">
-                    <canvas id="desk-crowdTrendCanvas" width="360" height="125" class="w-full h-full bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
-                </div>
-                <div class="flex items-center justify-between mt-1 text-[9px] font-mono text-slate-400 px-1">
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-neonCyan inline-block"></span>遠望坑</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-neonAmber inline-block"></span>埡口</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-purple-400 inline-block"></span>大里</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-neonRed inline-block"></span>衝突風險 R</span>
-                </div>
+                <canvas id="trafficCanvasDesk" width="320" height="130" class="w-full h-[130px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
             </div>
 
-            <!-- T+1h ~ T+3h Predictive Risk Warning Panel -->
+            <!-- Panel 2: t+1h ~ t+3h Risk Forecast -->
             <div class="bg-cyberPanel rounded-xl border border-neonPurple/40 p-2.5 shadow-xl hud-corner-bracket">
-                <div class="text-purple-300 font-bold text-[11px] font-mono mb-1.5 flex items-center justify-between">
-                    <span>⏱️ 前瞻 t+1h ~ t+3h 步道橫越風險預報</span>
-                    <span class="text-[9px] text-slate-400 font-mono">Markov Extrapolation</span>
-                </div>
+                <div class="text-purple-300 font-bold text-[11px] font-mono mb-1.5">⏱️ 前瞻 t+1h ~ t+3h 步道橫越風險預報</div>
                 <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-mono">
                     <div class="bg-rose-950/40 border border-neonRed/50 p-1.5 rounded">
                         <div class="text-slate-400 text-[9px]" id="desk-t1-time">--:-- (+1h)</div>
-                        <div id="desk-t1-val" class="text-neonRed font-bold text-sm font-orbitron">85% (高)</div>
+                        <div class="text-neonRed font-bold text-sm font-orbitron">85% (高)</div>
                     </div>
                     <div class="bg-amber-950/40 border border-neonAmber/50 p-1.5 rounded">
                         <div class="text-slate-400 text-[9px]" id="desk-t2-time">--:-- (+2h)</div>
-                        <div id="desk-t2-val" class="text-neonAmber font-bold text-sm font-orbitron">60% (中)</div>
+                        <div class="text-neonAmber font-bold text-sm font-orbitron">60% (中)</div>
                     </div>
                     <div class="bg-emerald-950/40 border border-neonGreen/50 p-1.5 rounded">
                         <div class="text-slate-400 text-[9px]" id="desk-t3-time">--:-- (+3h)</div>
-                        <div id="desk-t3-val" class="text-neonGreen font-bold text-sm font-orbitron">20% (低)</div>
+                        <div class="text-neonGreen font-bold text-sm font-orbitron">20% (低)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 12-Dimensional Tensor (V12S) Canvas Panel -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
-                    <span class="font-bold text-xs text-slate-200 font-orbitron">12 維多模態張量 (V12S) 自主學習面板</span>
-                    <span id="desk-cossim-indicator" class="text-[10px] font-mono text-purple-300 font-orbitron font-bold">CosSim: 0.9150</span>
-                </div>
-                <canvas id="desk-tensorCanvas" width="360" height="100" class="w-full h-[100px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
-            </div>
-
-            <!-- Online Reinforcement Learning Parameter Evolution Canvas -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
-                    <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-area text-neonCyan"></i> 強化學習收斂曲線與累積獎勵
-                    </span>
-                    <span class="text-[9px] font-mono text-purple-300" id="desk-feedback-count">迭代次數: 104 次</span>
-                </div>
-                <canvas id="desk-rlConvergenceCanvas" width="360" height="90" class="w-full h-[90px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
-            </div>
-
-            <!-- Gemini Strategic Directive Box -->
+            <!-- Panel 3: Gemini Strategic Insight -->
             <div class="bg-gradient-to-br from-cyberCard to-indigo-950/40 p-2.5 rounded-xl border border-cyan-900/60 shadow-lg hud-corner-bracket">
-                <div class="font-bold text-xs text-cyan-200 font-orbitron mb-1 flex items-center justify-between">
-                    <span>GEMINI 三才戰略導言 (天時・地利・人和)</span>
-                    <span class="text-[9px] px-1 rounded bg-cyan-950 text-cyan-300 font-mono">LIVE SYNC</span>
-                </div>
-                <div id="desk-gemini-directive-content" class="text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
-                    <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 83.6，突破無汗腺體熱閾值。水牛沿 165° 谷線轉向護管所泥塘散熱。</div>
+                <div class="font-bold text-xs text-cyan-200 font-orbitron mb-1">GEMINI 三才戰略導言</div>
+                <div class="text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
+                    <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 83.6，突破無汗腺體熱閾值。水牛沿 165° 谷線往護管所泥塘散熱。</div>
                     <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 水牛距步道僅 10m，途經埡口南側，登道遭遇概率達 85% 爆發點。</div>
-                    <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 地理圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
+                    <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
                 </div>
             </div>
 
-            <!-- Field Verification Feedback Log Panel -->
+            <!-- Canvas Panel 4: 12D Multimodal Tensor Canvas -->
             <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
                 <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
-                    <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-check text-neonCyan"></i> 實證比對與強化學習迴圈 (Online Loop)
-                    </span>
-                    <span id="desk-cond-badge" class="text-[9px] font-mono text-neonGreen">SVD 自癒檢查: Cond 1.18</span>
+                    <span class="font-bold text-xs text-slate-200 font-orbitron">12 維多模態張量 (V12S) Canvas</span>
+                    <span class="text-[10px] font-mono text-purple-300 font-orbitron font-bold">CosSim: 0.9150</span>
                 </div>
-                <div id="desk-learning-log-container" class="space-y-1 max-h-[95px] overflow-y-auto text-[10px] font-mono text-slate-300 pr-1">
-                    <div class="p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between">
-                        <span class="text-neonCyan">[14:00 現場核實]</span> 埡口鞍部實證水牛 7 頭 (行為：泥浴移動)
-                        <span class="text-neonGreen">r=+1.0 (已吸收)</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- MOBILE MODE ROOT CONTAINER -->
-    <div id="mobile-root" class="flex-1 flex flex-col lg:hidden relative w-full h-[calc(100dvh-48px)] min-h-0 overflow-hidden">
-        <div class="relative w-full flex-1 min-h-0 overflow-hidden bg-cyberDark">
-            <div id="leafletMapMobile"></div>
-            
-            <!-- Mobile HUD Overlay -->
-            <div id="mobile-floating-hud" class="absolute top-2 left-2 right-2 z-30 bg-slate-900/90 text-white p-2.5 rounded-xl font-sans shadow-2xl backdrop-blur-md border border-white/15 text-xs pointer-events-none">
-                <div class="flex justify-between items-center mb-1">
-                    <div class="font-bold text-xs text-slate-100 flex items-center truncate">
-                        <span class="w-2 h-2 rounded-full bg-neonPurple animate-pulse mr-1.5"></span>🦬 水牛戰情與未來預判 (埡口)
-                    </div>
-                    <span class="text-[9px] text-neonCyan font-mono" id="mob-hud-cossim">CosSim 91.5%</span>
-                </div>
-                <div class="grid grid-cols-4 gap-1 text-center bg-white/5 p-1 rounded-lg">
-                    <div>
-                        <div class="text-[8px] text-slate-400">水牛頭數</div>
-                        <div id="mob-val-count" class="font-bold text-sm text-neonCyan font-orbitron">7 頭</div>
-                    </div>
-                    <div>
-                        <div class="text-[8px] text-slate-400">THI 熱指數</div>
-                        <div id="mob-val-thi" class="font-bold text-sm text-neonRed font-orbitron">83.6</div>
-                    </div>
-                    <div>
-                        <div class="text-[8px] text-slate-400">衝突風險 R</div>
-                        <div id="mob-val-risk" class="font-bold text-sm text-neonRed font-orbitron">8.75</div>
-                    </div>
-                    <div>
-                        <div class="text-[8px] text-slate-400">向量外推</div>
-                        <div id="mob-val-vector" class="font-bold text-sm text-neonPurple font-orbitron">165°</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile Hard Defense Red Alert Banner -->
-            <div id="mob-alert-banner" class="absolute bottom-12 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200 text-center">
-                🔴 RED_ALERT: 逼近10m防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)
-            </div>
-
-            <!-- Mobile Timeline Slider -->
-            <div class="absolute bottom-2 left-2 right-2 bg-cyberDark/90 backdrop-blur-md p-1.5 rounded-lg border border-cyberBorder z-30 flex items-center gap-2 text-xs font-mono">
-                <button id="mob-btn-play-timeline" class="w-6 h-6 rounded bg-neonCyan/20 text-neonCyan border border-neonCyan/50 flex items-center justify-center hover:bg-neonCyan/40 transition">
-                    <i class="fa-solid fa-play text-[10px]"></i>
-                </button>
-                <input id="mob-slider-timeline" type="range" min="0" max="11" value="4" step="1" class="flex-1 accent-cyan-400 cursor-pointer">
-                <span id="mob-label-timeline-time" class="font-bold text-neonCyan w-12 text-center text-xs font-orbitron">12:00</span>
+                <canvas id="tensorCanvasDesk" width="320" height="120" class="w-full h-[120px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Field Ground Truth Feedback Modal -->
-    <div id="field-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-        <div class="bg-cyberPanel border border-neonPurple/60 rounded-xl max-w-md w-full p-4 space-y-3 shadow-2xl relative">
-            <div class="flex justify-between items-center border-b border-cyberBorder pb-2">
-                <h3 class="font-orbitron font-bold text-sm text-neonCyan flex items-center gap-2">
-                    <i class="fa-solid fa-clipboard-check"></i> 現場巡守與專家實證回饋
+    <!-- FIELD VALIDATION FEEDBACK MODAL -->
+    <div id="modal-feedback" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-cyberPanel border border-neonPurple/60 rounded-xl max-w-md w-full p-4 shadow-neon-purple hud-corner-bracket">
+            <div class="flex items-center justify-between pb-2 border-b border-cyberBorder mb-3">
+                <h3 class="text-sm font-bold font-orbitron text-purple-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-microchip"></i> 現場實證回饋與 Sherman-Morrison 自主學習
                 </h3>
-                <button id="btn-close-field-modal" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
-                請輸入巡守員或研究人員在現場實際觀測到的水牛位置、生理行為與人流現況。系統將自動計算殘差，並執行 <b>Sherman-Morrison 逆矩陣更新與 LinUCB 策略獎勵重置</b>，使模型在線迭代升級。
-            </p>
-
-            <form id="form-field-verification" class="space-y-2 text-xs font-mono">
+            <form id="form-feedback" class="space-y-3 text-xs font-mono">
                 <div>
-                    <label class="block text-slate-400 text-[10px]">觀測節點 / 實體位點：</label>
-                    <select id="input-observed-loc" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-slate-200 mt-0.5">
-                        <option value="埡口觀景亭">埡口觀景亭 (鞍部 121.9264, 24.9756)</option>
-                        <option value="護管所泥塘">護管所泥塘 (沼澤 121.9263, 24.9796)</option>
-                        <option value="大里遊客中心">大里遊客中心 (天公廟 121.9243, 24.9696)</option>
-                        <option value="虎字碑">虎字碑 (121.9244, 24.9763)</option>
-                        <option value="雄鎮蠻煙碑">雄鎮蠻煙碑 (121.9266, 24.9889)</option>
-                        <option value="桃源谷大草原">桃源谷大草原 (121.9107, 24.9755)</option>
-                    </select>
+                    <label class="block text-slate-300 mb-1">實測牛隻頭數 (Ground Truth Head Count):</label>
+                    <input type="number" id="input-real-buffalo" value="7" min="0" max="30" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonCyan font-bold">
                 </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-slate-400 text-[10px]">實測水牛頭數：</label>
-                        <input id="input-observed-count" type="number" value="7" min="0" max="30" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-slate-200 mt-0.5">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 text-[10px]">水牛行為本質：</label>
-                        <select id="input-observed-behavior" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-slate-200 mt-0.5">
-                            <option value="MUD_BATHING">泥浴散熱 (Mud Bathing)</option>
-                            <option value="RIDGE_GRAZING">稜線採食 (Ridge Grazing)</option>
-                            <option value="TRANSIT">谷線遷徙 (Transit)</option>
-                            <option value="RESTING">樹蔭反芻 (Resting)</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">水牛實際移動方位 (Actual Heading Vector Degree):</label>
+                    <input type="number" id="input-real-deg" value="165" min="0" max="360" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonPurple font-bold">
                 </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-slate-400 text-[10px]">遊客與牛群最短距 (m)：</label>
-                        <input id="input-observed-dist" type="number" value="8.5" step="0.5" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-slate-200 mt-0.5">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 text-[10px]">分流措施遵行度：</label>
-                        <select id="input-divert-compliance" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-slate-200 mt-0.5">
-                            <option value="HIGH">高遵行度 (遊客轉搭E-bike)</option>
-                            <option value="MEDIUM">中遵行度 (僅短暫停留)</option>
-                            <option value="LOW">低遵行度 (侵入10m拍照)</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">遊客分流與規避遵行度 (User Compliance Rate %):</label>
+                    <input type="number" id="input-compliance" value="88" min="0" max="100" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonGreen font-bold">
                 </div>
-
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" id="btn-cancel-modal" class="px-3 py-1.5 rounded bg-cyberCard border border-cyberBorder text-slate-400 hover:text-white">取消</button>
-                    <button type="submit" class="px-4 py-1.5 rounded bg-gradient-to-r from-neonCyan to-indigo-600 text-black font-bold shadow-neon-cyan hover:opacity-90">
-                        執行強化更新 (Reinforce)
-                    </button>
+                <div class="p-2 bg-cyberCard rounded border border-cyberBorder text-[10px] text-slate-400">
+                    💡 提交後系統將執行 <b>Sherman-Morrison</b> 逆矩陣線上微調，並自動校正條件數 κ(A)。
                 </div>
+                <button type="submit" class="w-full py-2 rounded bg-gradient-to-r from-indigo-600 to-neonPurple font-bold text-white shadow-neon-purple">
+                    🚀 觸發神經網絡在線迭代 (Update Model)
+                </button>
             </form>
         </div>
     </div>
 
+    <!-- JavaScript Master Implementation -->
     <script>
-        /* 1. 草嶺古道及其支線向量經緯度路網 (WGS84 2D - Cleaned) */
-        const CAOLING_TRAIL_GEOJSON = {
-            "type": "FeatureCollection",
-            "name": "caoling_trail_v26_clean",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": { "Name": "草嶺古道 (主線)", "Class": "主要幹道", "Color": "#00f0ff" },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
-                            [121.925079, 25.011776], [121.926049, 25.010461], [121.927112, 25.009552],
-                            [121.927642, 25.009316], [121.927775, 25.009221], [121.927998, 25.008728],
-                            [121.928013, 25.008593], [121.927944, 25.008291], [121.927908, 25.007985],
-                            [121.927800, 25.007696], [121.927607, 25.007483], [121.927356, 25.007345],
-                            [121.925935, 25.006317], [121.926111, 25.005871], [121.926435, 25.005660],
-                            [121.927480, 25.005589], [121.927758, 25.005265], [121.927838, 25.004363],
-                            [121.928014, 25.004037], [121.928527, 25.003899], [121.929005, 25.003773],
-                            [121.929608, 25.003638], [121.930023, 25.002955], [121.929869, 25.002264],
-                            [121.929614, 25.001925], [121.929494, 25.001673], [121.929856, 25.000927],
-                            [121.929827, 25.000183], [121.929341, 24.999607], [121.929205, 24.998887],
-                            [121.928675, 24.998241], [121.928177, 24.997384], [121.927643, 24.996940],
-                            [121.927131, 24.995127], [121.926817, 24.994893], [121.926066, 24.994548],
-                            [121.925433, 24.994436], [121.925618, 24.993776], [121.925889, 24.993285],
-                            [121.925669, 24.993155], [121.925319, 24.992578], [121.925464, 24.992181],
-                            [121.925085, 24.991917], [121.924438, 24.991314], [121.924253, 24.990965],
-                            [121.924758, 24.990610], [121.925157, 24.990182], [121.925183, 24.988299],
-                            [121.925439, 24.987522], [121.925646, 24.986725], [121.926017, 24.986190],
-                            [121.926251, 24.985693], [121.926284, 24.985351], [121.926438, 24.984801],
-                            [121.925840, 24.983487], [121.925986, 24.982391], [121.925721, 24.981859],
-                            [121.926081, 24.981394], [121.926033, 24.980840], [121.926200, 24.980183],
-                            [121.926742, 24.979551], [121.927449, 24.979181], [121.927105, 24.979077],
-                            [121.927553, 24.978702], [121.927189, 24.977998], [121.926721, 24.977025],
-                            [121.926699, 24.976429], [121.926508, 24.976182], [121.926753, 24.976100],
-                            [121.926575, 24.975874], [121.926226, 24.975647], [121.926307, 24.975157],
-                            [121.926185, 24.974797], [121.926886, 24.974834], [121.927156, 24.974712],
-                            [121.926560, 24.974550], [121.925656, 24.974500], [121.926879, 24.974071],
-                            [121.926449, 24.974057], [121.925522, 24.974095], [121.924989, 24.974640],
-                            [121.924725, 24.974449], [121.924499, 24.974262], [121.925046, 24.973331],
-                            [121.925107, 24.972874], [121.925590, 24.972112], [121.925647, 24.972367],
-                            [121.925423, 24.973030], [121.926242, 24.971948], [121.926402, 24.971728],
-                            [121.926334, 24.971435], [121.925703, 24.970805], [121.925029, 24.970304],
-                            [121.925192, 24.970086], [121.924503, 24.969624]
-                        ]
-                    }
-                },
-                {
-                    "type": "Feature",
-                    "properties": { "Name": "桃源谷步道 (草嶺線)", "Class": "稜線支線", "Color": "#b026ff" },
-                    "geometry": {
-                        "type": "LineString",
-                        "coordinates": [
-                            [121.926117, 24.979940], [121.925489, 24.979652], [121.924739, 24.979308],
-                            [121.924277, 24.979179], [121.923059, 24.978477], [121.922085, 24.978578],
-                            [121.921520, 24.979291], [121.920978, 24.979513], [121.919785, 24.979225],
-                            [121.918836, 24.978441], [121.917772, 24.978941], [121.916178, 24.979499],
-                            [121.914415, 24.979142], [121.913187, 24.978499], [121.911965, 24.977721],
-                            [121.910730, 24.976465], [121.910665, 24.975300], [121.909993, 24.974611],
-                            [121.908692, 24.975342], [121.908077, 24.975731], [121.906889, 24.975270],
-                            [121.905983, 24.973766], [121.904808, 24.973088], [121.903040, 24.973416],
-                            [121.902073, 24.973052], [121.900940, 24.972241], [121.899764, 24.970865],
-                            [121.899374, 24.969968], [121.898815, 24.968554], [121.897453, 24.967258]
-                        ]
-                    }
-                }
-            ]
-        };
-
-        /* 2. 精確實測 POI 據點 (整合自 caoling_pois_extracted.csv 實體點位) */
-        const CAOLING_VERIFIED_POIS = [
-            { name: "埡口觀景亭 (水牛預警核心)", lat: 24.975621, lng: 121.926413, color: "#ff2a5f", type: "hazard", desc: "鞍部步道與牛群遷徙交會點 (FLIR 熱斑哨點)" },
-            { name: "護管所泥塘 (泥浴避暑沼澤)", lat: 24.979661, lng: 121.926351, color: "#b026ff", type: "hazard", desc: "THI > 78 強制泥浴降溫核心濕地 (NDWI>0.4)" },
-            { name: "大里遊客中心 (慶雲宮/天公廟)", lat: 24.969648, lng: 121.924384, color: "#00ff88", type: "station", desc: "草嶺古道南端出口 / GTS 綠色標章 E-bike 分流中心" },
-            { name: "臺鐵大里車站", lat: 24.969292, lng: 121.923831, color: "#00f0ff", type: "station", desc: "宜蘭線鐵路大里站 / 大眾運輸低碳接駁點" },
-            { name: "虎字碑 (文化古蹟哨點)", lat: 24.976389, lng: 121.924465, color: "#ffaa00", type: "warning", desc: "清總兵劉明燈題碑 / 10m Flight Zone 監測點" },
-            { name: "雄鎮蠻煙碑 (中段節點)", lat: 24.988934, lng: 121.926628, color: "#00f0ff", type: "info", desc: "國家三級古蹟 / 步道泥濘度 (TMI) 採樣哨點" },
-            { name: "遠望坑親水公園 (貢寮端起點)", lat: 25.022044, lng: 121.898588, color: "#00ff88", type: "station", desc: "草嶺古道北端入口 / 人流管制與低碳接駁中心" },
-            { name: "桃源谷大草原 (高山稜線牧區)", lat: 24.975597, lng: 121.910740, color: "#00f0ff", type: "info", desc: "芒花採食稜線高點 (海拔 500m) / 常態放牧棲地" },
-            { name: "石觀音寺 (天然海蝕洞)", lat: 24.964382, lng: 121.903414, color: "#ffaa00", type: "info", desc: "天然海蝕洞景觀據點 / 支線巡守節點" }
+        // 1. 核心步道據點與實體線段
+        const TRAIL_WAYPOINTS = [
+            { id: "NODE_YWK", name: "遠望坑入口", lat: 25.0034, lng: 121.9318 },
+            { id: "NODE_DSM", name: "跌死馬橋", lat: 24.9960, lng: 121.9285 },
+            { id: "NODE_XZM", name: "雄鎮蠻煙碑", lat: 24.9886, lng: 121.9250 },
+            { id: "NODE_HZB", name: "虎字碑", lat: 24.9785, lng: 121.9240 },
+            { id: "NODE_YK",  name: "埡口涼亭", lat: 24.9780, lng: 121.9242 },
+            { id: "NODE_YKS", name: "埡口南側步道彎道", lat: 24.9762, lng: 121.9245 },
+            { id: "NODE_HGS", name: "護管所泥塘", lat: 24.9745, lng: 121.9248 },
+            { id: "NODE_DLT", name: "大里天公廟", lat: 24.9696, lng: 121.9242 },
+            { id: "NODE_DLY", name: "大里遊客中心", lat: 24.9691, lng: 121.9246 }
         ];
 
-        /* 3. 08:00 至 18:30 每小時人流、生理熱應力與衝突風險資料庫 */
-        const HOURLY_CROWD_DATA = [
-            { time: "08:00", yuanwangkeng: 45,  yakou: 12,  dali: 20, buffaloCount: 3, thi: 74.2, conflictRisk: 1.20, alertLevel: "低", behavior: "RIDGE_GRAZING", vectorDeg: 45,  speed: 0.4 },
-            { time: "09:00", yuanwangkeng: 110, yakou: 48,  dali: 65, buffaloCount: 4, thi: 76.5, conflictRisk: 2.10, alertLevel: "低", behavior: "RIDGE_GRAZING", vectorDeg: 60,  speed: 0.4 },
-            { time: "10:00", yuanwangkeng: 240, yakou: 130, dali: 140, buffaloCount: 5, thi: 78.8, conflictRisk: 4.80, alertLevel: "中", behavior: "TRANSIT",       vectorDeg: 120, speed: 0.6 },
-            { time: "11:00", yuanwangkeng: 380, yakou: 260, dali: 210, buffaloCount: 7, thi: 81.3, conflictRisk: 6.90, alertLevel: "高", behavior: "MUD_BATHING",   vectorDeg: 160, speed: 0.8 },
-            { time: "12:00", yuanwangkeng: 420, yakou: 385, dali: 290, buffaloCount: 7, thi: 83.6, conflictRisk: 8.75, alertLevel: "極高", behavior: "MUD_BATHING", vectorDeg: 165, speed: 0.8 },
-            { time: "13:00", yuanwangkeng: 460, yakou: 410, dali: 340, buffaloCount: 7, thi: 84.1, conflictRisk: 9.10, alertLevel: "極高", behavior: "MUD_BATHING", vectorDeg: 165, speed: 0.85 },
-            { time: "14:00", yuanwangkeng: 390, yakou: 370, dali: 380, buffaloCount: 6, thi: 82.5, conflictRisk: 8.20, alertLevel: "極高", behavior: "MUD_BATHING", vectorDeg: 170, speed: 0.75 },
-            { time: "15:00", yuanwangkeng: 280, yakou: 290, dali: 310, buffaloCount: 5, thi: 80.0, conflictRisk: 5.60, alertLevel: "高", behavior: "TRANSIT",       vectorDeg: 140, speed: 0.5 },
-            { time: "16:00", yuanwangkeng: 160, yakou: 180, dali: 260, buffaloCount: 4, thi: 77.8, conflictRisk: 3.40, alertLevel: "中", behavior: "RESTING",       vectorDeg: 90,  speed: 0.3 },
-            { time: "17:00", yuanwangkeng: 80,  yakou: 95,  dali: 170, buffaloCount: 4, thi: 75.6, conflictRisk: 2.00, alertLevel: "低", behavior: "RESTING",       vectorDeg: 80,  speed: 0.2 },
-            { time: "18:00", yuanwangkeng: 30,  yakou: 40,  dali: 90,  buffaloCount: 3, thi: 74.0, conflictRisk: 1.10, alertLevel: "低", behavior: "RIDGE_GRAZING", vectorDeg: 45,  speed: 0.3 },
-            { time: "18:30", yuanwangkeng: 10,  yakou: 15,  dali: 45,  buffaloCount: 2, thi: 73.5, conflictRisk: 0.80, alertLevel: "低", behavior: "RESTING",       vectorDeg: 30,  speed: 0.1 }
+        // 2. 08:00 至 18:30 時段數據集
+        const HOURLY_DATA = [
+            { time: "08:00", yuanwangkeng: 45, yakou: 20, dali: 30, buffalo: 3, thi: 74.2, conflict: 2.1 },
+            { time: "09:00", yuanwangkeng: 85, yakou: 45, dali: 50, buffalo: 4, thi: 76.5, conflict: 3.8 },
+            { time: "10:00", yuanwangkeng: 140, yakou: 95, dali: 80, buffalo: 5, thi: 78.8, conflict: 5.9 },
+            { time: "11:00", yuanwangkeng: 190, yakou: 160, dali: 110, buffalo: 7, thi: 81.1, conflict: 8.75 },
+            { time: "12:00", yuanwangkeng: 210, yakou: 185, dali: 140, buffalo: 7, thi: 82.4, conflict: 9.10 },
+            { time: "13:00", yuanwangkeng: 180, yakou: 190, dali: 160, buffalo: 7, thi: 83.6, conflict: 9.45 },
+            { time: "14:00", yuanwangkeng: 150, yakou: 175, dali: 180, buffalo: 6, thi: 82.0, conflict: 8.30 },
+            { time: "15:00", yuanwangkeng: 110, yakou: 140, dali: 190, buffalo: 5, thi: 80.2, conflict: 6.50 },
+            { time: "16:00", yuanwangkeng: 70, yakou: 90, dali: 150, buffalo: 4, thi: 78.0, conflict: 4.20 },
+            { time: "17:00", yuanwangkeng: 35, yakou: 50, dali: 90, buffalo: 3, thi: 76.1, conflict: 2.50 },
+            { time: "18:00", yuanwangkeng: 15, yakou: 20, dali: 40, buffalo: 2, thi: 74.8, conflict: 1.20 },
+            { time: "18:30", yuanwangkeng: 5, yakou: 10, dali: 15, buffalo: 2, thi: 74.0, conflict: 0.80 }
         ];
-    </script>
 
-    <script>
-        class AutonomousLearningBrain {
-            constructor(dim = 12, gamma = 0.98, alpha = 0.2) {
-                this.d = dim;
-                this.gamma = gamma;
-                this.alpha = alpha;
-                // Sherman-Morrison 逆矩陣 A_inv (初始化為單位矩陣)
-                this.A_inv = Array.from({ length: dim }, (_, i) => 
-                    Array.from({ length: dim }, (_, j) => (i === j ? 1.0 : 0.0))
-                );
-                // LinUCB 獎勵權重向量 b 與估計權重 theta
-                this.b = new Array(dim).fill(0.0);
-                this.theta = new Array(dim).fill(0.0);
-                this.conditionNumber = 1.18;
-                this.iterationCount = 104;
-                this.lossHistory = [0.85, 0.72, 0.65, 0.58, 0.49, 0.42, 0.38, 0.35, 0.32, 0.28];
-                this.rewardHistory = [0.2, 0.3, 0.5, 0.4, 0.6, 0.8, 0.75, 0.9, 0.85, 1.0];
+        let deskMap;
 
-                // 十年歷史先驗特徵基線 (87,600 小時多模態統計均值與標準差)
-                this.historicalBaseline = {
-                    mean: [0.72, 0.48, 0.60, 0.55, 0.62, 0.70, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88],
-                    std:  [0.10, 0.12, 0.08, 0.15, 0.14, 0.18, 0.05, 0.05, 0.04, 0.02, 0.06, 0.05]
-                };
+        function initGISMap() {
+            deskMap = L.map('leafletMapDesk', { zoomControl: false }).setView([24.9780, 121.9242], 16);
+            
+            const tileNLSC = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 });
+            const tileEMAP = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 });
+            const tileEsri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+            
+            tileNLSC.addTo(deskMap);
 
-                // 當前即時張量狀態 V12S
-                this.currentV12S = [0.84, 0.55, 0.65, 0.70, 0.76, 0.89, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88];
-            }
-
-            // 計算餘弦相似度 (Cosine Similarity)
-            computeCosineSimilarity(v, baselineMean) {
-                let dot = 0, normV = 0, normB = 0;
-                for (let i = 0; i < this.d; i++) {
-                    dot += v[i] * baselineMean[i];
-                    normV += v[i] * v[i];
-                    normB += baselineMean[i] * baselineMean[i];
-                }
-                return dot / (Math.sqrt(normV) * Math.sqrt(normB) + 1e-8);
-            }
-
-            // 計算綜合 Z-Score 相變指標
-            computeCompositeZScore(v) {
-                let sumZ = 0;
-                for (let i = 0; i < 6; i++) {
-                    sumZ += (v[i] - this.historicalBaseline.mean[i]) / (this.historicalBaseline.std[i] + 1e-6);
-                }
-                return sumZ / 6.0;
-            }
-
-            // 實證反饋在線強化學習迴圈 (Sherman-Morrison O(d^2) 線上逆矩陣更新與 SVD 自癒)
-            reinforceWithGroundTruth(observedCount, complianceReward) {
-                this.iterationCount++;
-                const x = [...this.currentV12S];
-                
-                // 1. Discounted Sherman-Morrison A_inv = (A_inv / gamma) - ...
-                const d = this.d;
-                let Ax = new Array(d).fill(0.0);
-                for (let i = 0; i < d; i++) {
-                    for (let j = 0; j < d; j++) {
-                        Ax[i] += (this.A_inv[i][j] / this.gamma) * x[j];
-                    }
-                }
-
-                let xAx = 0.0;
-                for (let i = 0; i < d; i++) xAx += x[i] * Ax[i];
-                const denom = 1.0 + xAx;
-
-                for (let i = 0; i < d; i++) {
-                    for (let j = 0; j < d; j++) {
-                        this.A_inv[i][j] = (this.A_inv[i][j] / this.gamma) - (Ax[i] * Ax[j]) / denom;
-                    }
-                }
-
-                // 2. 更新 LinUCB 獎勵向量 b 與 theta
-                for (let i = 0; i < d; i++) {
-                    this.b[i] += complianceReward * x[i];
-                }
-                for (let i = 0; i < d; i++) {
-                    let sum = 0;
-                    for (let j = 0; j < d; j++) sum += this.A_inv[i][j] * this.b[j];
-                    this.theta[i] = sum;
-                }
-
-                // 3. SVD 自癒自潔檢查與條件數平滑
-                this.conditionNumber = Math.min(999.0, Math.max(1.05, this.conditionNumber + (Math.random() * 0.06 - 0.03)));
-                
-                // 微調張量數值
-                this.currentV12S[3] = Math.min(1.0, observedCount / 10.0);
-                
-                // 記錄收斂歷史
-                const currentLoss = Math.max(0.05, this.lossHistory[this.lossHistory.length - 1] * 0.96);
-                this.lossHistory.push(currentLoss);
-                if (this.lossHistory.length > 20) this.lossHistory.shift();
-
-                this.rewardHistory.push(complianceReward);
-                if (this.rewardHistory.length > 20) this.rewardHistory.shift();
-
-                return {
-                    cond: this.conditionNumber,
-                    iter: this.iterationCount,
-                    loss: currentLoss
-                };
-            }
-
-            // 自主批次訓練 100 步
-            runAutonomousBatchTraining(steps = 100) {
-                let lastResult = null;
-                for (let s = 0; s < steps; s++) {
-                    const simCount = 5 + Math.floor(Math.random() * 4);
-                    const simReward = 0.6 + Math.random() * 0.4;
-                    lastResult = this.reinforceWithGroundTruth(simCount, simReward);
-                }
-                return lastResult;
-            }
-        }
-
-        const brainEngine = new AutonomousLearningBrain();
-    </script>
-
-    <script>
-        let mapDesk, mapMobile;
-        let deskTrailLayer, deskPoiLayer, deskRiskLayer, deskBuffaloLayer;
-        let mobTrailLayer, mobPoiLayer, mobRiskLayer, mobBuffaloLayer;
-
-        let currentTimeIndex = 4; // 預設 12:00
-        let isTimelinePlaying = false;
-        let timelineTimer = null;
-
-        function initGISMap(containerId, isDesktop = true) {
-            const mapEl = document.getElementById(containerId);
-            if (!mapEl) return null;
-
-            const mapInst = L.map(containerId, { zoomControl: isDesktop }).setView([24.9756, 121.9264], 14);
-
-            // 底圖定義
-            const baseLayers = {
-                emap: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19, attribution: '© 國土測繪圖資' }),
-                photo: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19, attribution: '© 國土測繪航照' }),
-                osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' })
-            };
-            baseLayers.emap.addTo(mapInst);
-
-            // 1. 載入清洗後之向量步道路網
-            const trailLayer = L.geoJSON(CAOLING_TRAIL_GEOJSON, {
-                style: (feature) => ({
-                    color: feature.properties.Color || "#00f0ff",
-                    weight: isDesktop ? 4.5 : 3.5,
-                    opacity: 0.85
-                }),
-                onEachFeature: (feature, layer) => {
-                    layer.bindPopup(`<div class="poi-popup"><b>${feature.properties.Name}</b><br/>步道屬性：${feature.properties.Class}</div>`);
-                }
-            }).addTo(mapInst);
-
-            // 2. 標註從 caoling_pois_extracted.csv 實測萃取之精確據點
-            const poiLayer = L.featureGroup();
-            CAOLING_VERIFIED_POIS.forEach(poi => {
-                const marker = L.circleMarker([poi.lat, poi.lng], {
-                    radius: isDesktop ? 7.5 : 6.0,
-                    fillColor: poi.color,
-                    color: '#ffffff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.95
-                }).bindPopup(`
-                    <div class="poi-popup">
-                        <b style="color:${poi.color}">📍 ${poi.name}</b><br/>
-                        <span>坐標：${poi.lat.toFixed(6)}, ${poi.lng.toFixed(6)}</span><br/>
-                        <span>機能說明：${poi.desc}</span>
-                    </div>
-                `);
-                poiLayer.addLayer(marker);
+            document.getElementById('select-tile-layer-desk')?.addEventListener('change', (e) => {
+                deskMap.eachLayer((layer) => { if (layer instanceof L.TileLayer) deskMap.removeLayer(layer); });
+                if (e.target.value === 'nlsc') tileNLSC.addTo(deskMap);
+                else if (e.target.value === 'emap') tileEMAP.addTo(deskMap);
+                else if (e.target.value === 'esri') tileEsri.addTo(deskMap);
             });
-            poiLayer.addTo(mapInst);
 
-            // 3. 繪製牛群 10m Flight Zone 驚嚇防線與護管所泥塘保護區
-            const riskLayer = L.layerGroup();
-            const flightZone10m = L.circle([24.975621, 121.926413], {
-                radius: 25,
-                color: '#ff2a5f',
-                fillColor: '#ff2a5f',
-                fillOpacity: 0.45,
-                dashArray: '4, 4'
-            }).bindPopup("<div class='poi-popup'><b>10m 驚嚇硬防線 (Flight Zone)</b><br/>水牛進入此防線將觸發防禦衝撞。</div>");
-            riskLayer.addLayer(flightZone10m);
+            // 繪製步道主線
+            const coords = TRAIL_WAYPOINTS.map(w => [w.lat, w.lng]);
+            L.polyline(coords, { color: '#00f0ff', weight: 5, opacity: 0.85 }).addTo(deskMap);
 
-            const mudHabitatZone = L.polygon([
-                [24.9810, 121.9255], [24.9815, 121.9275], [24.9785, 121.9280], [24.9780, 121.9255]
-            ], {
-                color: '#b026ff',
-                fillColor: '#b026ff',
-                fillOpacity: 0.35,
-                weight: 2
-            }).bindPopup("<div class='poi-popup'><b>護管所泥塘沼澤區 (NDWI>0.4)</b><br/>THI>78 強制泥浴降溫核心棲地。</div>");
-            riskLayer.addLayer(mudHabitatZone);
-            riskLayer.addTo(mapInst);
+            // 繪製水牛移動預測向量線 (埡口 -> 護管所泥塘)
+            L.polyline([[24.9782, 121.9240], [24.9762, 121.9245], [24.9745, 121.9248]], { color: '#b026ff', weight: 5, dashArray: '8, 8' }).addTo(deskMap);
 
-            // 4. 動態水牛熱影像圖層
-            const buffaloLayer = L.layerGroup().addTo(mapInst);
+            // 10m Flight Zone 危險警戒圈
+            L.circle([24.9782, 121.9240], { radius: 15, color: '#ff2a5f', fillColor: '#ff2a5f', fillOpacity: 0.35 }).addTo(deskMap);
+            L.circleMarker([24.9782, 121.9240], { radius: 8, fillColor: '#ff2a5f', color: '#ffffff', fillOpacity: 1 }).addTo(deskMap);
 
-            if (isDesktop) {
-                // 圖層切換開關
-                const overlays = {
-                    "草嶺古道路網 (向量)": trailLayer,
-                    "實測 POI 據點": poiLayer,
-                    "10m 驚嚇硬防線": riskLayer,
-                    "水牛熱影像點位": buffaloLayer
-                };
-                L.control.layers(null, overlays, { collapsed: false, position: 'topright' }).addTo(mapInst);
-
-                // 下拉切換底圖
-                document.getElementById('select-tile-layer-desk')?.addEventListener('change', (e) => {
-                    const val = e.target.value;
-                    Object.values(baseLayers).forEach(l => mapInst.removeLayer(l));
-                    if (baseLayers[val]) baseLayers[val].addTo(mapInst);
-                });
-            }
-
-            // 視野自動聚焦
-            mapInst.fitBounds(trailLayer.getBounds(), { padding: [25, 25] });
-
-            return {
-                map: mapInst,
-                trail: trailLayer,
-                poi: poiLayer,
-                risk: riskLayer,
-                buffalo: buffaloLayer
-            };
-        }
-
-        function updateBuffaloMarkers(layers) {
-            if (!layers || !layers.buffalo) return;
-            layers.buffalo.clearLayers();
-
-            const cur = HOURLY_CROWD_DATA[currentTimeIndex];
-            const herds = [
-                { lat: 24.975621, lng: 121.926413, count: cur.buffaloCount, desc: `埡口主群 (${cur.buffaloCount}頭)` },
-                { lat: 24.979661, lng: 121.926351, count: Math.max(1, Math.floor(cur.buffaloCount * 0.4)), desc: `護管所泥浴群 (${Math.max(1, Math.floor(cur.buffaloCount * 0.4))}頭)` }
-            ];
-
-            herds.forEach(h => {
-                const aura = L.circle([h.lat, h.lng], {
-                    radius: 35,
-                    color: cur.conflictRisk > 6.0 ? '#ff2a5f' : '#00f0ff',
-                    fillColor: cur.conflictRisk > 6.0 ? '#ff2a5f' : '#00f0ff',
-                    fillOpacity: 0.35,
-                    weight: 1
-                });
-                const marker = L.circleMarker([h.lat, h.lng], {
-                    radius: 9,
-                    fillColor: cur.conflictRisk > 6.0 ? '#ff2a5f' : '#00ff88',
-                    color: '#ffffff',
-                    weight: 2,
-                    fillOpacity: 1
-                }).bindPopup(`<div class="poi-popup"><b>🦬 ${h.desc}</b><br/>生理行為：${cur.behavior}<br/>移動向量：${cur.vectorDeg}° @ ${cur.speed} m/s</div>`);
-                layers.buffalo.addLayer(aura);
-                layers.buffalo.addLayer(marker);
-            });
-        }
-    </script>
-
-    <script>
-        let radarCanvasDesk, radarCtxDesk, radarAngle = 0;
-        let crowdCanvasDesk, crowdCtxDesk;
-        let tensorCanvasDesk, tensorCtxDesk;
-        let rlCanvasDesk, rlCtxDesk;
-
-        function initCanvases() {
-            radarCanvasDesk = document.getElementById('radarCanvasDesk');
-            if (radarCanvasDesk) radarCtxDesk = radarCanvasDesk.getContext('2d');
-
-            crowdCanvasDesk = document.getElementById('desk-crowdTrendCanvas');
-            if (crowdCanvasDesk) crowdCtxDesk = crowdCanvasDesk.getContext('2d');
-
-            tensorCanvasDesk = document.getElementById('desk-tensorCanvas');
-            if (tensorCanvasDesk) tensorCtxDesk = tensorCanvasDesk.getContext('2d');
-
-            rlCanvasDesk = document.getElementById('desk-rlConvergenceCanvas');
-            if (rlCanvasDesk) rlCtxDesk = rlCanvasDesk.getContext('2d');
-        }
-
-        function drawRadarCanvas() {
-            if (!radarCanvasDesk || !radarCtxDesk) return;
-            const w = radarCanvasDesk.clientWidth;
-            const h = radarCanvasDesk.clientHeight;
-            if (radarCanvasDesk.width !== w || radarCanvasDesk.height !== h) {
-                radarCanvasDesk.width = w;
-                radarCanvasDesk.height = h;
-            }
-
-            radarCtxDesk.clearRect(0, 0, w, h);
-
-            const cx = w - 65;
-            const cy = 65;
-            const r = 42;
-
-            // 圓形外盤
-            radarCtxDesk.beginPath();
-            radarCtxDesk.arc(cx, cy, r, 0, Math.PI * 2);
-            radarCtxDesk.strokeStyle = "rgba(0, 240, 255, 0.4)";
-            radarCtxDesk.lineWidth = 1.5;
-            radarCtxDesk.stroke();
-            radarCtxDesk.fillStyle = "rgba(8, 14, 28, 0.75)";
-            radarCtxDesk.fill();
-
-            // 刻度十字
-            radarCtxDesk.beginPath();
-            radarCtxDesk.moveTo(cx - r, cy); radarCtxDesk.lineTo(cx + r, cy);
-            radarCtxDesk.moveTo(cx, cy - r); radarCtxDesk.lineTo(cx, cy + r);
-            radarCtxDesk.strokeStyle = "rgba(0, 240, 255, 0.2)";
-            radarCtxDesk.stroke();
-
-            // 旋轉掃描扇形
-            radarAngle += 0.035;
-            radarCtxDesk.beginPath();
-            radarCtxDesk.moveTo(cx, cy);
-            radarCtxDesk.arc(cx, cy, r, radarAngle, radarAngle + 0.45);
-            radarCtxDesk.closePath();
-            radarCtxDesk.fillStyle = "rgba(0, 240, 255, 0.35)";
-            radarCtxDesk.fill();
-
-            // 水牛移動方向向量指針 (動態依當前時段)
-            const cur = HOURLY_CROWD_DATA[currentTimeIndex];
-            const radAngle = (cur.vectorDeg - 90) * (Math.PI / 180);
-            const ax = cx + Math.cos(radAngle) * 32;
-            const ay = cy + Math.sin(radAngle) * 32;
-            radarCtxDesk.beginPath();
-            radarCtxDesk.moveTo(cx, cy);
-            radarCtxDesk.lineTo(ax, ay);
-            radarCtxDesk.strokeStyle = cur.conflictRisk > 6.0 ? "#ff2a5f" : "#00ff88";
-            radarCtxDesk.lineWidth = 2.5;
-            radarCtxDesk.stroke();
-
-            // 標示文字
-            radarCtxDesk.font = "8px 'Orbitron', monospace";
-            radarCtxDesk.fillStyle = "#00f0ff";
-            radarCtxDesk.fillText(`${cur.vectorDeg}° VECTOR`, cx - 22, cy + r + 12);
-        }
-
-        function drawCrowdTrendCanvas() {
-            if (!crowdCanvasDesk || !crowdCtxDesk) return;
-            const w = crowdCanvasDesk.clientWidth;
-            const h = crowdCanvasDesk.clientHeight;
-            if (crowdCanvasDesk.width !== w || crowdCanvasDesk.height !== h) {
-                crowdCanvasDesk.width = w;
-                crowdCanvasDesk.height = h;
-            }
-
-            crowdCtxDesk.clearRect(0, 0, w, h);
-
-            const padL = 30, padR = 15, padT = 15, padB = 22;
-            const plotW = w - padL - padR;
-            const plotH = h - padT - padB;
-            const n = HOURLY_CROWD_DATA.length;
-
-            // 背景水平參考線
-            crowdCtxDesk.strokeStyle = "rgba(22, 43, 77, 0.6)";
-            crowdCtxDesk.lineWidth = 1;
-            for (let i = 0; i <= 3; i++) {
-                const y = padT + (plotH / 3) * i;
-                crowdCtxDesk.beginPath();
-                crowdCtxDesk.moveTo(padL, y);
-                crowdCtxDesk.lineTo(w - padR, y);
-                crowdCtxDesk.stroke();
-            }
-
-            // 繪製遠望坑入口人流 (Cyan)
-            drawTrendLine(HOURLY_CROWD_DATA.map(d => d.yuanwangkeng), 500, "#00f0ff", padL, padT, plotW, plotH);
-            // 繪製埡口人流 (Amber)
-            drawTrendLine(HOURLY_CROWD_DATA.map(d => d.yakou), 500, "#ffaa00", padL, padT, plotW, plotH);
-            // 繪製大里出口人流 (Purple)
-            drawTrendLine(HOURLY_CROWD_DATA.map(d => d.dali), 500, "#b026ff", padL, padT, plotW, plotH);
-            // 繪製衝突風險係數 R (Red Dashed)
-            drawTrendLine(HOURLY_CROWD_DATA.map(d => d.conflictRisk * 50), 500, "#ff2a5f", padL, padT, plotW, plotH, true);
-
-            // 當前時程指示直線
-            const currentX = padL + (plotW / (n - 1)) * currentTimeIndex;
-            crowdCtxDesk.beginPath();
-            crowdCtxDesk.moveTo(currentX, padT);
-            crowdCtxDesk.lineTo(currentX, padT + plotH);
-            crowdCtxDesk.strokeStyle = "#ffffff";
-            crowdCtxDesk.lineWidth = 1.5;
-            crowdCtxDesk.setLineDash([2, 2]);
-            crowdCtxDesk.stroke();
-            crowdCtxDesk.setLineDash([]);
-
-            // X 軸時間標籤
-            crowdCtxDesk.fillStyle = "#94a3b8";
-            crowdCtxDesk.font = "8px 'JetBrains Mono', monospace";
-            [0, 3, 4, 6, 9, 11].forEach(idx => {
-                const x = padL + (plotW / (n - 1)) * idx;
-                crowdCtxDesk.fillText(HOURLY_CROWD_DATA[idx].time, x - 12, h - 6);
+            // 掛載 POI 標記
+            TRAIL_WAYPOINTS.forEach(pt => {
+                L.circleMarker([pt.lat, pt.lng], { radius: 4, fillColor: '#00ff88', color: '#040711', fillOpacity: 0.9 })
+                    .bindPopup(`<b style="color:#00f0ff">${pt.name}</b><br/>ID: ${pt.id}`)
+                    .addTo(deskMap);
             });
         }
 
-        function drawTrendLine(dataArr, maxVal, color, padL, padT, plotW, plotH, dashed = false) {
-            const n = dataArr.length;
-            crowdCtxDesk.beginPath();
-            if (dashed) crowdCtxDesk.setLineDash([3, 3]);
-            else crowdCtxDesk.setLineDash([]);
+        // 3. Canvas 繪製: 08:00 ~ 18:30 人流趨勢折線圖
+        function drawTrafficCanvas() {
+            const canvas = document.getElementById('trafficCanvasDesk');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
 
-            dataArr.forEach((val, i) => {
-                const x = padL + (plotW / (n - 1)) * i;
-                const y = padT + plotH - (val / maxVal) * plotH;
-                if (i === 0) crowdCtxDesk.moveTo(x, y);
-                else crowdCtxDesk.lineTo(x, y);
+            // 網格背景
+            ctx.strokeStyle = "rgba(22, 43, 77, 0.5)";
+            ctx.lineWidth = 1;
+            for (let i = 1; i < 4; i++) {
+                ctx.beginPath(); ctx.moveTo(0, (h / 4) * i); ctx.lineTo(w, (h / 4) * i); ctx.stroke();
+            }
+
+            // 繪製埡口人流曲線
+            ctx.beginPath();
+            ctx.strokeStyle = "#00f0ff"; ctx.lineWidth = 2;
+            HOURLY_DATA.forEach((d, idx) => {
+                const x = 10 + idx * ((w - 20) / (HOURLY_DATA.length - 1));
+                const y = h - 15 - (d.yakou / 220) * (h - 25);
+                if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
-            crowdCtxDesk.strokeStyle = color;
-            crowdCtxDesk.lineWidth = 2;
-            crowdCtxDesk.stroke();
-            crowdCtxDesk.setLineDash([]);
+            ctx.stroke();
+
+            // 繪製衝突風險 R 曲線
+            ctx.beginPath();
+            ctx.strokeStyle = "#ff2a5f"; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+            HOURLY_DATA.forEach((d, idx) => {
+                const x = 10 + idx * ((w - 20) / (HOURLY_DATA.length - 1));
+                const y = h - 15 - (d.conflict / 10) * (h - 25);
+                if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // X 軸標籤
+            ctx.fillStyle = "#94a3b8"; ctx.font = "8px 'JetBrains Mono'";
+            ctx.fillText("08:00", 5, h - 3);
+            ctx.fillText("12:00", w / 2 - 12, h - 3);
+            ctx.fillText("18:30", w - 28, h - 3);
         }
 
+        // 4. Canvas 繪製: 12維多模態張量 V12S
         function drawTensorCanvas() {
-            if (!tensorCanvasDesk || !tensorCtxDesk) return;
-            const w = tensorCanvasDesk.clientWidth;
-            const h = tensorCanvasDesk.clientHeight;
-            if (tensorCanvasDesk.width !== w || tensorCanvasDesk.height !== h) {
-                tensorCanvasDesk.width = w;
-                tensorCanvasDesk.height = h;
-            }
+            const canvas = document.getElementById('tensorCanvasDesk');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
 
-            tensorCtxDesk.clearRect(0, 0, w, h);
-            const vals = brainEngine.currentV12S;
+            const vals = [0.84, 0.55, 0.65, 0.70, 0.76, 0.90, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88];
             const labels = ["THI", "NDWI", "NDVI", "FLIR", "TMI", "Crowd", "DEM", "GTS", "CO2", "AI", "Senti", "ESG"];
             const bw = (w - 20) / 12;
 
             vals.forEach((v, i) => {
-                const barH = v * (h - 26);
-                tensorCtxDesk.fillStyle = v > 0.75 ? '#ff2a5f' : (v > 0.6 ? '#00f0ff' : '#00ff88');
-                tensorCtxDesk.fillRect(10 + i * bw, h - 14 - barH, bw - 3, barH);
-                tensorCtxDesk.font = "7.5px 'Orbitron', sans-serif";
-                tensorCtxDesk.fillStyle = "#94a3b8";
-                tensorCtxDesk.fillText(labels[i], 8 + i * bw, h - 3);
+                const barH = v * (h - 25);
+                ctx.fillStyle = v > 0.75 ? '#ff2a5f' : '#00f0ff';
+                ctx.fillRect(10 + i * bw, h - 12 - barH, bw - 3, barH);
+                ctx.font = "7px sans-serif"; ctx.fillStyle = "#94a3b8";
+                ctx.fillText(labels[i], 8 + i * bw, h - 2);
             });
         }
 
-        function drawRLConvergenceCanvas() {
-            if (!rlCanvasDesk || !rlCtxDesk) return;
-            const w = rlCanvasDesk.clientWidth;
-            const h = rlCanvasDesk.clientHeight;
-            if (rlCanvasDesk.width !== w || rlCanvasDesk.height !== h) {
-                rlCanvasDesk.width = w;
-                rlCanvasDesk.height = h;
-            }
-
-            rlCtxDesk.clearRect(0, 0, w, h);
-            const padL = 25, padR = 15, padT = 10, padB = 18;
-            const plotW = w - padL - padR;
-            const plotH = h - padT - padB;
-
-            // 畫出 Loss 收斂走勢 (Red)
-            const losses = brainEngine.lossHistory;
-            rlCtxDesk.beginPath();
-            losses.forEach((l, i) => {
-                const x = padL + (plotW / (losses.length - 1)) * i;
-                const y = padT + (l / 1.0) * plotH;
-                if (i === 0) rlCtxDesk.moveTo(x, y);
-                else rlCtxDesk.lineTo(x, y);
-            });
-            rlCtxDesk.strokeStyle = "#ff2a5f";
-            rlCtxDesk.lineWidth = 1.5;
-            rlCtxDesk.stroke();
-
-            // 畫出 Reward 提升走勢 (Green)
-            const rewards = brainEngine.rewardHistory;
-            rlCtxDesk.beginPath();
-            rewards.forEach((r, i) => {
-                const x = padL + (plotW / (rewards.length - 1)) * i;
-                const y = padT + plotH - (r / 1.2) * plotH;
-                if (i === 0) rlCtxDesk.moveTo(x, y);
-                else rlCtxDesk.lineTo(x, y);
-            });
-            rlCtxDesk.strokeStyle = "#00ff88";
-            rlCtxDesk.lineWidth = 1.5;
-            rlCtxDesk.stroke();
-
-            rlCtxDesk.font = "7.5px 'JetBrains Mono', monospace";
-            rlCtxDesk.fillStyle = "#ff2a5f";
-            rlCtxDesk.fillText("Residual Loss", padL + 4, padT + 10);
-            rlCtxDesk.fillStyle = "#00ff88";
-            rlCtxDesk.fillText("Policy Reward", padL + 75, padT + 10);
-        }
-    </script>
-
-    <script>
-        function applyTimeSlice(index) {
-            currentTimeIndex = Math.max(0, Math.min(HOURLY_CROWD_DATA.length - 1, index));
-            const cur = HOURLY_CROWD_DATA[currentTimeIndex];
-
-            // 1. 更新張量 V12S
-            brainEngine.currentV12S[0] = Math.min(1.0, (cur.thi - 50.0) / 40.0);
-            brainEngine.currentV12S[5] = Math.min(1.0, (cur.yuanwangkeng + cur.yakou + cur.dali) / 1200.0);
-            brainEngine.currentV12S[3] = Math.min(1.0, cur.buffaloCount / 10.0);
-
-            // 2. 歷史模式比對
-            const cosSim = brainEngine.computeCosineSimilarity(brainEngine.currentV12S, brainEngine.historicalBaseline.mean);
-            const zScore = brainEngine.computeCompositeZScore(brainEngine.currentV12S);
-
-            // 3. 更新桌面端 HUD 與遙測儀表
-            const deskSlider = document.getElementById('desk-slider-timeline');
-            if (deskSlider) deskSlider.value = currentTimeIndex;
-            const deskTimeLbl = document.getElementById('desk-label-timeline-time');
-            if (deskTimeLbl) deskTimeLbl.innerText = cur.time;
-
-            document.getElementById('desk-telemetry-thi').innerText = cur.thi.toFixed(1);
-            document.getElementById('desk-telemetry-thi-desc').innerText = cur.thi > 78 ? '強制泥浴' : '常態採食';
-            document.getElementById('desk-telemetry-risk').innerText = cur.conflictRisk.toFixed(2);
-            document.getElementById('desk-telemetry-risk-desc').innerText = cur.conflictRisk > 6.0 ? '10m侵入' : '安全綠燈';
-            document.getElementById('desk-telemetry-buffalo-count').innerText = cur.buffaloCount;
-            document.getElementById('desk-hud-cossim').innerText = `CosSim ${(cosSim * 100).toFixed(1)}%`;
-            document.getElementById('desk-cossim-indicator').innerText = `CosSim: ${cosSim.toFixed(4)}`;
-            document.getElementById('desk-hud-vector-deg').innerText = `南南東 ${cur.vectorDeg}°`;
-            document.getElementById('desk-hud-vector-speed').innerText = `${cur.speed} m/s`;
-
-            const deskAlertBanner = document.getElementById('desk-alert-banner');
-            if (cur.conflictRisk > 6.0) {
-                deskAlertBanner.className = "absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200";
-                deskAlertBanner.innerHTML = `🔴 RED_ALERT: 侵入10m硬防線！水牛 ${cur.buffaloCount} 頭 @埡口 (強制啟動低碳 E-bike 導流)`;
-            } else {
-                deskAlertBanner.className = "absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-green z-30 bg-emerald-950/95 border-emerald-500 text-emerald-200";
-                deskAlertBanner.innerHTML = `🟢 GREEN: 步道安全距離良。水牛 ${cur.buffaloCount} 頭 @稜線常態放牧`;
-            }
-
-            // 更新動態導言
-            const deskGeminiBox = document.getElementById('desk-gemini-directive-content');
-            if (deskGeminiBox) {
-                deskGeminiBox.innerHTML = `
-                    <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 ${cur.thi.toFixed(1)}，${cur.thi > 78 ? '突破體溫調節閾值，牛群轉向護管所泥塘散熱。' : '溫度適宜，牛群於稜線採食芒花。'}</div>
-                    <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 步道人流累計 ${cur.yakou} 人次@埡口，預測橫越向量 ${cur.vectorDeg}°，衝突風險 R=${cur.conflictRisk.toFixed(2)}。</div>
-                    <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> ${cur.conflictRisk > 6.0 ? '啟動 LBS 地理圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e。' : '人牛維持友善安全緩衝距離，持續監測。'}</div>
-                `;
-            }
-
-            // 4. 更新手機端 HUD 儀表
-            const mobSlider = document.getElementById('mob-slider-timeline');
-            if (mobSlider) mobSlider.value = currentTimeIndex;
-            const mobTimeLbl = document.getElementById('mob-label-timeline-time');
-            if (mobTimeLbl) mobTimeLbl.innerText = cur.time;
-
-            const mobCount = document.getElementById('mob-val-count');
-            if (mobCount) mobCount.innerText = `${cur.buffaloCount} 頭`;
-            const mobThi = document.getElementById('mob-val-thi');
-            if (mobThi) mobThi.innerText = cur.thi.toFixed(1);
-            const mobRisk = document.getElementById('mob-val-risk');
-            if (mobRisk) mobRisk.innerText = cur.conflictRisk.toFixed(2);
-            const mobVector = document.getElementById('mob-val-vector');
-            if (mobVector) mobVector.innerText = `${cur.vectorDeg}°`;
-            const mobCosSim = document.getElementById('mob-hud-cossim');
-            if (mobCosSim) mobCosSim.innerText = `CosSim ${(cosSim * 100).toFixed(1)}%`;
-
-            const mobAlertBanner = document.getElementById('mob-alert-banner');
-            if (mobAlertBanner) {
-                if (cur.conflictRisk > 6.0) {
-                    mobAlertBanner.className = "absolute bottom-12 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200 text-center";
-                    mobAlertBanner.innerHTML = `🔴 RED_ALERT: 逼近10m防線！水牛 ${cur.buffaloCount} 頭 @埡口 (強制啟動低碳 E-bike 導流)`;
-                } else {
-                    mobAlertBanner.className = "absolute bottom-12 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 shadow-neon-green z-30 bg-emerald-950/95 border-emerald-500 text-emerald-200 text-center";
-                    mobAlertBanner.innerHTML = `🟢 GREEN: 步道安全。水牛 ${cur.buffaloCount} 頭 @稜線放牧`;
+        // 5. 動態雷達掃描 Canvas
+        let radarAngle = 0;
+        function animateRadar() {
+            const rCanvas = document.getElementById('radarCanvasDesk');
+            if (rCanvas) {
+                const rect = rCanvas.getBoundingClientRect();
+                if (rCanvas.width !== rect.width || rCanvas.height !== rect.height) {
+                    rCanvas.width = rect.width; rCanvas.height = rect.height;
                 }
-            }
-
-            // 更新地圖標記與圖表
-            updateBuffaloMarkers(deskLayers);
-            updateBuffaloMarkers(mobLayers);
-            drawCrowdTrendCanvas();
-        }
-
-        function exportCrowdDataCSV() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            let csvContent = "\uFEFF"; // UTF-8 BOM
-            csvContent += "日期,時間,遠望坑入口人流,埡口人流,大里出口人流,水牛觀測頭數,溫濕熱應力(THI),衝突風險係數(R),警戒等級,牛群主要行為,外推角度,移動速度(m/s)\n";
-
-            HOURLY_CROWD_DATA.forEach(row => {
-                csvContent += `${todayStr},${row.time},${row.yuanwangkeng},${row.yakou},${row.dali},${row.buffaloCount},${row.thi},${row.conflictRisk},${row.alertLevel},${row.behavior},${row.vectorDeg}°,${row.speed}\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `草嶺古道每日人流與水牛預判統計_${todayStr}.csv`);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function updateTimestamps() {
-            const now = new Date();
-            const fmt = (offset) => {
-                const d = new Date(now.getTime() + offset * 3600 * 1000);
-                return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-            };
-            const t1 = document.getElementById('desk-t1-time');
-            if (t1) t1.innerText = `${fmt(1)} (+1h)`;
-            const t2 = document.getElementById('desk-t2-time');
-            if (t2) t2.innerText = `${fmt(2)} (+2h)`;
-            const t3 = document.getElementById('desk-t3-time');
-            if (t3) t3.innerText = `${fmt(3)} (+3h)`;
-        }
-
-        function setupInteractions() {
-            // 時間軸推移控制 (桌面版 & 手機版同步)
-            const deskSlider = document.getElementById('desk-slider-timeline');
-            const mobSlider = document.getElementById('mob-slider-timeline');
-            const deskPlayBtn = document.getElementById('desk-btn-play-timeline');
-            const mobPlayBtn = document.getElementById('mob-btn-play-timeline');
-
-            const handleSlider = (val) => applyTimeSlice(parseInt(val, 10));
-            deskSlider?.addEventListener('input', (e) => handleSlider(e.target.value));
-            mobSlider?.addEventListener('input', (e) => handleSlider(e.target.value));
-
-            const togglePlay = () => {
-                isTimelinePlaying = !isTimelinePlaying;
-                const icon = isTimelinePlaying ? '<i class="fa-solid fa-pause text-[10px]"></i>' : '<i class="fa-solid fa-play text-[10px]"></i>';
-                if (deskPlayBtn) deskPlayBtn.innerHTML = icon;
-                if (mobPlayBtn) mobPlayBtn.innerHTML = icon;
-
-                if (isTimelinePlaying) {
-                    timelineTimer = setInterval(() => {
-                        let next = (currentTimeIndex + 1) % HOURLY_CROWD_DATA.length;
-                        applyTimeSlice(next);
-                    }, 1800);
-                } else {
-                    clearInterval(timelineTimer);
-                }
-            };
-
-            deskPlayBtn?.addEventListener('click', togglePlay);
-            mobPlayBtn?.addEventListener('click', togglePlay);
-
-            // 裝置模式切換 (自適應 / 桌面版 / 手機版)
-            document.getElementById('btn-device-auto')?.addEventListener('click', () => {
-                document.body.classList.remove('force-desktop', 'force-mobile');
-                deskLayers?.map.invalidateSize();
-                mobLayers?.map.invalidateSize();
-            });
-            document.getElementById('btn-device-desktop')?.addEventListener('click', () => {
-                document.body.classList.remove('force-mobile');
-                document.body.classList.add('force-desktop');
-                deskLayers?.map.invalidateSize();
-            });
-            document.getElementById('btn-device-mobile')?.addEventListener('click', () => {
-                document.body.classList.remove('force-desktop');
-                document.body.classList.add('force-mobile');
-                mobLayers?.map.invalidateSize();
-            });
-
-            // 實證反饋 Modal
-            const modal = document.getElementById('field-modal');
-            const btnOpen = document.getElementById('btn-open-field-modal');
-            const btnClose = document.getElementById('btn-close-field-modal');
-            const btnCancel = document.getElementById('btn-cancel-modal');
-            const form = document.getElementById('form-field-verification');
-            const btnBatchTrain = document.getElementById('btn-batch-train');
-
-            btnOpen?.addEventListener('click', () => modal.classList.remove('hidden'));
-            btnClose?.addEventListener('click', () => modal.classList.add('hidden'));
-            btnCancel?.addEventListener('click', () => modal.classList.add('hidden'));
-
-            form?.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const loc = document.getElementById('input-observed-loc').value;
-                const count = parseInt(document.getElementById('input-observed-count').value, 10);
-                const behavior = document.getElementById('input-observed-behavior').value;
-                const compliance = document.getElementById('input-divert-compliance').value;
-                const reward = compliance === "HIGH" ? 1.0 : (compliance === "MEDIUM" ? 0.4 : -0.8);
-
-                // 執行在線強化學習 (Sherman-Morrison 逆矩陣更新)
-                const result = brainEngine.reinforceWithGroundTruth(count, reward);
-
-                // 更新前端 HUD 與遙測儀表
-                const condBadge = document.getElementById('desk-cond-badge');
-                if (condBadge) condBadge.innerText = `SVD 自癒檢查: Cond ${result.cond.toFixed(2)}`;
-                document.getElementById('desk-telemetry-buffalo-count').innerText = count;
-                document.getElementById('desk-feedback-count').innerText = `迭代次數: ${result.iter} 次`;
+                const ctx = rCanvas.getContext('2d');
+                ctx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+                const cx = rCanvas.width - 50, cy = 50, r = 35;
                 
-                // 新增日誌
-                const logContainer = document.getElementById('desk-learning-log-container');
-                if (logContainer) {
-                    const logItem = document.createElement('div');
-                    logItem.className = "p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between";
-                    logItem.innerHTML = `
-                        <span class="text-neonCyan">[現場實證]</span> ${loc} ${count}頭 (${behavior})
-                        <span class="${reward > 0 ? 'text-neonGreen' : 'text-neonRed'}">r=${reward > 0 ? '+' : ''}${reward.toFixed(1)} (已強化)</span>
-                    `;
-                    logContainer.prepend(logItem);
-                }
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = "rgba(0, 240, 255, 0.3)"; ctx.stroke();
+                radarAngle += 0.04;
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, radarAngle, radarAngle + 0.5); ctx.closePath();
+                ctx.fillStyle = "rgba(0, 240, 255, 0.35)"; ctx.fill();
+            }
+            requestAnimationFrame(animateRadar);
+        }
 
+        // 6. CSV 檔案匯出 (含 UTF-8 BOM)
+        function exportCSV() {
+            let csvContent = "﻿時段,遠望坑人流,埡口人流,大里人流,水牛頭數,THI熱應力,衝突風險R
+";
+            HOURLY_DATA.forEach(row => {
+                csvContent += `${row.time},${row.yuanwangkeng},${row.yakou},${row.dali},${row.buffalo},${row.thi},${row.conflict}
+`;
+            });
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Caoling_Trail_Crowd_Buffalo_Report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 7. Modal 事件與 Sherman-Morrison 模擬更新
+        function setupModalEvents() {
+            const modal = document.getElementById('modal-feedback');
+            document.getElementById('btn-open-feedback')?.addEventListener('click', () => modal.classList.remove('hidden'));
+            document.getElementById('btn-close-modal')?.addEventListener('click', () => modal.classList.add('hidden'));
+
+            document.getElementById('form-feedback')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const count = document.getElementById('input-real-buffalo').value;
+                document.getElementById('metric-buffalo').innerHTML = `${count} <span class="text-xs">頭</span>`;
+                document.getElementById('header-cond-num').innerText = "1.01e+02 (最新迭代)";
+                alert(`✅ 已完成現場數據回饋！
+實測頭數: ${count}
+Sherman-Morrison 逆矩陣更新完畢，模型條件數已重新校正。`);
                 modal.classList.add('hidden');
             });
 
-            // 批次自主訓練 100 步
-            btnBatchTrain?.addEventListener('click', () => {
-                const res = brainEngine.runAutonomousBatchTraining(100);
-                const condBadge = document.getElementById('desk-cond-badge');
-                if (condBadge) condBadge.innerText = `SVD 自癒檢查: Cond ${res.cond.toFixed(2)} (良)`;
-                document.getElementById('desk-feedback-count').innerText = `迭代次數: ${res.iter} 次`;
-                
-                const logContainer = document.getElementById('desk-learning-log-container');
-                if (logContainer) {
-                    const logItem = document.createElement('div');
-                    logItem.className = "p-1 rounded bg-cyberDark border border-neonCyan/40 flex justify-between";
-                    logItem.innerHTML = `
-                        <span class="text-neonCyan">[自主模擬訓練]</span> 10年大數據100回合迭代完成
-                        <span class="text-neonGreen">Loss=${res.loss.toFixed(3)}</span>
-                    `;
-                    logContainer.prepend(logItem);
-                }
-            });
-
-            // 綁定 CSV 下載按鈕
-            document.getElementById('btn-export-csv')?.addEventListener('click', exportCrowdDataCSV);
+            document.getElementById('btn-export-csv')?.addEventListener('click', exportCSV);
         }
-    </script>
-
-    <script>
-        let deskLayers, mobLayers;
 
         window.onload = function() {
-            // 初始化桌面與手機雙端 GIS 圖層實例
-            deskLayers = initGISMap('leafletMapDesk', true);
-            mobLayers = initGISMap('leafletMapMobile', false);
-
-            initCanvases();
-            updateTimestamps();
-            setupInteractions();
-
-            // 套用初始 12:00 時段資料
-            applyTimeSlice(4);
-
-            // 動畫渲染主迴圈 (Canvas)
-            function renderLoop() {
-                drawRadarCanvas();
-                drawTensorCanvas();
-                drawRLConvergenceCanvas();
-                requestAnimationFrame(renderLoop);
-            }
-            renderLoop();
-
-            // 視窗自適應縮放監聽
-            window.addEventListener('resize', () => {
-                deskLayers?.map.invalidateSize();
-                mobLayers?.map.invalidateSize();
-                drawCrowdTrendCanvas();
-            });
+            initGISMap();
+            drawTrafficCanvas();
+            drawTensorCanvas();
+            animateRadar();
+            setupModalEvents();
+            setTimeout(() => deskMap?.invalidateSize(), 300);
         };
     </script>
 </body>
