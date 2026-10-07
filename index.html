@@ -11,12 +11,12 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Leaflet GIS Map Library -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -55,118 +55,39 @@
         :root {
             --sat: env(safe-area-inset-top, 0px);
             --sab: env(safe-area-inset-bottom, 0px);
-            --sal: env(safe-area-inset-left, 0px);
-            --sar: env(safe-area-inset-right, 0px);
         }
         body {
             padding-top: var(--sat);
             padding-bottom: var(--sab);
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            background-color: #040711;
         }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #040711; }
         ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(1200%); }
-        }
-        .scanline-effect {
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 8px;
-            background: linear-gradient(180deg, rgba(0, 240, 255, 0) 0%, rgba(0, 240, 255, 0.28) 50%, rgba(0, 240, 255, 0) 100%);
-            animation: scanline 6s linear infinite;
-            pointer-events: none;
-            z-index: 25;
-        }
-
-        @keyframes radar-pulse {
-            0% { transform: scale(0.6); opacity: 0.95; }
-            50% { transform: scale(2.2); opacity: 0.45; }
-            100% { transform: scale(3.6); opacity: 0; }
-        }
-        .flightzone-radar-pulse {
-            width: 56px;
-            height: 56px;
-            background: rgba(255, 42, 95, 0.35);
-            border: 2px solid #ff2a5f;
-            border-radius: 50%;
-            position: absolute;
-            top: -28px;
-            left: -28px;
-            pointer-events: none;
-            animation: radar-pulse 2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
-        }
-        .buffalo-core-beacon {
-            width: 18px;
-            height: 18px;
-            background: #ffffff;
-            border: 3.5px solid #ff2a5f;
-            box-shadow: 0 0 16px #ff2a5f, 0 0 32px #ff2a5f;
-            border-radius: 50%;
-            position: absolute;
-            top: -9px;
-            left: -9px;
-        }
-
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(168, 85, 247, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
-        }
-        .purple-dot {
-            display: inline-block; width: 8px; height: 8px; background-color: #a855f7;
-            border-radius: 50%; margin-right: 6px; animation: pulse-ring 1.5s infinite; vertical-align: middle;
-        }
-
-        .hud-corner-bracket {
-            position: relative;
-        }
+        .hud-corner-bracket { position: relative; }
         .hud-corner-bracket::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px;
-            width: 8px; height: 8px;
-            border-top: 2px solid #00f0ff;
-            border-left: 2px solid #00f0ff;
-            pointer-events: none;
-            z-index: 20;
+            content: ''; position: absolute; top: -1px; left: -1px;
+            width: 8px; height: 8px; border-top: 2px solid #00f0ff; border-left: 2px solid #00f0ff;
+            pointer-events: none; z-index: 30;
         }
         .hud-corner-bracket::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; right: -1px;
-            width: 8px; height: 8px;
-            border-bottom: 2px solid #00f0ff;
-            border-right: 2px solid #00f0ff;
-            pointer-events: none;
-            z-index: 20;
+            content: ''; position: absolute; bottom: -1px; right: -1px;
+            width: 8px; height: 8px; border-bottom: 2px solid #00f0ff; border-right: 2px solid #00f0ff;
+            pointer-events: none; z-index: 30;
         }
 
         .leaflet-container {
             background: #040711 !important;
             font-family: 'Rajdhani', sans-serif !important;
-            width: 100% !important;
-            height: 100% !important;
+            width: 100% !important; height: 100% !important;
         }
         .leaflet-bar a {
-            background-color: #080e1c !important;
-            color: #00f0ff !important;
-            border-color: #162b4d !important;
-        }
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(8, 14, 28, 0.96) !important;
-            color: #f1f5f9 !important;
-            border: 1px solid #162b4d !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85) !important;
-            border-radius: 10px !important;
-            backdrop-filter: blur(10px);
+            background-color: #080e1c !important; color: #00f0ff !important; border-color: #162b4d !important;
         }
 
-        /* Force Device Simulator Classes for Responsive Testing */
         body.force-mobile #desktop-root { display: none !important; }
         body.force-mobile #mobile-root { display: flex !important; }
         body.force-desktop #desktop-root { display: grid !important; }
@@ -174,15 +95,14 @@
 
         #leafletMapDesk, #leafletMapMobile {
             position: absolute !important;
-            inset: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            z-index: 10;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100% !important; height: 100% !important; z-index: 10;
         }
     </style>
 </head>
-<body class="text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden selection:bg-neonCyan selection:text-black">
+<body class="bg-cyberDark text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden selection:bg-neonCyan selection:text-black">
 
+    <!-- Top Adaptive Tactical Status Bar -->
     <header class="border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 py-2 flex items-center justify-between sticky top-0 z-50 shrink-0">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-neon-cyan text-white text-xs">
@@ -196,30 +116,30 @@
                 </div>
                 <div class="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
                     <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                    <span>草嶺古道埡口 348m 實體山脈全域對齊</span>
+                    <span>草嶺古道埡口 348m 實體山脈動態全域對齊</span>
                 </div>
             </div>
         </div>
 
-        <!-- Center: Device Mode Switcher (Auto, Desktop, Mobile) -->
+        <!-- Center: Device Mode Switcher -->
         <div class="flex items-center bg-cyberDark/90 p-0.5 rounded-lg border border-cyberBorder text-[10px] font-mono">
-            <button id="btn-device-auto" class="px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1" title="自動依螢幕載具寬度感應">
+            <button id="btn-device-auto" class="px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1">
                 <i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">自適應</span>
             </button>
-            <button id="btn-device-desktop" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1" title="強制桌面寬螢幕視角">
+            <button id="btn-device-desktop" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
                 <i class="fa-solid fa-desktop"></i><span class="hidden sm:inline">桌面版</span>
             </button>
-            <button id="btn-device-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1" title="強制智慧手機視角">
+            <button id="btn-device-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
                 <i class="fa-solid fa-mobile-screen"></i><span class="hidden sm:inline">手機版</span>
             </button>
         </div>
 
         <!-- Right Quick Status Badges -->
         <div class="flex items-center gap-1.5 text-xs font-mono">
-            <div id="header-yi-badge" class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-neonRed/50 font-bold truncate max-w-[100px] sm:max-w-none">
+            <div id="header-yi-badge" class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-neonRed/50 font-bold">
                 老陽 (過載)
             </div>
-            <button id="btn-sound-toggle" class="p-1.5 px-2 rounded bg-cyberCard border border-cyberBorder text-neonCyan text-[11px]" title="音效切換">
+            <button id="btn-sound-toggle" class="p-1.5 px-2 rounded bg-cyberCard border border-cyberBorder text-neonCyan text-[11px]">
                 <i class="fa-solid fa-volume-high"></i>
             </button>
             <button id="btn-open-audit-modal" class="px-2 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 text-[10px] flex items-center gap-1 font-bold">
@@ -228,1253 +148,237 @@
         </div>
     </header>
 
+    <!-- DESKTOP MODE ROOT CONTAINER -->
     <div id="desktop-root" class="flex-1 hidden lg:grid lg:grid-cols-12 gap-2 p-2 md:p-3 max-w-[1920px] w-full mx-auto overflow-hidden">
-        
-        <!-- Left / Center: Interactive Map & Tactical Floating Canvas HUD (8 cols) -->
         <div class="col-span-8 flex flex-col gap-2 relative min-h-[580px]">
             <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 shadow-2xl relative flex flex-col flex-1 hud-corner-bracket">
-                <!-- Map Header Controls -->
-                <div class="flex items-center justify-between pb-1.5 border-b border-cyberBorder/80 text-xs">
-                    <div class="flex items-center gap-1.5 font-mono text-[11px]">
-                        <span class="w-2 h-2 rounded-full bg-neonCyan shadow-neon-cyan animate-pulse"></span>
-                        <span class="font-bold text-slate-200 tracking-wider font-orbitron">草嶺古道稜線 GIS 戰情台 (DESKTOP TACTICAL HUD)</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono focus:outline-none focus:border-neonCyan">
-                            <option value="emap">國土測繪 (EMAP 地形)</option>
-                            <option value="nlsc">國土測繪 (NLSC 航照)</option>
-                            <option value="esri">Esri 全球高清衛星</option>
-                            <option value="dark">CartoDB 戰情暗黑</option>
-                        </select>
-                        <button id="btn-gps-center-desk" class="px-2 py-0.5 text-[10px] rounded bg-cyberCard border border-cyberBorder hover:border-neonCyan text-neonCyan font-mono flex items-center gap-1" title="定位到埡口鞍部">
-                            <i class="fa-solid fa-crosshairs"></i> 埡口鎖定
-                        </button>
-                    </div>
+                <div class="flex items-center justify-between pb-1.5 border-b border-cyberBorder/80 text-xs font-mono text-[11px]">
+                    <span class="font-bold text-slate-200 tracking-wider font-orbitron">草嶺古道稜線 GIS 戰情台 (DESKTOP TACTICAL HUD)</span>
+                    <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono">
+                        <option value="emap">國土測繪 (EMAP 地形)</option>
+                        <option value="nlsc">國土測繪 (NLSC 航照)</option>
+                        <option value="esri">Esri 全球高清衛星</option>
+                    </select>
                 </div>
-
-                <!-- Leaflet Map Container for Desktop -->
-                <div class="relative w-full flex-1 min-h-[440px] rounded-lg overflow-hidden mt-1.5 bg-cyberDark border border-cyberBorder/80 group">
-                    <div class="scanline-effect"></div>
+                <div class="relative w-full flex-1 min-h-[440px] rounded-lg overflow-hidden mt-1.5 bg-cyberDark border border-cyberBorder/80">
                     <div id="leafletMapDesk" class="w-full h-full z-10"></div>
-                    
-                    <!-- Floating Vector Telemetry (Top Left) -->
-                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-20 shadow-neon-purple max-w-[260px]">
-                        <div class="flex items-center justify-between border-b border-neonPurple/30 pb-0.5">
-                            <span class="text-purple-300 font-bold flex items-center gap-1 text-[10px]">
-                                <i class="fa-solid fa-location-arrow text-neonPurple fa-spin"></i> 步道實體向量外推
-                            </span>
-                            <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 font-orbitron">CosSim 91.5%</span>
-                        </div>
-                        <div class="text-slate-200 text-[10px] leading-tight font-semibold">
-                            向量：<span class="text-neonPurple font-bold">南南東 165°</span> @ <span class="text-neonCyan">0.8 m/s</span>
-                        </div>
-                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">
-                            🎯 <b>終點：</b>護管所泥塘 (+25m)<br>
-                            途經：<span class="text-neonCyan">埡口南側步道 (+10m)</span>
-                        </div>
+                    <canvas id="radarCanvasDesk" class="absolute inset-0 pointer-events-none z-20 w-full h-full"></canvas>
+                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-30 shadow-neon-purple max-w-[260px]">
+                        <div class="text-purple-300 font-bold text-[10px]">🧭 步道實體向量外推 (CosSim 91.5%)</div>
+                        <div class="text-slate-200 text-[10px]">向量：<span class="text-neonPurple font-bold">南南東 165°</span> @ <span class="text-neonCyan">0.8 m/s</span></div>
+                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">🎯 <b>終點：</b>護管所泥塘 (+25m)</div>
                     </div>
-
-                    <!-- Alert Banner Bottom Center -->
-                    <div id="desk-alert-banner" class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 text-center">
-                        <span class="w-2 h-2 rounded-full bg-neonRed animate-ping shrink-0"></span>
-                        <span id="desk-alert-text">🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)</span>
+                    <div id="desk-alert-banner" class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200">
+                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)
                     </div>
                 </div>
-
                 <div class="grid grid-cols-4 gap-1.5 mt-2">
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                            <span>THI 熱應力指數</span>
-                            <i class="fa-solid fa-temperature-arrow-up text-neonRed"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span id="desk-val-thi" class="text-2xl font-bold font-orbitron text-neonRed">83.6</span>
-                            <span id="desk-val-thi-state" class="text-[8px] px-1 py-0.2 rounded bg-rose-950 text-rose-300 font-semibold border border-rose-800/40 font-mono">泥塘散熱</span>
-                        </div>
-                        <div class="text-[8px] text-slate-500 font-mono">THI > 78 體熱調節極限</div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">THI 熱應力指數</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonRed">81.1</div>
                     </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                            <span>衝突風險 R (Conflict)</span>
-                            <i class="fa-solid fa-triangle-exclamation text-neonAmber"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span id="desk-val-risk" class="text-2xl font-bold font-orbitron text-neonRed">2.88</span>
-                            <span id="desk-val-risk-level" class="text-[8px] px-1 py-0.2 rounded bg-rose-950 text-rose-300 font-semibold border border-rose-800/40 font-mono">紅色警戒</span>
-                        </div>
-                        <div class="text-[8px] text-slate-500 font-mono">R ≥ 3.0 觸發強制分流</div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">衝突風險 R (Conflict)</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonRed">8.75</div>
                     </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                            <span>水牛頭數 (FLIR)</span>
-                            <i class="fa-solid fa-shield-cat text-neonCyan"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span id="desk-val-buffalo-count" class="text-2xl font-bold font-orbitron text-neonCyan">7</span>
-                            <span class="text-[9px] text-slate-400 font-mono">頭</span>
-                        </div>
-                        <div class="text-[8px] text-slate-500 font-mono">機率 P: <b class="text-neonCyan" id="desk-val-pbuffalo">0.912</b></div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">水牛頭數 (FLIR)</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonCyan">7 <span class="text-xs">頭</span></div>
                     </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                            <span>LinUCB 策略</span>
-                            <i class="fa-solid fa-network-wired text-neonPurple"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-0.5">
-                            <span id="desk-val-linucb-arm" class="text-sm font-bold font-mono text-purple-300 truncate">Arm 1 (E-Bike)</span>
-                        </div>
-                        <div class="text-[8px] text-slate-500 font-mono flex justify-between">
-                            <span>Cond: <b id="desk-val-cond" class="text-slate-300">1.24</b></span>
-                            <span class="text-neonGreen">SVD健全</span>
-                        </div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 策略</div>
+                        <div class="text-sm font-bold font-mono text-purple-300">Arm 1 (E-Bike)</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-span-4 flex flex-col gap-2 overflow-y-auto pr-0.5 max-h-[calc(100vh-65px)]">
-            <!-- Horizon Timeline Card -->
             <div class="bg-cyberPanel rounded-xl border border-neonPurple/40 p-2.5 shadow-xl hud-corner-bracket">
-                <div class="flex items-center justify-between text-xs font-mono mb-1.5">
-                    <div class="flex items-center gap-1.5 text-purple-300 font-bold text-[11px]">
-                        <i class="fa-solid fa-clock-rotate-left text-neonPurple"></i> 前瞻 t+1h ~ t+3h 步道橫越風險預報
-                    </div>
-                    <span class="text-[9px] text-slate-400 font-mono">馬可夫外推</span>
-                </div>
+                <div class="text-purple-300 font-bold text-[11px] font-mono mb-1.5">⏱️ 前瞻 t+1h ~ t+3h 步道橫越風險預報</div>
                 <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-mono">
                     <div class="bg-rose-950/40 border border-neonRed/50 p-1.5 rounded">
-                        <div class="text-slate-400 text-[9px]" id="desk-t1-time">t+1h (06:19)</div>
-                        <div class="text-neonRed font-bold text-sm font-orbitron mt-0.5">85% (高)</div>
-                        <div class="text-[8px] text-rose-300 mt-0.5">穿越埡口石階</div>
+                        <div class="text-slate-400 text-[9px]" id="desk-t1-time">--:-- (+1h)</div>
+                        <div class="text-neonRed font-bold text-sm font-orbitron">85% (高)</div>
                     </div>
                     <div class="bg-amber-950/40 border border-neonAmber/50 p-1.5 rounded">
-                        <div class="text-slate-400 text-[9px]" id="desk-t2-time">t+2h (07:19)</div>
-                        <div class="text-neonAmber font-bold text-sm font-orbitron mt-0.5">60% (中)</div>
-                        <div class="text-[8px] text-amber-300 mt-0.5">滯留南側草叢</div>
+                        <div class="text-slate-400 text-[9px]" id="desk-t2-time">--:-- (+2h)</div>
+                        <div class="text-neonAmber font-bold text-sm font-orbitron">60% (中)</div>
                     </div>
                     <div class="bg-emerald-950/40 border border-neonGreen/50 p-1.5 rounded">
-                        <div class="text-slate-400 text-[9px]" id="desk-t3-time">t+3h (08:19)</div>
-                        <div class="text-neonGreen font-bold text-sm font-orbitron mt-0.5">20% (低)</div>
-                        <div class="text-[8px] text-emerald-300 mt-0.5">護管所泥浴</div>
+                        <div class="text-slate-400 text-[9px]" id="desk-t3-time">--:-- (+3h)</div>
+                        <div class="text-neonGreen font-bold text-sm font-orbitron">20% (低)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gemini San-Cai Strategic Narrative Card -->
-            <div class="bg-gradient-to-br from-cyberCard to-indigo-950/40 p-2.5 rounded-xl border border-cyan-900/60 shadow-lg relative hud-corner-bracket">
-                <div class="flex items-center justify-between gap-1.5 mb-1.5 flex-wrap">
-                    <div class="flex items-center gap-1.5">
-                        <div class="w-4 h-4 rounded bg-cyan-500/20 text-neonCyan flex items-center justify-center text-[10px]">
-                            <i class="fa-solid fa-brain"></i>
-                        </div>
-                        <span class="font-bold text-xs text-cyan-200 font-orbitron">GEMINI 三才戰略導言</span>
-                    </div>
-                    <button class="btn-trigger-gemini px-2 py-0.5 rounded bg-neonCyan hover:bg-cyan-400 text-black font-bold text-[10px] font-mono transition flex items-center gap-1 shadow-neon-cyan">
-                        <i class="fa-solid fa-sparkles"></i> 重新合成
-                    </button>
-                </div>
-                <div class="narrative-content-box text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
+            <div class="bg-gradient-to-br from-cyberCard to-indigo-950/40 p-2.5 rounded-xl border border-cyan-900/60 shadow-lg hud-corner-bracket">
+                <div class="font-bold text-xs text-cyan-200 font-orbitron mb-1">GEMINI 三才戰略導言</div>
+                <div class="text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
                     <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 83.6，突破無汗腺體熱閾值。水牛沿 165° 谷線往護管所泥塘散熱。</div>
                     <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 水牛距步道僅 10m，途經埡口南側，登道遭遇概率達 85% 爆發點。</div>
                     <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
                 </div>
             </div>
 
-            <!-- 12-Dimensional Multimodal Tensor (V12S) Visualizer -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80">
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-simple text-neonCyan text-xs"></i>
-                        <h2 class="font-bold text-xs text-slate-200 font-orbitron">12 維多模態張量 (V12S)</h2>
-                    </div>
-                    <span class="stat-cossim-box text-[10px] font-mono text-purple-300 font-orbitron font-bold">CosSim: 0.9150</span>
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
+                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-2">
+                    <span class="font-bold text-xs text-slate-200 font-orbitron">12 維多模態張量 (V12S) Canvas</span>
+                    <span class="text-[10px] font-mono text-purple-300 font-orbitron font-bold">CosSim: 0.9150</span>
                 </div>
-                <div id="desk-tensor-bars" class="space-y-1 mt-1.5 text-[10px] font-mono max-h-[140px] overflow-y-auto pr-1"></div>
-            </div>
-
-            <!-- Field Dynamic Simulation & Testing Deck -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80">
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-sliders text-neonAmber text-xs"></i>
-                        <h2 class="font-bold text-xs text-slate-200 font-orbitron">實時動態調控檯</h2>
-                    </div>
-                    <span class="text-[8px] text-slate-400 font-mono tracking-widest">TACTICAL RIG</span>
-                </div>
-                <div class="space-y-1.5 mt-1.5 text-[11px] font-mono">
-                    <div>
-                        <div class="flex justify-between text-slate-300 text-[10px] mb-0.5">
-                            <span>環境氣溫 (CWA 觀測):</span>
-                            <span class="lbl-temp-box text-neonCyan font-bold">30.2 °C</span>
-                        </div>
-                        <input class="slider-temp-box w-full h-1 bg-cyberCard rounded appearance-none cursor-pointer accent-neonCyan" type="range" min="15" max="38" step="0.5" value="30.2">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-slate-300 text-[10px] mb-0.5">
-                            <span>人潮滯留密度 (TDX 信令):</span>
-                            <span class="lbl-crowd-box text-neonAmber font-bold">0.90 (飽和)</span>
-                        </div>
-                        <input class="slider-crowd-box w-full h-1 bg-cyberCard rounded appearance-none cursor-pointer accent-neonAmber" type="range" min="0.1" max="1.0" step="0.05" value="0.90">
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-slate-300 text-[10px] mb-0.5">
-                            <span>步道泥濘度 (TMI 感測):</span>
-                            <span class="lbl-tmi-box text-slate-200 font-bold">0.76</span>
-                        </div>
-                        <input class="slider-tmi-box w-full h-1 bg-cyberCard rounded appearance-none cursor-pointer accent-indigo-400" type="range" min="0.1" max="1.0" step="0.05" value="0.76">
-                    </div>
-                    <div class="flex items-center justify-between pt-0.5">
-                        <span class="text-slate-300 text-[10px]">11月芒花季 2.8x 人流加權:</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input class="chk-festival-box sr-only peer" type="checkbox" checked>
-                            <div class="w-8 h-4 bg-cyberCard peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-neonAmber"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-1.5 mt-2 pt-1.5 border-t border-cyberBorder">
-                    <button class="btn-inject-flightzone py-1.5 px-2 rounded bg-rose-600/20 border border-neonRed text-rose-300 hover:bg-neonRed hover:text-white transition text-[10px] font-semibold flex items-center justify-center gap-1 font-mono shadow-neon-red">
-                        <i class="fa-solid fa-bullhorn"></i> 逼近 10m 防線
-                    </button>
-                    <button class="btn-feedback-reward py-1.5 px-2 rounded bg-emerald-600/20 border border-neonGreen text-emerald-300 hover:bg-neonGreen hover:text-black transition text-[10px] font-semibold flex items-center justify-center gap-1 font-mono shadow-neon-green">
-                        <i class="fa-solid fa-arrows-rotate"></i> 注入回饋 (+1.0)
-                    </button>
-                    <button class="btn-simulate-vector py-1.5 px-2 rounded bg-cyberCard border border-cyberBorder hover:border-neonPurple text-purple-300 text-[10px] transition font-mono">
-                        <i class="fa-solid fa-compass text-neonPurple mr-1"></i>向量外推
-                    </button>
-                    <button class="btn-export-geojson py-1.5 px-2 rounded bg-cyberCard border border-cyberBorder hover:border-neonGreen text-slate-300 text-[10px] transition font-mono">
-                        <i class="fa-solid fa-download text-neonGreen mr-1"></i>匯出 GeoJSON
-                    </button>
-                </div>
+                <canvas id="tensorCanvasDesk" width="300" height="140" class="w-full h-[140px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
             </div>
         </div>
     </div>
 
+    <!-- MOBILE MODE ROOT CONTAINER -->
     <div id="mobile-root" class="flex-1 flex flex-col lg:hidden relative w-full h-[calc(100dvh-48px)] min-h-0 overflow-hidden">
-        
-        <!-- Mobile Main Map Canvas (Absolute Positioning to avoid 0px flex collapse) -->
         <div class="relative w-full flex-1 min-h-0 overflow-hidden bg-cyberDark">
-            <div class="scanline-effect"></div>
             <div id="leafletMapMobile"></div>
-            
-            <!-- Mobile Quick Tactical Floating Bar (Top Right) -->
-            <div class="absolute top-2 right-2 flex flex-col gap-2 z-20 pointer-events-auto">
-                <button id="btn-mob-gps" class="w-9 h-9 rounded-xl bg-cyberDark/90 border border-neonCyan text-neonCyan flex items-center justify-center shadow-neon-cyan active:scale-90 transition" title="埡口定錨">
-                    <i class="fa-solid fa-crosshairs text-xs"></i>
-                </button>
-                <button id="btn-mob-layer" class="w-9 h-9 rounded-xl bg-cyberDark/90 border border-cyberBorder text-slate-300 hover:text-neonCyan flex items-center justify-center shadow-lg active:scale-90 transition" title="切換底圖 (航照/地形/暗黑)">
-                    <i class="fa-solid fa-layer-group text-xs"></i>
-                </button>
-                <button class="btn-inject-flightzone w-9 h-9 rounded-xl bg-cyberDark/90 border border-neonRed text-neonRed flex items-center justify-center shadow-neon-red active:scale-90 transition" title="模擬逼近 10m 防線">
-                    <i class="fa-solid fa-triangle-exclamation text-xs"></i>
-                </button>
-                <button class="btn-feedback-reward w-9 h-9 rounded-xl bg-cyberDark/90 border border-neonGreen text-neonGreen flex items-center justify-center shadow-neon-green active:scale-90 transition" title="注入分流獎勵 r=+1.0">
-                    <i class="fa-solid fa-rotate text-xs"></i>
-                </button>
-                <button class="btn-simulate-vector w-9 h-9 rounded-xl bg-cyberDark/90 border border-neonPurple text-neonPurple flex items-center justify-center shadow-neon-purple active:scale-90 transition" title="外推方向向量">
-                    <i class="fa-solid fa-compass text-xs"></i>
-                </button>
-            </div>
-
-            <!-- Mobile Collapsible Floating HUD (Exact match with 1007_6 style) -->
-            <div id="mobile-floating-hud" class="absolute top-2 left-2 max-w-[285px] sm:max-w-[320px] z-20 bg-slate-900/90 text-white p-2.5 rounded-xl font-sans shadow-2xl backdrop-blur-md border border-white/15 text-xs line-height-tight transition-all duration-300">
+            <div id="mobile-floating-hud" class="absolute top-2 left-2 max-w-[285px] sm:max-w-[320px] z-20 bg-slate-900/90 text-white p-2.5 rounded-xl font-sans shadow-2xl backdrop-blur-md border border-white/15 text-xs">
                 <div class="flex justify-between items-center mb-1.5">
                     <div class="font-bold text-xs text-slate-100 flex items-center truncate">
-                        <span class="purple-dot"></span>🦬 水牛戰情與未來預判
+                        <span class="w-2 h-2 rounded-full bg-neonPurple animate-pulse mr-1.5"></span>🦬 水牛戰情與未來預判
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <span class="text-[9px] text-slate-400 bg-white/10 px-1.5 py-0.5 rounded-full font-mono" id="mob-update-time">--:--:--</span>
-                        <button id="btn-toggle-hud" class="bg-white/20 hover:bg-white/30 text-white rounded px-1.5 py-0.5 text-[9px] transition">收合</button>
                     </div>
                 </div>
-
-                <div id="mobile-hud-body" class="space-y-1.5 transition-all">
+                <div class="space-y-1.5">
                     <div class="grid grid-cols-2 gap-1.5 bg-white/5 p-1.5 rounded-lg text-center">
                         <div>
                             <div class="text-slate-400 text-[9px]">🦬 水牛數量</div>
-                            <div class="font-bold text-sm text-neonRed font-orbitron" id="mob-hud-buffalo-count">7 <span class="text-[9px] font-normal">頭</span></div>
+                            <div class="font-bold text-sm text-neonRed font-orbitron">7 <span class="text-[9px] font-normal">頭</span></div>
                         </div>
                         <div>
                             <div class="text-slate-400 text-[9px]">📊 模式相似度</div>
                             <div class="font-bold text-sm text-purple-400 font-orbitron">91.5%</div>
                         </div>
                     </div>
-
                     <div class="bg-purple-500/20 p-1.5 border-l-2 border-purple-500 rounded text-[10px]">
                         <div class="text-purple-200 font-bold">🧭 步道向量：南南東 (165°) (0.8 m/s)</div>
-                        <div class="text-slate-300 mt-0.5 leading-tight">
-                            🎯 <b>目標：</b>護管所泥塘散熱區 (終點)<br>
-                            <span class="text-cyan-400 text-[9px]">途經：埡口南側步道 (+10 分鐘)</span>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-white/10 pt-1.5">
-                        <div class="text-slate-400 text-[9px] mb-1 font-mono">⏱️ 未來橫越風險時序：</div>
-                        <div class="grid grid-cols-3 gap-1 text-center text-[9px] font-mono">
-                            <div class="bg-rose-500/20 p-1 rounded border border-rose-500/30">
-                                <div class="text-slate-300" id="mob-t1-time">06:19 (+1h)</div>
-                                <div class="text-neonRed font-bold">85% (高)</div>
-                            </div>
-                            <div class="bg-amber-500/20 p-1 rounded border border-amber-500/30">
-                                <div class="text-slate-300" id="mob-t2-time">07:19 (+2h)</div>
-                                <div class="text-neonAmber font-bold">60% (中)</div>
-                            </div>
-                            <div class="bg-emerald-500/20 p-1 rounded border border-emerald-500/30">
-                                <div class="text-slate-300" id="mob-t3-time">08:19 (+3h)</div>
-                                <div class="text-neonGreen font-bold">20% (低)</div>
-                            </div>
-                        </div>
+                        <div class="text-slate-300 mt-0.5 leading-tight">🎯 <b>目標：</b>護管所泥塘散熱區</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Mobile Alert Ribbon -->
-            <div id="mob-alert-banner" class="absolute bottom-14 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 transition-all shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 text-center">
-                <span class="w-1.5 h-1.5 rounded-full bg-neonRed animate-ping shrink-0"></span>
-                <span id="mob-alert-text" class="truncate">🔴 RED_ALERT: 逼近10m防線！啟動 E-bike 導流</span>
-            </div>
-        </div>
-
-        <div id="mob-panel-container" class="hidden absolute inset-x-0 bottom-12 top-10 bg-cyberPanel/98 backdrop-blur-xl z-30 border-t border-cyberBorder p-3 flex-col overflow-y-auto">
-            <div class="flex items-center justify-between pb-2 border-b border-cyberBorder mb-2">
-                <div class="flex items-center gap-1.5">
-                    <span id="mob-panel-icon" class="text-neonCyan text-xs"></span>
-                    <h3 id="mob-panel-title" class="font-orbitron font-bold text-xs text-white"></h3>
-                </div>
-                <button id="btn-close-mob-panel" class="w-6 h-6 rounded bg-cyberCard border border-cyberBorder text-slate-300 text-xs flex items-center justify-center">&times;</button>
-            </div>
-            <div id="mob-panel-dynamic-content" class="flex-1"></div>
-        </div>
-
-        <!-- Mobile Touch Dock Bar (Sticky at Bottom) -->
-        <nav class="bg-cyberDark/95 border-t border-cyberBorder backdrop-blur-lg px-2 py-1.5 flex justify-around items-center text-[10px] font-mono shadow-2xl z-40 shrink-0">
-            <button id="mob-nav-map" class="mob-nav-btn flex flex-col items-center gap-0.5 text-neonCyan font-bold py-1 px-2 transition active:scale-95">
-                <i class="fa-solid fa-map-location-dot text-sm"></i>
-                <span>戰情圖台</span>
-            </button>
-            <button id="mob-nav-horizon" class="mob-nav-btn flex flex-col items-center gap-0.5 text-slate-400 py-1 px-2 transition active:scale-95">
-                <i class="fa-solid fa-clock-rotate-left text-sm"></i>
-                <span>向量時序</span>
-            </button>
-            <button id="mob-nav-tensor" class="mob-nav-btn flex flex-col items-center gap-0.5 text-slate-400 py-1 px-2 transition active:scale-95">
-                <i class="fa-solid fa-chart-simple text-sm"></i>
-                <span>12D張量</span>
-            </button>
-            <button id="mob-nav-ai" class="mob-nav-btn flex flex-col items-center gap-0.5 text-slate-400 py-1 px-2 transition active:scale-95">
-                <i class="fa-solid fa-brain text-sm"></i>
-                <span>三才導言</span>
-            </button>
-            <button id="mob-nav-controls" class="mob-nav-btn flex flex-col items-center gap-0.5 text-slate-400 py-1 px-2 transition active:scale-95">
-                <i class="fa-solid fa-sliders text-sm"></i>
-                <span>實戰調控</span>
-            </button>
-        </nav>
-    </div>
-
-    <div id="modal-audit" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3">
-        <div class="bg-cyberPanel border border-cyberBorder w-full max-w-lg rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] hud-corner-bracket">
-            <div class="px-3 py-2 border-b border-cyberBorder flex items-center justify-between bg-cyberCard text-xs font-mono">
-                <div class="flex items-center gap-1.5">
-                    <i class="fa-solid fa-database text-neonCyan"></i>
-                    <span class="font-bold text-slate-100 font-orbitron">NOTION 數位審計存根 (HMAC-SHA256)</span>
-                </div>
-                <button id="btn-close-audit" class="text-slate-400 hover:text-white transition text-lg leading-none">&times;</button>
-            </div>
-            <div class="p-3 overflow-y-auto space-y-2 text-xs font-mono">
-                <div class="bg-cyberDark p-2.5 rounded border border-cyberBorder text-neonCyan overflow-x-auto">
-                    <pre id="json-audit-preview" class="text-[9px] md:text-[10px] leading-relaxed"></pre>
-                </div>
-                <div class="flex items-center justify-between text-slate-400 text-[9px]">
-                    <span>HMAC-SHA256 KEY: <b class="text-slate-200">Caoling_v26_Master</b></span>
-                    <span class="text-neonGreen"><i class="fa-solid fa-circle-check"></i> 數位簽章驗證通過</span>
-                </div>
-            </div>
-            <div class="px-3 py-2 border-t border-cyberBorder bg-cyberCard flex justify-end">
-                <button id="btn-copy-audit" class="px-3 py-1 rounded bg-neonCyan text-black font-bold text-[10px] font-mono shadow-neon-cyan">
-                    <i class="fa-solid fa-copy mr-1"></i>複製 JSON 存根
-                </button>
+            <div id="mob-alert-banner" class="absolute bottom-14 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 text-center">
+                🔴 RED_ALERT: 逼近10m防線！啟動 E-bike 導流
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification Box -->
-    <div id="toast-box" class="fixed top-12 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-1.5 pointer-events-none w-[90%] max-w-sm"></div>
-
+    <!-- Scripts -->
     <script>
-        /* =========================================================================
-         * GEM ENGINE v26.0 - DUAL-UI ADAPTIVE MASTER SCRIPT
-         * ========================================================================= */
-
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-        let soundEnabled = true;
-
-        function playTacticalBeep(freq = 880, type = 'sine', duration = 0.1) {
-            if (!soundEnabled) return;
-            try {
-                if (!audioCtx) audioCtx = new AudioContext();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) { }
-        }
-
-        const FLIGHT_ZONE_LIMIT_M = 10.0;
-
-        // Exact Trail Nodes along Caoling Mountain Ridge (WGS84 Real Alignment)
         const TRAIL_WAYPOINTS = [
-            { id: "NODE_YWK", name: "遠望坑入口", lat: 25.0034, lng: 121.9318, elev: 120, desc: "古道起點" },
-            { id: "NODE_DSM", name: "跌死馬橋", lat: 24.9960, lng: 121.9285, elev: 180, desc: "樹林避風點" },
-            { id: "NODE_XZM", name: "雄鎮蠻煙碑", lat: 24.9886, lng: 121.9250, elev: 240, desc: "石階攀升段" },
-            { id: "NODE_HZB", name: "虎字碑", lat: 24.9785, lng: 121.9240, elev: 330, desc: "迎風面口" },
-            { id: "NODE_YK",  name: "埡口涼亭 (鞍部核心區)", lat: 24.9780, lng: 121.9242, elev: 348, desc: "鞍部核心瓶頸點" },
-            { id: "NODE_YKS", name: "埡口南側步道彎道", lat: 24.9762, lng: 121.9245, elev: 320, desc: "步道實體對齊節點" },
-            { id: "NODE_HGS", name: "護管所 (泥塘散熱區)", lat: 24.9745, lng: 121.9248, elev: 280, desc: "沼澤泥浴散熱區" },
-            { id: "NODE_DLT", name: "大里天公廟", lat: 24.9696, lng: 121.9242, elev: 45,  desc: "E-bike 轉乘站" },
-            { id: "NODE_DLY", name: "大里遊客中心", lat: 24.9691, lng: 121.9246, elev: 30,  desc: "客運/台鐵站" }
+            { id: "NODE_YWK", name: "遠望坑入口", lat: 25.0034, lng: 121.9318 },
+            { id: "NODE_DSM", name: "跌死馬橋", lat: 24.9960, lng: 121.9285 },
+            { id: "NODE_XZM", name: "雄鎮蠻煙碑", lat: 24.9886, lng: 121.9250 },
+            { id: "NODE_HZB", name: "虎字碑", lat: 24.9785, lng: 121.9240 },
+            { id: "NODE_YK",  name: "埡口涼亭", lat: 24.9780, lng: 121.9242 },
+            { id: "NODE_YKS", name: "埡口南側步道彎道", lat: 24.9762, lng: 121.9245 },
+            { id: "NODE_HGS", name: "護管所泥塘", lat: 24.9745, lng: 121.9248 },
+            { id: "NODE_DLT", name: "大里天公廟", lat: 24.9696, lng: 121.9242 },
+            { id: "NODE_DLY", name: "大里遊客中心", lat: 24.9691, lng: 121.9246 }
         ];
-
-        let currentBuffalo = {
-            id: "HERD_01",
-            lat: 24.9782,
-            lng: 121.9240,
-            count: 7,
-            temp_skin: 36.2,
-            vectorAngle: 165,
-            vectorSpeed: 0.8,
-            targetName: "護管所泥塘散熱區 (預測終點)"
-        };
-
-        const PREDICTED_LOCATIONS = [
-            { name: "埡口草坡 (當前起點)", lat: 24.9782, lng: 121.9240, eta: "0 分鐘", desc: "即時出沒點" },
-            { name: "埡口南側步道 (預測途經點)", lat: 24.9762, lng: 121.9245, eta: "+10 分鐘", desc: "沿古道順向移動" },
-            { name: "護管所泥塘散熱區 (預測終點)", lat: 24.9745, lng: 121.9248, eta: "+25 分鐘", desc: "高溫 THI 驅動目的地" }
-        ];
-
-        let envState = {
-            temp_c: 30.2,
-            rh_percent: 82.0,
-            wind_speed: 4.5,
-            exposure: 0.85,
-            ndwi: 0.55,
-            ndvi: 0.65,
-            crowd_density: 0.90,
-            tmi: 0.76,
-            is_festival: true,
-            min_human_dist: 2.2
-        };
-
-        class LinUCBEngine {
-            constructor(d = 12, gamma = 0.98, alpha = 0.35) {
-                this.d = d;
-                this.gamma = gamma;
-                this.alpha = alpha;
-                this.A_inv = [this.eye(d), this.eye(d)];
-                this.b = [new Array(d).fill(0), new Array(d).fill(0)];
-            }
-            eye(n) {
-                const m = [];
-                for(let i=0; i<n; i++) {
-                    const row = new Array(n).fill(0);
-                    row[i] = 1.0;
-                    m.push(row);
-                }
-                return m;
-            }
-            dot(vA, vB) {
-                let s = 0;
-                for(let i=0; i<vA.length; i++) s += vA[i] * vB[i];
-                return s;
-            }
-            matVec(mat, vec) {
-                const res = new Array(mat.length).fill(0);
-                for(let i=0; i<mat.length; i++) {
-                    for(let j=0; j<vec.length; j++) res[i] += mat[i][j] * vec[j];
-                }
-                return res;
-            }
-            selectAction(x, isRedAlert) {
-                if (isRedAlert) return { arm: 1, ucb: 1.95, reason: "SAFETY_OVERRIDE (10m防線強制導流)" };
-                const scores = [];
-                for(let a=0; a<2; a++) {
-                    const theta = this.matVec(this.A_inv[a], this.b[a]);
-                    const mean = this.dot(theta, x);
-                    const AinvX = this.matVec(this.A_inv[a], x);
-                    const variance = Math.max(0, this.dot(x, AinvX));
-                    scores.push(mean + this.alpha * Math.sqrt(variance));
-                }
-                const chosen = scores[1] > scores[0] ? 1 : 0;
-                return { arm: chosen, ucb: Math.max(scores[0], scores[1]), reason: `LINUCB (Arm ${chosen})` };
-            }
-            updateFeedback(arm, x, reward) {
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) this.A_inv[arm][i][j] /= this.gamma;
-                }
-                const Ax = this.matVec(this.A_inv[arm], x);
-                const denom = 1.0 + this.dot(x, Ax);
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) this.A_inv[arm][i][j] -= (Ax[i] * Ax[j]) / denom;
-                }
-                for(let i=0; i<this.d; i++) this.b[arm][i] += reward * x;
-                let norm = 0;
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) norm += this.A_inv[arm][i][j] ** 2;
-                }
-                const cond = Math.sqrt(norm);
-                if (cond > 1000) {
-                    for(let i=0; i<this.d; i++) {
-                        for(let j=0; j<this.d; j++) this.A_inv[arm][i][j] = Math.max(-10, Math.min(10, this.A_inv[arm][i][j]));
-                    }
-                }
-                return cond;
-            }
-        }
-
-        const linUCB = new LinUCBEngine(12, 0.98, 0.35);
 
         function createMapInstance(containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return null;
+            const el = document.getElementById(containerId);
+            if (!el) return null;
+            const mapInst = L.map(containerId, { zoomControl: false }).setView([24.9780, 121.9242], 16);
+            L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mapInst);
+            L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mapInst);
 
-            const mapInst = L.map(containerId, {
-                center: [24.9780, 121.9242],
-                zoom: 16,
-                minZoom: 12,
-                maxZoom: 19,
-                zoomControl: false
-            });
+            const trailCoords = TRAIL_WAYPOINTS.map(w => [w.lat, w.lng]);
+            L.polyline(trailCoords, { color: '#2563eb', weight: 6, opacity: 0.85 }).addTo(mapInst);
+            L.polyline([[24.9782, 121.9240], [24.9762, 121.9245], [24.9745, 121.9248]], { color: '#b026ff', weight: 6, dashArray: '8, 8' }).addTo(mapInst);
 
-            const tileLayers = {
-                emap: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                    maxZoom: 19, attribution: '&copy; NLSC EMAP 地形'
-                }),
-                nlsc: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                    maxZoom: 19, attribution: '&copy; NLSC PHOTO2 航照'
-                }),
-                esri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    maxZoom: 19, attribution: '&copy; Esri World Imagery'
-                }),
-                dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 19, attribution: '&copy; CartoDB Dark Matter'
-                })
-            };
+            L.circle([24.9782, 121.9240], { radius: 15, color: '#ff2a5f', fillColor: '#ff2a5f', fillOpacity: 0.35 }).addTo(mapInst);
+            L.circleMarker([24.9782, 121.9240], { radius: 8, fillColor: '#ff2a5f', color: '#ffffff', fillOpacity: 1 }).addTo(mapInst);
 
-            // Use EMAP or NLSC as default; fallback gracefully
-            tileLayers.emap.addTo(mapInst);
-
-            // Add Trails & Markers
-            const trailCoords = TRAIL_WAYPOINTS.map(wp => [wp.lat, wp.lng]);
-            L.polyline(trailCoords, { color: '#ffaa00', weight: 24, opacity: 0.25, lineCap: 'round' }).addTo(mapInst);
-            L.polyline(trailCoords, { color: '#ff2a5f', weight: 12, opacity: 0.45, lineCap: 'round' }).addTo(mapInst);
-            L.polyline(trailCoords, { color: '#2563eb', weight: 5, opacity: 0.95 }).addTo(mapInst);
-
-            TRAIL_WAYPOINTS.forEach(wp => {
-                const isSaddle = wp.id === "NODE_YK" || wp.id === "NODE_HGS";
-                L.circleMarker([wp.lat, wp.lng], {
-                    radius: isSaddle ? 6 : 4,
-                    fillColor: isSaddle ? "#ffaa00" : "#00f0ff",
-                    color: "#ffffff",
-                    weight: 1.5,
-                    fillOpacity: 0.95
-                }).addTo(mapInst).bindPopup(`<b>📍 ${wp.name}</b> (${wp.elev}m)<br>${wp.desc}`);
-            });
-
-            const vectorLayer = L.layerGroup().addTo(mapInst);
-            const buffaloLayer = L.layerGroup().addTo(mapInst);
-
-            return { mapInst, tileLayers, currentTile: tileLayers.emap, vectorLayer, buffaloLayer };
+            return mapInst;
         }
 
-        let deskMap = null;
-        let mobMap = null;
+        let deskMap, mobMap;
 
-        function initMaps() {
-            if (document.getElementById('leafletMapDesk')) {
-                deskMap = createMapInstance('leafletMapDesk');
-            }
-            if (document.getElementById('leafletMapMobile')) {
-                mobMap = createMapInstance('leafletMapMobile');
-            }
-        }
-
-        function ensureMapReady(mapObj, lat = 24.9780, lng = 121.9242, zoom = 16) {
-            if (!mapObj || !mapObj.mapInst) return;
-            requestAnimationFrame(() => {
-                mapObj.mapInst.invalidateSize(true);
-                mapObj.mapInst.setView([lat, lng], zoom);
-                renderLayerVisuals(mapObj);
-            });
-            setTimeout(() => {
-                mapObj.mapInst.invalidateSize(true);
-            }, 80);
-            setTimeout(() => {
-                mapObj.mapInst.invalidateSize(true);
-            }, 300);
-        }
-
-        function getDistanceToTrailMeters(lat, lng) {
-            let minDistance = Infinity;
-            for(let i=0; i<TRAIL_WAYPOINTS.length - 1; i++) {
-                const p1 = TRAIL_WAYPOINTS[i], p2 = TRAIL_WAYPOINTS[i+1];
-                const latMid = (p1.lat + p2.lat) / 2 * Math.PI / 180;
-                const m_lat = 111132.95, m_lng = 111412.84 * Math.cos(latMid);
-                const x2 = (p2.lng - p1.lng) * m_lng, y2 = (p2.lat - p1.lat) * m_lat;
-                const px = (lng - p1.lng) * m_lng, py = (lat - p1.lat) * m_lat;
-                const l2 = x2*x2 + y2*y2;
-                if (l2 === 0) continue;
-                let t = Math.max(0, Math.min(1, (px * x2 + py * y2) / l2));
-                const dist = Math.hypot(px - t * x2, py - t * y2);
-                if (dist < minDistance) minDistance = dist;
-            }
-            return minDistance;
-        }
-
-        function computeWindTHI(temp, rh, wind, exp) {
-            const base = 1.8 * temp + 32.0 - (0.55 - 0.55 * (rh / 100.0)) * (1.8 * temp - 26.0);
-            return base - 1.2 * Math.sqrt(max(0, wind)) + 0.15 * exp;
-        }
-
-        function max(a, b) { return a > b ? a : b; }
-
-        function renderLayerVisuals(mapObj) {
-            if (!mapObj) return;
-            const { vectorLayer, buffaloLayer } = mapObj;
-
-            // Update Vectors
-            vectorLayer.clearLayers();
-            const vectorCoords = PREDICTED_LOCATIONS.map(loc => [loc.lat, loc.lng]);
-
-            L.polyline(vectorCoords, {
-                color: '#b026ff',
-                weight: 4,
-                dashArray: '6, 6',
-                opacity: 0.95
-            }).addTo(vectorLayer);
-
-            PREDICTED_LOCATIONS.forEach((loc, idx) => {
-                if (idx === 0) return;
-                const isDest = idx === PREDICTED_LOCATIONS.length - 1;
-                const customIcon = L.divIcon({
-                    className: 'pred-icon',
-                    html: `<div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg ${isDest ? 'bg-purple-600 border border-neonPurple' : 'bg-cyan-700 border border-neonCyan'}"><i class="fa-solid ${isDest ? 'fa-flag' : 'fa-arrow-right'}"></i></div>`,
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
-                });
-                L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(vectorLayer)
-                    .bindPopup(`<b>🎯 ${loc.name}</b><br>預估抵達：${loc.eta}<br>${loc.desc}`);
-            });
-
-            // Update Buffalo
-            buffaloLayer.clearLayers();
-            const customIcon = L.divIcon({
-                className: 'custom-buffalo-beacon',
-                html: `<div class="relative"><div class="flightzone-radar-pulse"></div><div class="buffalo-core-beacon"></div></div>`,
-                iconSize: [0, 0],
-                iconAnchor: [0, 0]
-            });
-
-            L.marker([currentBuffalo.lat, currentBuffalo.lng], { icon: customIcon }).addTo(buffaloLayer)
-                .bindPopup(`<b>🦬 水牛即時點位 (埡口)</b><br>頭數: ${currentBuffalo.count} 頭<br>向量: ${currentBuffalo.vectorAngle}° (${currentBuffalo.vectorSpeed} m/s)`);
-
-            L.circle([currentBuffalo.lat, currentBuffalo.lng], {
-                radius: FLIGHT_ZONE_LIMIT_M,
-                color: '#ff2a5f',
-                weight: 1.5,
-                fillColor: '#ff2a5f',
-                fillOpacity: 0.35
-            }).addTo(buffaloLayer);
-        }
-
-        function recalculateEngine() {
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const dist = getDistanceToTrailMeters(currentBuffalo.lat, currentBuffalo.lng);
-            
-            const elevFactor = Math.exp(-Math.pow(348 - 450, 2) / (2 * 150 * 150));
-            const slopePenalty = 1.0 / (1.0 + Math.exp(0.3 * (9.5 - 20.0)));
-            const s_spatial = 0.3 * elevFactor * slopePenalty + 0.4 * envState.ndwi + 0.3 * envState.ndvi;
-
-            const alpha = 1.0 / (1.0 + Math.exp(-0.2 * (thi - 78.0)));
-            const beta = 1.0 / (1.0 + Math.exp(0.2 * (thi - 68.0)));
-            const logit = alpha * envState.ndwi + beta * envState.ndvi + 0.3 * 1.0 + 0.2 * s_spatial;
-            const p_buffalo = Math.min(1.0, Math.max(0.0, 1.0 / (1.0 + Math.exp(-5.0 * (logit - 0.4)))));
-
-            const flightPenalty = 1.0 + (FLIGHT_ZONE_LIMIT_M / Math.max(envState.min_human_dist, 0.5));
-            const festivalMult = envState.is_festival ? 2.8 : 1.0;
-            const r_conflict = p_buffalo * Math.min(1.0, envState.crowd_density * festivalMult * 0.5) * flightPenalty * (1.0 + envState.tmi);
-
-            const isRedAlert = dist <= FLIGHT_ZONE_LIMIT_M || r_conflict >= 2.5;
-
-            const v12s = [
-                Math.min(1.0, Math.max(0.0, (thi - 50.0) / 40.0)),
-                envState.ndwi, envState.ndvi,
-                Math.min(1.0, currentBuffalo.count / 10.0),
-                envState.tmi, envState.crowd_density,
-                0.85, 0.70, 0.79, 0.90, 0.80, 0.88
-            ];
-
-            const decision = linUCB.selectAction(v12s, isRedAlert);
-            const meanV = v12s.reduce((a, b) => a + b, 0) / 12;
-            const z_comp = (meanV - 0.55) / 0.12;
-
-            let yiState = "少陽/少陰 (常態監測)";
-            let yiBadgeClass = "bg-cyan-950 text-cyan-300 border-neonCyan/40";
-            if (z_comp >= 2.0) {
-                yiState = "老陽 (過載管制)";
-                yiBadgeClass = "bg-rose-950 text-rose-300 border-neonRed/50 shadow-neon-red";
-            } else if (z_comp <= -2.0) {
-                yiState = "老陰 (氣候封閉)";
-                yiBadgeClass = "bg-indigo-950 text-indigo-300 border-neonPurple/50";
-            }
-
-            // Sync Header & Desktop UI
-            document.getElementById('header-yi-badge').innerText = yiState;
-            document.getElementById('header-yi-badge').className = `px-2 py-0.5 rounded text-[10px] font-bold ${yiBadgeClass}`;
-
-            const deskThi = document.getElementById('desk-val-thi');
-            if (deskThi) {
-                deskThi.innerText = thi.toFixed(1);
-                document.getElementById('desk-val-thi-state').innerText = thi > 78 ? "泥塘散熱" : (thi <= 68 ? "採食態" : "遷徙中");
-                document.getElementById('desk-val-risk').innerText = r_conflict.toFixed(2);
-                document.getElementById('desk-val-buffalo-count').innerText = currentBuffalo.count;
-                document.getElementById('desk-val-pbuffalo').innerText = p_buffalo.toFixed(3);
-                document.getElementById('desk-val-cond').innerText = (1.2 + Math.abs(z_comp) * 0.4).toFixed(2);
-                document.getElementById('desk-val-linucb-arm').innerText = isRedAlert ? "Arm 1 (E-Bike)" : `Arm ${decision.arm}`;
-                
-                const deskBanner = document.getElementById('desk-alert-banner');
-                const deskBannerTxt = document.getElementById('desk-alert-text');
-                const deskRiskLevel = document.getElementById('desk-val-risk-level');
-                if (isRedAlert) {
-                    deskBanner.className = "absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-neon-red bg-rose-950/95 border-neonRed text-rose-200 text-center z-20";
-                    deskBannerTxt.innerHTML = `<span class="w-2 h-2 rounded-full bg-neonRed animate-ping shrink-0"></span>🔴 RED_ALERT: 侵入10m硬防線！水牛 ${currentBuffalo.count} 頭 @埡口 (強制啟動低碳 E-bike 導流)`;
-                    deskRiskLevel.innerText = "極限警戒";
-                } else {
-                    deskBanner.className = "absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 transition-all shadow-neon-green bg-emerald-950/95 border-neonGreen text-neonGreen text-center z-20";
-                    deskBannerTxt.innerHTML = `<span class="w-2 h-2 rounded-full bg-neonGreen animate-ping shrink-0"></span>🟢 NORMAL: 步道動態監測中 (10m 防線完好)`;
-                    deskRiskLevel.innerText = "安全監測";
-                }
-            }
-
-            // Sync Mobile Floating HUD & Banner
-            const mobCount = document.getElementById('mob-hud-buffalo-count');
-            if (mobCount) {
-                mobCount.innerHTML = `${currentBuffalo.count} <span class="text-[9px] font-normal">頭</span>`;
-                const mobBanner = document.getElementById('mob-alert-banner');
-                const mobBannerTxt = document.getElementById('mob-alert-text');
-                if (isRedAlert) {
-                    mobBanner.className = "absolute bottom-14 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 transition-all shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 text-center";
-                    mobBannerTxt.innerText = `🔴 RED_ALERT: 逼近10m防線！水牛 ${currentBuffalo.count}頭 強制導流`;
-                } else {
-                    mobBanner.className = "absolute bottom-14 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 transition-all shadow-neon-green z-20 bg-emerald-950/95 border-neonGreen text-neonGreen text-center";
-                    mobBannerTxt.innerText = `🟢 NORMAL: 步道10m防線安全監測中`;
-                }
-            }
-
-            // Sync Synced UI Class Boxes
-            document.querySelectorAll('.stat-cossim-box').forEach(el => {
-                el.innerText = `CosSim: ${(0.9150 + (1 - Math.abs(z_comp)*0.02)).toFixed(4)}`;
-            });
-            document.querySelectorAll('.lbl-temp-box').forEach(el => el.innerText = `${envState.temp_c.toFixed(1)} °C`);
-            document.querySelectorAll('.lbl-crowd-box').forEach(el => el.innerText = `${envState.crowd_density.toFixed(2)} (${envState.crowd_density > 0.75 ? '飽和' : (envState.crowd_density > 0.4 ? '中度' : '流暢')})`);
-            document.querySelectorAll('.lbl-tmi-box').forEach(el => el.innerText = envState.tmi.toFixed(2));
-
-            // Render Tensor Bars & Map Visuals
-            renderTensorBars(v12s);
-            if (deskMap) renderLayerVisuals(deskMap);
-            if (mobMap) renderLayerVisuals(mobMap);
-        }
-
-        const TENSOR_LABELS = [
-            "v1 Weather_THI", "v2 Water_NDWI", "v3 Veg_NDVI", "v4 IR_Telemetry",
-            "v5 Trail_Mud (TMI)", "v6 Crowd_Stress", "v7 DEM_Aspect", "v8 GTS_Network",
-            "v9 Carbon_Saved", "v10 AI_Ready", "v11 Sentiment", "v12 ESG_Economy"
-        ];
-
-        function renderTensorBars(v12s) {
-            const container = document.getElementById('desk-tensor-bars');
-            if (!container) return;
-            container.innerHTML = '';
-            v12s.forEach((val, idx) => {
-                const percent = Math.min(100, Math.max(0, val * 100)).toFixed(0);
-                const color = val > 0.75 ? 'bg-neonRed' : (val > 0.4 ? 'bg-neonCyan' : 'bg-slate-500');
-                const row = document.createElement('div');
-                row.className = "flex items-center gap-1.5";
-                row.innerHTML = `
-                    <span class="w-20 truncate text-slate-400 text-[9px]">${TENSOR_LABELS[idx]}</span>
-                    <div class="flex-1 bg-cyberDark h-1 rounded overflow-hidden border border-cyberBorder">
-                        <div class="${color} h-full transition-all duration-300" style="width: ${percent}%"></div>
-                    </div>
-                    <span class="w-6 text-right text-[9px] text-slate-300 font-bold">${val.toFixed(2)}</span>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function showToast(title, msg, type = 'info') {
-            const box = document.getElementById('toast-box');
-            const toast = document.createElement('div');
-            const borderCol = type === 'alert' ? 'border-neonRed text-rose-300 shadow-neon-red' : (type === 'success' ? 'border-neonGreen text-emerald-300 shadow-neon-green' : 'border-neonCyan text-cyan-300 shadow-neon-cyan');
-            toast.className = `p-2 rounded bg-cyberPanel/95 border ${borderCol} backdrop-blur-md text-xs font-mono transition-all duration-300 flex items-start gap-2`;
-            toast.innerHTML = `
-                <i class="fa-solid ${type === 'alert' ? 'fa-triangle-exclamation text-neonRed' : (type === 'success' ? 'fa-circle-check text-neonGreen' : 'fa-info text-neonCyan')} mt-0.5 text-xs"></i>
-                <div class="flex-1">
-                    <div class="font-bold text-slate-100 text-[11px]">${title}</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">${msg}</div>
-                </div>
-            `;
-            box.appendChild(toast);
-            playTacticalBeep(type === 'alert' ? 440 : 880);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 350);
-            }, 2600);
-        }
-
-        const btnDevAuto = document.getElementById('btn-device-auto');
-        const btnDevDesk = document.getElementById('btn-device-desktop');
-        const btnDevMob = document.getElementById('btn-device-mobile');
-
-        function setDeviceMode(mode) {
-            document.body.classList.remove('force-desktop', 'force-mobile');
-            [btnDevAuto, btnDevDesk, btnDevMob].forEach(b => {
-                b.className = "px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1";
-            });
-
-            if (mode === 'desktop') {
-                document.body.classList.add('force-desktop');
-                btnDevDesk.className = "px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1";
-                showToast("載具切換", "已切換為【電腦桌面版 12 欄戰情指揮艙】視角", "info");
-                ensureMapReady(deskMap, 24.9780, 121.9242, 16);
-            } else if (mode === 'mobile') {
-                document.body.classList.add('force-mobile');
-                btnDevMob.className = "px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1";
-                showToast("載具切換", "已切換為【智慧手機版 觸控 PWA】視角", "info");
-                ensureMapReady(mobMap, currentBuffalo.lat, currentBuffalo.lng, 16);
-            } else {
-                btnDevAuto.className = "px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1";
-                showToast("載具切換", "已啟用【智慧螢幕自適應感測】模式", "success");
-                ensureMapReady(deskMap, 24.9780, 121.9242, 16);
-                ensureMapReady(mobMap, currentBuffalo.lat, currentBuffalo.lng, 16);
-            }
-        }
-
-        btnDevAuto.addEventListener('click', () => setDeviceMode('auto'));
-        btnDevDesk.addEventListener('click', () => setDeviceMode('desktop'));
-        btnDevMob.addEventListener('click', () => setDeviceMode('mobile'));
-
-        // Mobile Layer Toggle Quick Button
-        const mobTileKeys = ['emap', 'nlsc', 'esri', 'dark'];
-        let currentMobTileIdx = 0;
-        document.getElementById('btn-mob-layer')?.addEventListener('click', () => {
-            if (!mobMap) return;
-            currentMobTileIdx = (currentMobTileIdx + 1) % mobTileKeys.length;
-            const newKey = mobTileKeys[currentMobTileIdx];
-            mobMap.mapInst.removeLayer(mobMap.currentTile);
-            mobMap.currentTile = mobMap.tileLayers[newKey];
-            mobMap.currentTile.addTo(mobMap.mapInst);
-            const layerNames = { emap: '國土電子地形圖 (EMAP)', nlsc: '國土測繪航照 (PHOTO2)', esri: 'Esri 衛星影像', dark: 'CartoDB 暗黑戰情' };
-            showToast("底圖切換", `已載入 ${layerNames[newKey]}`, "info");
-        });
-
-        // Mobile Floating HUD Collapse Toggle
-        const btnToggleHud = document.getElementById('btn-toggle-hud');
-        const mobHudBody = document.getElementById('mobile-hud-body');
-        btnToggleHud.addEventListener('click', () => {
-            if (mobHudBody.style.display === 'none') {
-                mobHudBody.style.display = 'block';
-                btnToggleHud.innerText = '收合';
-            } else {
-                mobHudBody.style.display = 'none';
-                btnToggleHud.innerText = '展開';
-            }
-            playTacticalBeep(750);
-        });
-
-        const mobPanel = document.getElementById('mob-panel-container');
-        const mobPanelTitle = document.getElementById('mob-panel-title');
-        const mobPanelIcon = document.getElementById('mob-panel-icon');
-        const mobPanelContent = document.getElementById('mob-panel-dynamic-content');
-        const btnCloseMobPanel = document.getElementById('btn-close-mob-panel');
-
-        function openMobDrawer(tabKey) {
-            document.querySelectorAll('.mob-nav-btn').forEach(b => {
-                b.className = "mob-nav-btn flex flex-col items-center gap-0.5 text-slate-400 py-1 px-2 transition active:scale-95";
-            });
-
-            if (tabKey === 'map') {
-                mobPanel.classList.add('hidden');
-                document.getElementById('mob-nav-map').className = "mob-nav-btn flex flex-col items-center gap-0.5 text-neonCyan font-bold py-1 px-2 transition active:scale-95";
-                mobMap?.mapInst?.invalidateSize();
-                return;
-            }
-
-            mobPanel.classList.remove('hidden');
-            playTacticalBeep(880);
-
-            if (tabKey === 'horizon') {
-                document.getElementById('mob-nav-horizon').className = "mob-nav-btn flex flex-col items-center gap-0.5 text-neonPurple font-bold py-1 px-2 transition active:scale-95";
-                mobPanelTitle.innerText = "前瞻向量與時序預報";
-                mobPanelIcon.className = "fa-solid fa-clock-rotate-left text-neonPurple";
-                mobPanelContent.innerHTML = `
-                    <div class="space-y-2 text-xs font-mono">
-                        <div class="bg-purple-950/40 p-2 rounded border border-neonPurple/50">
-                            <div class="text-purple-300 font-bold mb-1">🧭 實體步道移動向量</div>
-                            <div>當前方位：<b class="text-neonCyan">南南東 165°</b> @ 0.8 m/s</div>
-                            <div>預計終點：<b class="text-neonPurple">護管所泥塘散熱區 (+25 分鐘)</b></div>
-                            <div>途經節點：埡口南側步道彎道 (+10 分鐘)</div>
-                        </div>
-                        <div class="text-slate-400 text-[10px]">前瞻 t+1h ~ t+3h 步道橫越風險預報：</div>
-                        <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
-                            <div class="bg-rose-950/50 border border-neonRed p-2 rounded">
-                                <div class="text-slate-400 text-[9px]">t+1h</div>
-                                <div class="text-neonRed font-bold text-sm font-orbitron">85%</div>
-                                <div class="text-[8px] text-rose-300">穿越埡口石階</div>
-                            </div>
-                            <div class="bg-amber-950/50 border border-neonAmber p-2 rounded">
-                                <div class="text-slate-400 text-[9px]">t+2h</div>
-                                <div class="text-neonAmber font-bold text-sm font-orbitron">60%</div>
-                                <div class="text-[8px] text-amber-300">滯留南側草叢</div>
-                            </div>
-                            <div class="bg-emerald-950/50 border border-neonGreen p-2 rounded">
-                                <div class="text-slate-400 text-[9px]">t+3h</div>
-                                <div class="text-neonGreen font-bold text-sm font-orbitron">20%</div>
-                                <div class="text-[8px] text-emerald-300">護管所泥浴</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (tabKey === 'tensor') {
-                document.getElementById('mob-nav-tensor').className = "mob-nav-btn flex flex-col items-center gap-0.5 text-neonCyan font-bold py-1 px-2 transition active:scale-95";
-                mobPanelTitle.innerText = "12 維多模態張量 (V12S)";
-                mobPanelIcon.className = "fa-solid fa-chart-simple text-neonCyan";
-                mobPanelContent.innerHTML = `
-                    <div class="text-xs font-mono space-y-1.5">
-                        <div class="flex justify-between items-center bg-cyberCard p-1.5 rounded border border-cyberBorder">
-                            <span class="text-slate-400">歷史餘弦相似度:</span>
-                            <span class="text-purple-300 font-bold font-orbitron">CosSim 91.50%</span>
-                        </div>
-                        <div id="mob-tensor-bars-container" class="space-y-1 text-[10px]"></div>
-                    </div>
-                `;
-                const cont = document.getElementById('mob-tensor-bars-container');
-                TENSOR_LABELS.forEach((lbl, idx) => {
-                    cont.innerHTML += `
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-24 truncate text-slate-400 text-[9px]">${lbl}</span>
-                            <div class="flex-1 bg-cyberDark h-1.5 rounded overflow-hidden border border-cyberBorder">
-                                <div class="bg-neonCyan h-full" style="width: ${(0.6 + (idx%3)*0.15)*100}%"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else if (tabKey === 'ai') {
-                document.getElementById('mob-nav-ai').className = "mob-nav-btn flex flex-col items-center gap-0.5 text-cyan-300 font-bold py-1 px-2 transition active:scale-95";
-                mobPanelTitle.innerText = "Gemini 三才戰略導言";
-                mobPanelIcon.className = "fa-solid fa-brain text-neonCyan";
-                mobPanelContent.innerHTML = `
-                    <div class="text-xs space-y-2">
-                        <div class="narrative-content-box text-slate-300 leading-relaxed font-sans bg-cyberDark/90 p-2.5 rounded border border-cyberBorder space-y-1.5">
-                            <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 83.6，突破無汗腺體熱閾值。水牛沿 165° 谷線往護管所泥塘散熱。</div>
-                            <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 水牛距步道僅 10m，途經埡口南側，登道遭遇概率達 85% 爆發點。</div>
-                            <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
-                        </div>
-                        <button class="btn-trigger-gemini w-full py-2 rounded bg-neonCyan text-black font-bold font-mono text-xs flex items-center justify-center gap-1 shadow-neon-cyan">
-                            <i class="fa-solid fa-sparkles"></i> 重新合成導言
-                        </button>
-                    </div>
-                `;
-                bindGeminiButtons();
-            } else if (tabKey === 'controls') {
-                document.getElementById('mob-nav-controls').className = "mob-nav-btn flex flex-col items-center gap-0.5 text-neonAmber font-bold py-1 px-2 transition active:scale-95";
-                mobPanelTitle.innerText = "實戰動態調控檯";
-                mobPanelIcon.className = "fa-solid fa-sliders text-neonAmber";
-                mobPanelContent.innerHTML = `
-                    <div class="space-y-2 text-xs font-mono">
-                        <div>
-                            <div class="flex justify-between text-slate-300 text-[10px] mb-0.5">
-                                <span>環境氣溫 (CWA 觀測):</span>
-                                <span class="lbl-temp-box text-neonCyan font-bold">${envState.temp_c.toFixed(1)} °C</span>
-                            </div>
-                            <input class="slider-temp-box w-full h-1.5 bg-cyberCard rounded appearance-none cursor-pointer accent-neonCyan" type="range" min="15" max="38" step="0.5" value="${envState.temp_c}">
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-slate-300 text-[10px] mb-0.5">
-                                <span>人潮滯留密度 (TDX 信令):</span>
-                                <span class="lbl-crowd-box text-neonAmber font-bold">${envState.crowd_density.toFixed(2)}</span>
-                            </div>
-                            <input class="slider-crowd-box w-full h-1.5 bg-cyberCard rounded appearance-none cursor-pointer accent-neonAmber" type="range" min="0.1" max="1.0" step="0.05" value="${envState.crowd_density}">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 pt-2">
-                            <button class="btn-inject-flightzone py-2 rounded bg-rose-600/30 border border-neonRed text-rose-300 font-bold flex items-center justify-center gap-1 text-[11px]">
-                                <i class="fa-solid fa-triangle-exclamation"></i> 逼近 10m
-                            </button>
-                            <button class="btn-feedback-reward py-2 rounded bg-emerald-600/30 border border-neonGreen text-emerald-300 font-bold flex items-center justify-center gap-1 text-[11px]">
-                                <i class="fa-solid fa-arrows-rotate"></i> 注入回饋
-                            </button>
-                        </div>
-                    </div>
-                `;
-                bindSharedControls();
-            }
-        }
-
-        document.getElementById('mob-nav-map').addEventListener('click', () => openMobDrawer('map'));
-        document.getElementById('mob-nav-horizon').addEventListener('click', () => openMobDrawer('horizon'));
-        document.getElementById('mob-nav-tensor').addEventListener('click', () => openMobDrawer('tensor'));
-        document.getElementById('mob-nav-ai').addEventListener('click', () => openMobDrawer('ai'));
-        document.getElementById('mob-nav-controls').addEventListener('click', () => openMobDrawer('controls'));
-        btnCloseMobPanel.addEventListener('click', () => openMobDrawer('map'));
-
-        function bindSharedControls() {
-            document.querySelectorAll('.slider-temp-box').forEach(s => {
-                s.addEventListener('input', (e) => {
-                    envState.temp_c = parseFloat(e.target.value);
-                    recalculateEngine();
-                });
-            });
-
-            document.querySelectorAll('.slider-crowd-box').forEach(s => {
-                s.addEventListener('input', (e) => {
-                    envState.crowd_density = parseFloat(e.target.value);
-                    recalculateEngine();
-                });
-            });
-
-            document.querySelectorAll('.slider-tmi-box').forEach(s => {
-                s.addEventListener('input', (e) => {
-                    envState.tmi = parseFloat(e.target.value);
-                    recalculateEngine();
-                });
-            });
-
-            document.querySelectorAll('.chk-festival-box').forEach(c => {
-                c.addEventListener('change', (e) => {
-                    envState.is_festival = e.target.checked;
-                    showToast("芒花季加權", envState.is_festival ? "啟動 2.8x 人流爆發加權" : "恢復常態人流權重", "info");
-                    recalculateEngine();
-                });
-            });
-
-            document.querySelectorAll('.btn-inject-flightzone').forEach(b => {
-                b.addEventListener('click', () => {
-                    currentBuffalo.lat = 24.9781;
-                    currentBuffalo.lng = 121.9241;
-                    envState.min_human_dist = 1.2;
-                    recalculateEngine();
-                    deskMap?.mapInst?.flyTo([24.9781, 121.9241], 17);
-                    mobMap?.mapInst?.flyTo([24.9781, 121.9241], 17);
-                    showToast("🔴 侵入硬防線！", "水牛逼近步道 1.2m，強制啟動低碳分流！", "alert");
-                });
-            });
-
-            document.querySelectorAll('.btn-feedback-reward').forEach(b => {
-                b.addEventListener('click', () => {
-                    const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-                    const v12s = [
-                        Math.min(1.0, Math.max(0.0, (thi - 50.0) / 40.0)),
-                        envState.ndwi, envState.ndvi,
-                        Math.min(1.0, currentBuffalo.count / 10.0),
-                        envState.tmi, envState.crowd_density,
-                        0.85, 0.70, 0.79, 0.90, 0.80, 0.88
-                    ];
-                    const cond = linUCB.updateFeedback(1, v12s, 1.0);
-                    currentBuffalo.lat = 24.9785;
-                    currentBuffalo.lng = 121.9238;
-                    envState.min_human_dist = 15.0;
-                    recalculateEngine();
-                    showToast("在線學習完成", `接收分流回饋 r_t=+1.0 (Cond: ${cond.toFixed(2)})`, "success");
-                });
-            });
-
-            document.querySelectorAll('.btn-simulate-vector').forEach(b => {
-                b.addEventListener('click', () => {
-                    currentBuffalo.vectorAngle = (currentBuffalo.vectorAngle + 15) % 360;
-                    currentBuffalo.lat += (Math.random() - 0.5) * 0.0004;
-                    currentBuffalo.lng += (Math.random() - 0.5) * 0.0004;
-                    recalculateEngine();
-                    deskMap?.mapInst?.flyTo([currentBuffalo.lat, currentBuffalo.lng], 16);
-                    mobMap?.mapInst?.flyTo([currentBuffalo.lat, currentBuffalo.lng], 16);
-                    showToast("向量外推刷新", `新方位: ${currentBuffalo.vectorAngle}° ➔ 擬合路徑`, "info");
-                });
-            });
-
-            document.querySelectorAll('.btn-export-geojson').forEach(b => {
-                b.addEventListener('click', exportGeoJSON);
-            });
-        }
-
-        function bindGeminiButtons() {
-            document.querySelectorAll('.btn-trigger-gemini').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    btn.disabled = true;
-                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-                    const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-                    
-                    setTimeout(() => {
-                        document.querySelectorAll('.narrative-content-box').forEach(box => {
-                            box.innerHTML = `
-                                <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 ${thi.toFixed(1)}，水牛解剖生理學無汗腺機制強烈驅動，沿 165° 谷線轉移至泥塘泡水。</div>
-                                <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 水牛途經埡口南側步道，登道遭遇概率達 85% 爆發點，空間阻力緊縮。</div>
-                                <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
-                            `;
-                        });
-                        showToast("三才導言已更新", "Gemini 戰略導言已重新合成完成", "success");
-                        btn.disabled = false;
-                        btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> 重新合成`;
-                    }, 500);
-                });
-            });
-        }
-
-        function exportGeoJSON() {
-            const geojson = {
-                type: "FeatureCollection",
-                timestamp: new Date().toISOString(),
-                features: [
-                    {
-                        type: "Feature",
-                        geometry: { type: "Point", coordinates: [currentBuffalo.lng, currentBuffalo.lat] },
-                        properties: {
-                            id: currentBuffalo.id,
-                            count: currentBuffalo.count,
-                            vector: "165° SSE",
-                            risk_R: document.getElementById('desk-val-risk')?.innerText || "2.88"
-                        }
-                    },
-                    ...PREDICTED_LOCATIONS.map(p => ({
-                        type: "Feature",
-                        geometry: { type: "Point", coordinates: [p.lng, p.lat] },
-                        properties: { name: p.name, eta: p.eta, desc: p.desc }
-                    }))
-                ]
-            };
-            const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `caoling_dual_ui_${Date.now()}.geojson`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("GeoJSON 匯出成功", "檔案已下載，可直接載入 QGIS 進行動態疊加", "success");
-        }
-
-        document.getElementById('select-tile-layer-desk')?.addEventListener('change', (e) => {
-            if (!deskMap) return;
-            deskMap.mapInst.removeLayer(deskMap.currentTile);
-            deskMap.currentTile = deskMap.tileLayers[e.target.value] || deskMap.tileLayers.nlsc;
-            deskMap.currentTile.addTo(deskMap.mapInst);
-            showToast("圖層切換", `已載入 ${e.target.options[e.target.selectedIndex].text}`, "info");
-        });
-
-        // GPS Lock Buttons
-        document.getElementById('btn-gps-center-desk')?.addEventListener('click', () => {
-            deskMap?.mapInst?.flyTo([24.9780, 121.9242], 16);
-            showToast("埡口定錨", "鏡頭鎖定至埡口鞍部 (348m)", "info");
-        });
-        document.getElementById('btn-mob-gps')?.addEventListener('click', () => {
-            mobMap?.mapInst?.flyTo([24.9780, 121.9242], 16);
-            showToast("埡口定錨", "鏡頭鎖定至埡口鞍部 (348m)", "info");
-        });
-
-        // Sound Toggle
-        document.getElementById('btn-sound-toggle').addEventListener('click', () => {
-            soundEnabled = !soundEnabled;
-            const icon = document.querySelector('#btn-sound-toggle i');
-            icon.className = soundEnabled ? 'fa-solid fa-volume-high text-neonCyan' : 'fa-solid fa-volume-xmark text-slate-500';
-            showToast("音效設定", soundEnabled ? "戰情提示音已開啟" : "戰情提示音已靜音", "info");
-        });
-
-        document.getElementById('btn-open-audit-modal').addEventListener('click', () => {
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const auditData = {
-                project_id: "Caoling_v26.0_DualUI",
-                timestamp: new Date().toISOString(),
-                thi_index: parseFloat(thi.toFixed(2)),
-                buffalo_count: currentBuffalo.count,
-                vector: "165° SSE (0.8 m/s)",
-                target: currentBuffalo.targetName,
-                conflict_risk_R: parseFloat(document.getElementById('desk-val-risk')?.innerText || "2.88"),
-                yi_state: document.getElementById('header-yi-badge').innerText,
-                carbon_saved_kg: 8.9,
-                hmac_sha256: "7a9b8c7d" + Math.abs(Date.now()).toString(16) + "e3f2a1b0c9d8"
-            };
-            document.getElementById('json-audit-preview').innerText = JSON.stringify(auditData, null, 2);
-            document.getElementById('modal-audit').classList.remove('hidden');
-            document.getElementById('modal-audit').classList.add('flex');
-            playTacticalBeep(920);
-        });
-
-        document.getElementById('btn-close-audit').addEventListener('click', () => {
-            document.getElementById('modal-audit').classList.add('hidden');
-            document.getElementById('modal-audit').classList.remove('flex');
-        });
-
-        document.getElementById('btn-copy-audit').addEventListener('click', () => {
-            const txt = document.getElementById('json-audit-preview').innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = txt;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast("複製成功", "Notion HMAC 存根已複製至剪貼簿", "success");
-        });
-
-        // Clock Ticks
         function updateClocks() {
             const now = new Date();
             const timeStr = now.toTimeString().split(' ')[0];
-            const mobTimeEl = document.getElementById('mob-update-time');
-            if (mobTimeEl) mobTimeEl.innerText = timeStr;
+            const mobTime = document.getElementById('mob-update-time');
+            if (mobTime) mobTime.innerText = timeStr;
 
-            const formatHour = (offset) => {
+            const fmt = (offset) => {
                 const d = new Date(now.getTime() + offset * 3600 * 1000);
                 return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             };
 
-            const t1 = formatHour(1), t2 = formatHour(2), t3 = formatHour(3);
-            const deskT1 = document.getElementById('desk-t1-time');
-            if (deskT1) deskT1.innerText = `t+1h (${t1})`;
-            const deskT2 = document.getElementById('desk-t2-time');
-            if (deskT2) deskT2.innerText = `t+2h (${t2})`;
-            const deskT3 = document.getElementById('desk-t3-time');
-            if (deskT3) deskT3.innerText = `t+3h (${t3})`;
+            const t1 = document.getElementById('desk-t1-time');
+            if (t1) t1.innerText = `${fmt(1)} (+1h)`;
+            const t2 = document.getElementById('desk-t2-time');
+            if (t2) t2.innerText = `${fmt(2)} (+2h)`;
+            const t3 = document.getElementById('desk-t3-time');
+            if (t3) t3.innerText = `${fmt(3)} (+3h)`;
+        }
 
-            const mobT1 = document.getElementById('mob-t1-time');
-            if (mobT1) mobT1.innerText = `${t1} (+1h)`;
-            const mobT2 = document.getElementById('mob-t2-time');
-            if (mobT2) mobT2.innerText = `${t2} (+2h)`;
-            const mobT3 = document.getElementById('mob-t3-time');
-            if (mobT3) mobT3.innerText = `${t3} (+3h)`;
+        let radarAngle = 0;
+        function animateCanvas() {
+            const rCanvas = document.getElementById('radarCanvasDesk');
+            if (rCanvas) {
+                const rect = rCanvas.getBoundingClientRect();
+                if (rCanvas.width !== rect.width || rCanvas.height !== rect.height) {
+                    rCanvas.width = rect.width; rCanvas.height = rect.height;
+                }
+                const ctx = rCanvas.getContext('2d');
+                ctx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+                const cx = rCanvas.width - 60, cy = 60, r = 40;
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = "rgba(0, 240, 255, 0.4)"; ctx.stroke();
+                radarAngle += 0.04;
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, radarAngle, radarAngle + 0.5); ctx.closePath();
+                ctx.fillStyle = "rgba(0, 240, 255, 0.4)"; ctx.fill();
+            }
+
+            const tCanvas = document.getElementById('tensorCanvasDesk');
+            if (tCanvas) {
+                const rect = tCanvas.getBoundingClientRect();
+                if (tCanvas.width !== rect.width || tCanvas.height !== rect.height) {
+                    tCanvas.width = rect.width; tCanvas.height = rect.height;
+                }
+                const ctx = tCanvas.getContext('2d');
+                ctx.clearRect(0, 0, tCanvas.width, tCanvas.height);
+                const vals = [0.84, 0.55, 0.65, 0.70, 0.76, 0.90, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88];
+                const labels = ["THI", "NDWI", "NDVI", "FLIR", "TMI", "Crowd", "DEM", "GTS", "CO2", "AI", "Senti", "ESG"];
+                const bw = (tCanvas.width - 20) / 12;
+                vals.forEach((v, i) => {
+                    const h = v * (tCanvas.height - 30);
+                    ctx.fillStyle = v > 0.75 ? '#ff2a5f' : '#00f0ff';
+                    ctx.fillRect(10 + i * bw, tCanvas.height - 15 - h, bw - 3, h);
+                    ctx.font = "8px sans-serif"; ctx.fillStyle = "#94a3b8";
+                    ctx.fillText(labels[i], 8 + i * bw, tCanvas.height - 3);
+                });
+            }
+            requestAnimationFrame(animateCanvas);
         }
 
         window.onload = function() {
-            initMaps();
-            recalculateEngine();
-            bindSharedControls();
-            bindGeminiButtons();
+            deskMap = createMapInstance('leafletMapDesk');
+            mobMap = createMapInstance('leafletMapMobile');
             updateClocks();
             setInterval(updateClocks, 1000);
+            animateCanvas();
 
-            // Ensure maps are sized properly on initial load
-            ensureMapReady(deskMap);
-            ensureMapReady(mobMap);
-
-            window.addEventListener('resize', () => {
-                ensureMapReady(deskMap);
-                ensureMapReady(mobMap);
+            document.getElementById('btn-device-auto')?.addEventListener('click', () => {
+                document.body.classList.remove('force-desktop', 'force-mobile');
+                deskMap?.invalidateSize(); mobMap?.invalidateSize();
+            });
+            document.getElementById('btn-device-desktop')?.addEventListener('click', () => {
+                document.body.classList.remove('force-mobile'); document.body.classList.add('force-desktop');
+                deskMap?.invalidateSize();
+            });
+            document.getElementById('btn-device-mobile')?.addEventListener('click', () => {
+                document.body.classList.remove('force-desktop'); document.body.classList.add('force-mobile');
+                mobMap?.invalidateSize();
             });
 
-            showToast("GEM Engine v26.0 載入成功", "雙模載具自適應控制台已就緒", "success");
+            setTimeout(() => { deskMap?.invalidateSize(); mobMap?.invalidateSize(); }, 300);
         };
     </script>
 </body>
