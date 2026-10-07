@@ -1,1345 +1,819 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GEM Engine v26.0 | 草嶺古道水牛動態預判與空間戰情互動控制台</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet GIS Map Library -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Google Fonts & FontAwesome -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        orbitron: ['Orbitron', 'sans-serif'],
-                        rajdhani: ['Rajdhani', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    },
-                    colors: {
-                        cyberDark: '#040711',
-                        cyberPanel: 'rgba(8, 14, 28, 0.88)',
-                        cyberCard: 'rgba(13, 24, 46, 0.75)',
-                        cyberBorder: '#162b4d',
-                        neonCyan: '#00f0ff',
-                        neonPurple: '#b026ff',
-                        neonAmber: '#ffaa00',
-                        neonRed: '#ff2a5f',
-                        neonGreen: '#00ff88',
-                    },
-                    boxShadow: {
-                        'neon-cyan': '0 0 15px rgba(0, 240, 255, 0.45)',
-                        'neon-purple': '0 0 18px rgba(176, 38, 255, 0.45)',
-                        'neon-red': '0 0 20px rgba(255, 42, 95, 0.55)',
-                        'neon-green': '0 0 15px rgba(0, 255, 136, 0.45)',
-                        'neon-amber': '0 0 15px rgba(255, 170, 0, 0.45)',
-                    }
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_048a8715459fd8f8b6b5c2d0406098b9 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
                 }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
             }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #040711; }
-        ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+            </style>
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(1000%); }
-        }
-        .scanline-effect {
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 10px;
-            background: linear-gradient(180deg, rgba(0, 240, 255, 0) 0%, rgba(0, 240, 255, 0.15) 50%, rgba(0, 240, 255, 0) 100%);
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-            z-index: 25;
-        }
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
 
-        @keyframes radar-pulse {
-            0% { transform: scale(0.6); opacity: 0.95; }
-            50% { transform: scale(1.8); opacity: 0.45; }
-            100% { transform: scale(3.0); opacity: 0; }
-        }
-        .flightzone-radar-pulse {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 42, 95, 0.28);
-            border: 2px solid #ff2a5f;
-            border-radius: 50%;
-            position: absolute;
-            top: -24px;
-            left: -24px;
-            pointer-events: none;
-            animation: radar-pulse 2.2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
-        }
-        .buffalo-core-beacon {
-            width: 16px;
-            height: 16px;
-            background: #ffffff;
-            border: 3px solid #ff2a5f;
-            box-shadow: 0 0 16px #ff2a5f, 0 0 30px #ff2a5f;
-            border-radius: 50%;
-            position: absolute;
-            top: -8px;
-            left: -8px;
-        }
-        .hud-corner-bracket {
-            position: relative;
-        }
-        .hud-corner-bracket::before {
-            content: '';
-            position: absolute;
-            top: -1px; left: -1px;
-            width: 8px; height: 8px;
-            border-top: 2px solid #00f0ff;
-            border-left: 2px solid #00f0ff;
-            pointer-events: none;
-        }
-        .hud-corner-bracket::after {
-            content: '';
-            position: absolute;
-            bottom: -1px; right: -1px;
-            width: 8px; height: 8px;
-            border-bottom: 2px solid #00f0ff;
-            border-right: 2px solid #00f0ff;
-            pointer-events: none;
-        }
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
 
-        .leaflet-container {
-            background: #040711 !important;
-            font-family: 'Rajdhani', sans-serif !important;
-        }
-        .leaflet-bar a {
-            background-color: #080e1c !important;
-            color: #00f0ff !important;
-            border-color: #162b4d !important;
-        }
-        .leaflet-bar a:hover {
-            background-color: #0d182e !important;
-            color: #ffffff !important;
-        }
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(8, 14, 28, 0.95) !important;
-            color: #f1f5f9 !important;
-            border: 1px solid #162b4d !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
-            border-radius: 10px !important;
-            backdrop-filter: blur(8px);
-        }
-    </style>
-</head>
-<body class="bg-cyberDark text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden selection:bg-neonCyan selection:text-black">
-
-    <!-- Top Tactical Status Bar -->
-    <header class="border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 md:px-5 py-2 flex items-center justify-between sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-neon-cyan text-white text-base">
-                <i class="fa-solid fa-radar fa-spin"></i>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="font-orbitron font-extrabold text-sm md:text-base tracking-widest text-white flex items-center gap-1.5">
-                        GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v26.0 PRO</span>
-                    </h1>
-                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-950/80 text-neonGreen border border-emerald-500/40">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span> 實時山脈向量對齊
-                    </span>
-                </div>
-                <p class="text-[10px] md:text-xs text-slate-400 font-mono tracking-wider truncate max-w-[200px] md:max-w-none">草嶺古道水牛動態棲地預判與實體山區 GIS 戰情室</p>
-            </div>
-        </div>
-
-        <!-- Global Header Indicators -->
-        <div class="flex items-center gap-2 text-xs font-mono">
-            <div class="hidden sm:flex bg-cyberCard px-2.5 py-1 rounded border border-cyberBorder items-center gap-1.5">
-                <i class="fa-solid fa-compass text-amber-400"></i>
-                <span id="yijing-badge" class="text-amber-300 font-semibold text-[11px]">老陽 (極限過載管制)</span>
-            </div>
-            <div class="hidden sm:flex bg-cyberCard px-2.5 py-1 rounded border border-cyberBorder items-center gap-1.5">
-                <i class="fa-solid fa-leaf text-neonGreen"></i>
-                <span class="text-emerald-300 font-bold text-[11px]">-8.9 kg CO₂e</span>
-            </div>
-            <button id="btn-sound-toggle" class="p-1.5 px-2.5 rounded bg-cyberCard border border-cyberBorder text-slate-300 hover:text-neonCyan transition flex items-center gap-1.5 text-[11px]" title="音效切換">
-                <i class="fa-solid fa-volume-high text-neonCyan"></i> <span class="hidden sm:inline">HUD音效</span>
-            </button>
-            <button id="btn-open-audit-modal" class="px-2.5 py-1.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-600 hover:text-white transition flex items-center gap-1 text-[11px]">
-                <i class="fa-solid fa-shield-halved"></i> <span class="hidden sm:inline">Notion</span>存根
-            </button>
-        </div>
-    </header>
-
-    <!-- Mobile View Switcher Tab Bar -->
-    <nav class="lg:hidden border-b border-cyberBorder bg-cyberPanel flex justify-around text-xs font-mono py-1.5 px-1 sticky top-[51px] z-40">
-        <button id="tab-btn-map" class="flex-1 py-1.5 text-neonCyan border-b-2 border-neonCyan font-bold flex items-center justify-center gap-1">
-            <i class="fa-solid fa-map-location-dot"></i> 戰情圖台
-        </button>
-        <button id="tab-btn-vector" class="flex-1 py-1.5 text-slate-400 border-b-2 border-transparent flex items-center justify-center gap-1">
-            <i class="fa-solid fa-location-arrow"></i> 向量外推
-        </button>
-        <button id="tab-btn-tensor" class="flex-1 py-1.5 text-slate-400 border-b-2 border-transparent flex items-center justify-center gap-1">
-            <i class="fa-solid fa-chart-simple"></i> 12D張量
-        </button>
-        <button id="tab-btn-controls" class="flex-1 py-1.5 text-slate-400 border-b-2 border-transparent flex items-center justify-center gap-1">
-            <i class="fa-solid fa-sliders"></i> 調控模擬
-        </button>
-    </nav>
-
-    <!-- Main Command Workspace Container -->
-    <main class="flex-1 p-2 md:p-3.5 grid grid-cols-1 lg:grid-cols-12 gap-3 max-w-[1920px] w-full mx-auto pb-16 lg:pb-3">
         
-        <!-- Left / Center: Real GIS Map & Interactive HUD (8 Cols) -->
-        <div id="section-map" class="lg:col-span-8 flex flex-col gap-2.5">
-            
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 md:p-3 shadow-2xl relative flex flex-col hud-corner-bracket">
-                <div class="flex items-center justify-between pb-2 border-b border-cyberBorder/80 text-xs">
-                    <div class="flex items-center gap-2 font-mono">
-                        <span class="w-2.5 h-2.5 rounded-full bg-neonCyan inline-block shadow-neon-cyan animate-pulse"></span>
-                        <span class="font-bold text-slate-200 tracking-wider text-xs md:text-sm font-orbitron">草嶺古道稜線 GIS 向量戰情台</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <select id="select-tile-layer" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-2 py-1 text-[11px] font-mono focus:outline-none focus:border-neonCyan">
-                            <option value="nlsc">國土測繪 (NLSC 航照正射)</option>
-                            <option value="emap">國土測繪 (EMAP 標高地形圖)</option>
-                            <option value="esri">Esri 全球高清衛星航照</option>
-                            <option value="dark">CartoDB 戰情暗黑底圖</option>
-                        </select>
-                        <button id="btn-gps-center" class="px-2.5 py-1 text-[11px] rounded bg-cyberCard border border-cyberBorder hover:border-neonCyan text-slate-300 font-mono flex items-center gap-1" title="定位到埡口鞍部">
-                            <i class="fa-solid fa-crosshairs text-neonCyan"></i> 埡口鎖定
-                        </button>
-                    </div>
-                </div>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_048a8715459fd8f8b6b5c2d0406098b9" ></div>
+        
 
-                <!-- Leaflet Map Viewport Container -->
-                <div class="relative w-full h-[400px] sm:h-[460px] md:h-[500px] rounded-lg overflow-hidden mt-2 bg-cyberDark border border-cyberBorder/80 group">
-                    <div class="scanline-effect"></div>
-                    <div id="leafletMap" class="w-full h-full z-10"></div>
-                    
-                    <!-- HUD Overlay: Top Left Vector & Target Predictor (Cyber Glassmorphism) -->
-                    <div class="absolute top-3 left-3 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2.5 pointer-events-none text-xs font-mono space-y-1 z-20 shadow-neon-purple max-w-[280px]">
-                        <div class="flex items-center justify-between border-b border-neonPurple/30 pb-1">
-                            <span class="text-purple-300 font-bold flex items-center gap-1 text-[11px]">
-                                <i class="fa-solid fa-location-arrow text-neonPurple fa-spin"></i> 步道實體向量外推
-                            </span>
-                            <span class="text-[9px] px-1 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-700/60 font-orbitron">CosSim 91.5%</span>
-                        </div>
-                        <div class="text-slate-200 text-[11px] leading-tight font-semibold">
-                            移動向量：<span class="text-neonPurple font-bold">南南東 (165°)</span> @ <span class="text-neonCyan">0.8 m/s</span>
-                        </div>
-                        <div class="text-[10px] text-slate-300 bg-cyberCard/80 p-1.5 rounded border border-cyberBorder">
-                            🎯 <b>目標終點：</b>護管所泥塘散熱區 (+25 min)<br>
-                            途經節點：<span class="text-neonCyan">埡口南側步道 (+10 min)</span>
-                        </div>
-                        <div class="text-amber-400 text-[10px]">
-                            空間阻力面：<span id="hud-resistance" class="font-bold text-amber-300">S_spatial=0.742 (極強吸引)</span>
-                        </div>
-                    </div>
+    <style>
+      @keyframes pulse-ring {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(168, 85, 247, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+      }
+      .purple-dot {
+        display: inline-block; width: 8px; height: 8px; background-color: #a855f7;
+        border-radius: 50%; margin-right: 6px; animation: pulse-ring 1.5s infinite; vertical-align: middle;
+      }
+    </style>
 
-                    <!-- HUD Overlay: Alert Status Banner Bottom Center -->
-                    <div id="canvas-alert-banner" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg backdrop-blur-md border font-mono font-bold text-[11px] md:text-xs flex items-center gap-2.5 transition-all duration-300 shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 max-w-[94%] md:max-w-none text-center">
-                        <span class="w-2.5 h-2.5 rounded-full bg-neonRed animate-ping shrink-0"></span>
-                        <span id="canvas-alert-text">🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)</span>
-                    </div>
-
-                    <!-- Interactive Floating Mini Radar Legend -->
-                    <div class="absolute bottom-14 left-3 bg-cyberDark/90 backdrop-blur-md border border-cyberBorder/80 rounded-lg p-2 text-[10px] font-mono space-y-1 z-20 hidden sm:block">
-                        <div class="flex items-center gap-1.5 text-rose-400 font-bold"><span class="w-2 h-2 rounded-full bg-neonRed animate-pulse"></span> 10m Flight Zone (驚嚇硬防線)</div>
-                        <div class="flex items-center gap-1.5 text-amber-400"><span class="w-2 h-2 rounded-full bg-neonAmber"></span> 20m 預警告示廊道</div>
-                        <div class="flex items-center gap-1.5 text-purple-400"><span class="w-2 h-2 rounded-full bg-neonPurple"></span> 預測移動向量虛線軌跡</div>
-                        <div class="flex items-center gap-1.5 text-neonCyan"><span class="w-2 h-2 rounded-full bg-neonCyan"></span> 水牛群體 FLIR 熱斑 (33°C~37°C)</div>
-                    </div>
-                </div>
-
-                <!-- Ahead-of-Time 1~3h Horizon Timeline & Key Metrics -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2.5">
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                            <span>THI 熱應力指數</span>
-                            <i class="fa-solid fa-temperature-arrow-up text-neonRed"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span id="val-thi" class="text-xl md:text-2xl font-bold font-orbitron text-neonRed">83.6</span>
-                            <span id="val-thi-state" class="text-[9px] px-1 py-0.5 rounded bg-rose-950 text-rose-300 font-semibold border border-rose-800/40 font-mono">泥塘散熱</span>
-                        </div>
-                        <div class="text-[9px] text-slate-500 mt-0.5 font-mono">
-                            THI > 78 體熱調節極限
-                        </div>
-                    </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                            <span>衝突風險 R (Conflict)</span>
-                            <i class="fa-solid fa-triangle-exclamation text-neonAmber"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span id="val-risk" class="text-xl md:text-2xl font-bold font-orbitron text-neonRed">2.88</span>
-                            <span id="val-risk-level" class="text-[9px] px-1 py-0.5 rounded bg-rose-950 text-rose-300 font-semibold border border-rose-800/40 font-mono">紅色警戒</span>
-                        </div>
-                        <div class="text-[9px] text-slate-500 mt-0.5 font-mono">
-                            R ≥ 3.0 或侵入 10m 觸發強制分流
-                        </div>
-                    </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                            <span>水牛頭數 (FLIR)</span>
-                            <i class="fa-solid fa-shield-cat text-neonCyan"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span id="val-buffalo-count" class="text-xl md:text-2xl font-bold font-orbitron text-neonCyan">7</span>
-                            <span class="text-[10px] text-slate-400 font-mono">頭</span>
-                        </div>
-                        <div class="text-[9px] text-slate-500 mt-0.5 font-mono">
-                            棲地概率 P: <b class="text-neonCyan font-mono" id="val-pbuffalo">0.912</b>
-                        </div>
-                    </div>
-
-                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                            <span>LinUCB 決策臂</span>
-                            <i class="fa-solid fa-network-wired text-neonPurple"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span id="val-linucb-arm" class="text-sm md:text-base font-bold font-mono text-purple-300 truncate">Arm 1 (E-Bike)</span>
-                        </div>
-                        <div class="text-[9px] text-slate-500 mt-0.5 font-mono flex items-center justify-between">
-                            <span>條件數 Cond: <b id="val-cond" class="text-slate-300 font-mono">1.24</b></span>
-                            <span class="text-neonGreen">SVD健全</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ahead-of-Time Predictive Horizon (t+1h ~ t+3h) Interactive Timeline Card -->
-                <div class="bg-cyberCard border border-neonPurple/30 rounded-lg p-2.5 mt-2.5">
-                    <div class="flex items-center justify-between text-xs font-mono mb-2">
-                        <div class="flex items-center gap-1.5 text-purple-300 font-bold">
-                            <i class="fa-solid fa-clock-rotate-left text-neonPurple"></i> 前瞻 t+1h ~ t+3h 時空跨越風險預報 (Ahead-of-Time Horizon)
-                        </div>
-                        <span class="text-[10px] text-slate-400 font-mono">馬可夫外推模態</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-                        <div class="bg-rose-950/40 border border-neonRed/50 p-2 rounded">
-                            <div class="text-slate-400 text-[10px]">t+1h (06:19)</div>
-                            <div class="text-neonRed font-bold text-sm md:text-base font-orbitron mt-0.5">85% (高)</div>
-                            <div class="text-[9px] text-rose-300 mt-0.5">穿越埡口石階步道</div>
-                        </div>
-                        <div class="bg-amber-950/40 border border-neonAmber/50 p-2 rounded">
-                            <div class="text-slate-400 text-[10px]">t+2h (07:19)</div>
-                            <div class="text-neonAmber font-bold text-sm md:text-base font-orbitron mt-0.5">60% (中)</div>
-                            <div class="text-[9px] text-amber-300 mt-0.5">滯留鞍部南側草叢</div>
-                        </div>
-                        <div class="bg-emerald-950/40 border border-neonGreen/50 p-2 rounded">
-                            <div class="text-slate-400 text-[10px]">t+3h (08:19)</div>
-                            <div class="text-neonGreen font-bold text-sm md:text-base font-orbitron mt-0.5">20% (低)</div>
-                            <div class="text-[9px] text-emerald-300 mt-0.5">進入護管所泥塘泥浴</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gemini API San-Cai Strategic Narrative Card -->
-                <div id="section-ai-card" class="mt-2.5 bg-gradient-to-br from-cyberCard to-indigo-950/40 p-3 rounded-lg border border-cyan-900/60 shadow-lg relative overflow-hidden">
-                    <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-5 h-5 rounded bg-cyan-500/20 text-neonCyan flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-brain"></i>
-                            </div>
-                            <span class="font-bold text-xs md:text-sm text-cyan-200 font-orbitron">GEMINI 三才戰略導言 (San-Cai Briefing)</span>
-                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-700/60 font-mono">gemini-2.5-flash</span>
-                        </div>
-                        <button id="btn-call-gemini" class="px-2.5 py-1 rounded bg-neonCyan hover:bg-cyan-400 text-black font-bold text-[11px] font-mono transition flex items-center gap-1 shadow-neon-cyan">
-                            <i class="fa-solid fa-sparkles"></i> 重新合成導言
-                        </button>
-                    </div>
-
-                    <div id="narrative-content" class="text-xs text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2.5 rounded border border-cyberBorder/80">
-                        <div class="flex items-start gap-1.5">
-                            <span class="font-mono font-bold text-neonCyan shrink-0">【天時・恆卦】</span>
-                            <p class="inline">鞍部即時 THI_wind 達 83.6，突破水牛無汗腺體溫調節閾值。牛群受生理熱應力強烈驅動，以 0.8 m/s 沿山谷向量 165° 往護管所泥塘泡水散熱。</p>
-                        </div>
-                        <div class="flex items-start gap-1.5 mt-1.5">
-                            <span class="font-mono font-bold text-neonAmber shrink-0">【地利・艮山】</span>
-                            <p class="inline">埡口涼亭至虎字碑石階步道呈現高阻力；水牛目前距離步道僅 10m，途經埡口南側步道，登道遭遇概率達 85% 爆發點。</p>
-                        </div>
-                        <div class="flex items-start gap-1.5 mt-1.5">
-                            <span class="font-mono font-bold text-neonGreen shrink-0">【人和・離火/賁卦】</span>
-                            <p class="inline">啟動 PWA 500m LBS 圍欄避險推播，執行 LinUCB Arm 1 導流指令，引導遊客往大里天公廟搭乘低碳 E-bike，人均減碳 8.9 kg CO₂e，名實對齊完畢。</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+    <div id="mobile-dashboard" style="
+        position: fixed; top: 10px; left: 10px; max-width: 320px; z-index: 9999;
+        background: rgba(15, 23, 42, 0.92); color: white; padding: 12px 14px;
+        border-radius: 12px; font-family: -apple-system, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.12); font-size: 12px; line-height: 1.5;
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <div style="font-weight: bold; font-size: 14px; color: #f8fafc;">
+          <span class="purple-dot"></span>🦬 水牛向量與古道對齊預判
         </div>
-
-        <!-- Right Sidebar (4 Cols on Desktop, Tabbed on Mobile) -->
-        <div id="section-sidebar" class="lg:col-span-4 flex flex-col gap-2.5">
-            
-            <!-- 12-Dimensional Multimodal Tensor (V12S) Visualizer -->
-            <div id="section-tensor-card" class="bg-cyberPanel rounded-xl border border-cyberBorder p-3 shadow-xl hud-corner-bracket">
-                <div class="flex items-center justify-between pb-2 border-b border-cyberBorder/80">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-chart-simple text-neonCyan text-sm"></i>
-                        <h2 class="font-bold text-xs md:text-sm text-slate-200 font-orbitron">12 維多模態張量 (V12S)</h2>
-                    </div>
-                    <span id="yi-state-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-neonRed/50">
-                        老陽 (極限過載管制)
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 mt-2 text-[11px] font-mono">
-                    <div class="bg-cyberCard p-2 rounded border border-cyberBorder">
-                        <div class="text-slate-400 text-[10px]">餘弦相似度 (CosSim)</div>
-                        <div id="stat-cossim" class="text-purple-300 font-bold text-xs md:text-sm font-orbitron mt-0.5">0.9150</div>
-                    </div>
-                    <div class="bg-cyberCard p-2 rounded border border-cyberBorder">
-                        <div class="text-slate-400 text-[10px]">揲蓍 Z-Score (Composite)</div>
-                        <div id="stat-zscore" class="text-neonRed font-bold text-xs md:text-sm font-orbitron mt-0.5">+2.42 σ</div>
-                    </div>
-                </div>
-
-                <!-- 12 Bars Container -->
-                <div id="tensor-bars" class="space-y-1.5 mt-2.5 text-[11px] font-mono max-h-[195px] overflow-y-auto pr-1">
-                    <!-- Dynamically Populated by JS -->
-                </div>
-            </div>
-
-            <!-- Field Dynamic Simulation & Testing Deck -->
-            <div id="section-control-card" class="bg-cyberPanel rounded-xl border border-cyberBorder p-3 shadow-xl flex-1 flex flex-col justify-between hud-corner-bracket">
-                <div>
-                    <div class="flex items-center justify-between pb-2 border-b border-cyberBorder/80">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-neonAmber text-sm"></i>
-                            <h2 class="font-bold text-xs md:text-sm text-slate-200 font-orbitron">場域實戰動態調控檯</h2>
-                        </div>
-                        <span class="text-[9px] text-slate-400 font-mono tracking-widest">TACTICAL RIG</span>
-                    </div>
-
-                    <!-- Sliders for testing environment -->
-                    <div class="space-y-2.5 mt-2.5 text-xs font-mono">
-                        <div>
-                            <div class="flex justify-between text-slate-300 mb-0.5">
-                                <span>環境氣溫 (CWA 觀測):</span>
-                                <span id="lbl-temp" class="text-neonCyan font-bold">30.2 °C</span>
-                            </div>
-                            <input id="slider-temp" type="range" min="15" max="38" step="0.5" value="30.2" class="w-full h-1.5 bg-cyberCard rounded appearance-none cursor-pointer accent-neonCyan">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-slate-300 mb-0.5">
-                                <span>人潮滯留密度 (TDX 信令):</span>
-                                <span id="lbl-crowd" class="text-neonAmber font-bold">0.90 (飽和)</span>
-                            </div>
-                            <input id="slider-crowd" type="range" min="0.1" max="1.0" step="0.05" value="0.90" class="w-full h-1.5 bg-cyberCard rounded appearance-none cursor-pointer accent-neonAmber">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-slate-300 mb-0.5">
-                                <span>步道泥濘度 (TMI 感測):</span>
-                                <span id="lbl-tmi" class="text-slate-200 font-bold">0.76</span>
-                            </div>
-                            <input id="slider-tmi" type="range" min="0.1" max="1.0" step="0.05" value="0.76" class="w-full h-1.5 bg-cyberCard rounded appearance-none cursor-pointer accent-indigo-400">
-                        </div>
-
-                        <div class="flex items-center justify-between pt-1">
-                            <span class="text-slate-300 text-[11px]">11月芒花季 2.8x 人流加權:</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input id="chk-festival" type="checkbox" checked class="sr-only peer">
-                                <div class="w-9 h-5 bg-cyberCard peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-neonAmber"></div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Simulation Action Buttons -->
-                <div class="space-y-2 mt-3 pt-2.5 border-t border-cyberBorder">
-                    <button id="btn-inject-flightzone" class="w-full py-2 px-3 rounded bg-rose-600/20 border border-neonRed text-rose-300 hover:bg-neonRed hover:text-white transition text-xs font-semibold flex items-center justify-center gap-1.5 font-mono shadow-neon-red">
-                        <i class="fa-solid fa-bullhorn"></i> 模擬逼近 10m Flight Zone (強制紅燈)
-                    </button>
-
-                    <button id="btn-feedback-reward" class="w-full py-2 px-3 rounded bg-emerald-600/20 border border-neonGreen text-emerald-300 hover:bg-neonGreen hover:text-black transition text-xs font-semibold flex items-center justify-center gap-1.5 font-mono shadow-neon-green">
-                        <i class="fa-solid fa-arrows-rotate"></i> 注入現場分流核銷回饋 (r_t = +1.0)
-                    </button>
-
-                    <div class="grid grid-cols-2 gap-2 pt-0.5">
-                        <button id="btn-simulate-vector" class="py-1.5 px-2 rounded bg-cyberCard border border-cyberBorder hover:border-neonPurple text-purple-300 text-xs transition font-mono">
-                            <i class="fa-solid fa-compass text-neonPurple mr-1"></i>向量外推
-                        </button>
-                        <button id="btn-export-geojson" class="py-1.5 px-2 rounded bg-cyberCard border border-cyberBorder hover:border-neonGreen text-slate-300 text-xs transition font-mono">
-                            <i class="fa-solid fa-download text-neonGreen mr-1"></i>匯出 GeoJSON
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
+        <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 10px;">
+          <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
         </div>
+      </div>
 
-    </main>
-
-    <!-- Notion Audit Stub Inspection Modal -->
-    <div id="modal-audit" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 md:p-4">
-        <div class="bg-cyberPanel border border-cyberBorder w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] hud-corner-bracket">
-            <div class="px-4 py-3 border-b border-cyberBorder flex items-center justify-between bg-cyberCard">
-                <div class="flex items-center gap-2 font-mono text-xs md:text-sm">
-                    <i class="fa-solid fa-database text-neonCyan"></i>
-                    <span class="font-bold text-slate-100 font-orbitron">NOTION 數位審計存根 (HMAC-SHA256 簽名)</span>
-                </div>
-                <button id="btn-close-audit" class="text-slate-400 hover:text-white transition text-xl">&times;</button>
-            </div>
-            <div class="p-4 overflow-y-auto space-y-3 text-xs font-mono">
-                <p class="text-slate-300 font-sans text-xs">
-                    GEM Engine v26.0 每次預判皆即時運算 12 維張量 $V_{12S}$ 並產生防篡改 HMAC-SHA256 數位簽名，秒級同步至 Notion 作為歐盟 ESG 防漂綠及自然資本可追溯憑證。
-                </p>
-                <div class="bg-cyberDark p-3 rounded border border-cyberBorder text-neonCyan overflow-x-auto">
-                    <pre id="json-audit-preview" class="text-[10px] md:text-[11px] leading-relaxed"></pre>
-                </div>
-                <div class="flex items-center justify-between text-slate-400 font-mono text-[10px]">
-                    <span>HMAC-SHA256 KEY: <b class="text-slate-200">Caoling_v26_Master_Secret</b></span>
-                    <span class="text-neonGreen"><i class="fa-solid fa-circle-check"></i> 數位簽章驗證通過</span>
-                </div>
-            </div>
-            <div class="px-4 py-2.5 border-t border-cyberBorder bg-cyberCard flex justify-end">
-                <button id="btn-copy-audit" class="px-3.5 py-1.5 rounded bg-neonCyan hover:bg-cyan-400 text-black font-bold text-xs transition font-mono shadow-neon-cyan">
-                    <i class="fa-solid fa-copy mr-1"></i>複製 JSON 存根
-                </button>
-            </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
+        <div>
+          <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
+          <div style="font-weight: bold; font-size: 15px; color: #f87171;">7 <span style="font-size: 10px;">頭</span></div>
         </div>
+        <div>
+          <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
+          <div style="font-weight: bold; font-size: 15px; color: #c084fc;">91.5%</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.15); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
+        <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 步道沿線向量：南南東 (165°) (0.8 m/s)</div>
+        <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
+          🎯 <b>預測目標地點：</b>護管所泥塘散熱區 (預測終點)
+          <br><span style="color: #38bdf8; font-size: 10px;">途經：埡口南側步道 (預測途經點) (+10 分鐘)</span>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
+        <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險時序：</b></div>
+        <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+          <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+            <div style="color: #cbd5e1;">06:38 (+1h)</div>
+            <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+          </div>
+          <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+            <div style="color: #cbd5e1;">07:38 (+2h)</div>
+            <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+          </div>
+          <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+            <div style="color: #cbd5e1;">08:38 (+3h)</div>
+            <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Toast Notification Box -->
-    <div id="toast-box" class="fixed bottom-14 lg:bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
     <script>
-        /* =========================================================================
-         * GEM ENGINE v26.0 CYBER TACTICAL OPERATOR & GIS LEAFLET ENGINE
-         * ========================================================================= */
+      let count = parseInt(localStorage.getItem('caoling_map_refresh_count') || '0') + 1;
+      localStorage.setItem('caoling_map_refresh_count', count);
+      document.getElementById('refresh-count').innerText = '#' + count;
 
-        // Web Audio Feedback Synthesizer
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-        let soundEnabled = true;
+      let now = new Date();
+      document.getElementById('update-time').innerText = now.toTimeString().split(' ')[0];
 
-        function playTacticalBeep(freq = 880, type = 'sine', duration = 0.12) {
-            if (!soundEnabled) return;
-            try {
-                if (!audioCtx) audioCtx = new AudioContext();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) { console.warn("Tactical audio unavailable", e); }
-        }
-
-        const FLIGHT_ZONE_LIMIT_M = 10.0;
-        const WARNING_CORRIDOR_M = 20.0;
-
-        // Exact Trail Nodes along Caoling Mountain Ridge from 水午行為分析1007_5.py
-        const TRAIL_WAYPOINTS = [
-            { id: "NODE_YWK", name: "遠望坑入口", lat: 25.0034, lng: 121.9318, elev: 120, desc: "古道起點平緩區" },
-            { id: "NODE_DSM", name: "跌死馬橋", lat: 24.9960, lng: 121.9285, elev: 180, desc: "樹林窪地避風點" },
-            { id: "NODE_XZM", name: "雄鎮蠻煙碑", lat: 24.9886, lng: 121.9250, elev: 240, desc: "古道石階攀升段" },
-            { id: "NODE_HZB", name: "虎字碑", lat: 24.9785, lng: 121.9240, elev: 330, desc: "風口風寒體感高" },
-            { id: "NODE_YK",  name: "埡口涼亭 (鞍部核心區)", lat: 24.9780, lng: 121.9242, elev: 348, desc: "鞍部核心瓶頸點" },
-            { id: "NODE_YKS", name: "埡口南側步道彎道", lat: 24.9762, lng: 121.9245, elev: 320, desc: "步道實體對齊節點" },
-            { id: "NODE_HGS", name: "護管所 (泥塘散熱區)", lat: 24.9745, lng: 121.9248, elev: 280, desc: "水牛泥浴散熱區" },
-            { id: "NODE_DLT", name: "大里天公廟", lat: 24.9696, lng: 121.9242, elev: 45,  desc: "E-bike 低碳轉乘站" },
-            { id: "NODE_DLY", name: "大里遊客中心", lat: 24.9691, lng: 121.9246, elev: 30,  desc: "台鐵/客運轉乘處" }
-        ];
-
-        // Active Water Buffalo Herd Tracking
-        let currentBuffalo = {
-            id: "HERD_01",
-            lat: 24.9782,
-            lng: 121.9240,
-            count: 7,
-            temp_skin: 36.2,
-            vectorAngle: 165,
-            vectorSpeed: 0.8,
-            targetName: "護管所泥塘散熱區 (預測終點)"
-        };
-
-        // Projected Vector Nodes (Strictly trail-aligned from 水午行為分析1007_5.py)
-        const PREDICTED_LOCATIONS = [
-            { name: "埡口草坡 (當前起點)", lat: 24.9782, lng: 121.9240, eta: "0 分鐘", desc: "即時出沒點" },
-            { name: "埡口南側步道 (預測途經點)", lat: 24.9762, lng: 121.9245, eta: "+10 分鐘", desc: "沿草嶺古道步道順向移動" },
-            { name: "護管所泥塘散熱區 (預測終點)", lat: 24.9745, lng: 121.9248, eta: "+25 分鐘", desc: "高溫 THI 驅動泥塘泡水目的地" }
-        ];
-
-        // Environmental State Variables
-        let envState = {
-            temp_c: 30.2,
-            rh_percent: 82.0,
-            wind_speed: 4.5,
-            exposure: 0.85,
-            ndwi: 0.55,
-            ndvi: 0.65,
-            crowd_density: 0.90,
-            tmi: 0.76,
-            is_festival: true,
-            min_human_dist: 2.2
-        };
-
-        // LinUCB Reinforcement Learning Engine
-        class LinUCBEngine {
-            constructor(d = 12, gamma = 0.98, alpha = 0.35) {
-                this.d = d;
-                this.gamma = gamma;
-                this.alpha = alpha;
-                this.A_inv = [this.eye(d), this.eye(d)]; // 2 arms
-                this.b = [new Array(d).fill(0), new Array(d).fill(0)];
-                this.svdHealingCount = 0;
-            }
-
-            eye(n) {
-                const m = [];
-                for(let i=0; i<n; i++) {
-                    const row = new Array(n).fill(0);
-                    row[i] = 1.0;
-                    m.push(row);
-                }
-                return m;
-            }
-
-            dot(vecA, vecB) {
-                let sum = 0;
-                for(let i=0; i<vecA.length; i++) sum += vecA[i] * vecB[i];
-                return sum;
-            }
-
-            matVec(mat, vec) {
-                const res = new Array(mat.length).fill(0);
-                for(let i=0; i<mat.length; i++) {
-                    for(let j=0; j<vec.length; j++) {
-                        res[i] += mat[i][j] * vec[j];
-                    }
-                }
-                return res;
-            }
-
-            selectAction(x, isRedAlert) {
-                if (isRedAlert) {
-                    return { arm: 1, ucb: 1.95, reason: "SAFETY_OVERRIDE (侵入10m硬防線強制低碳導流)" };
-                }
-                const scores = [];
-                for(let a=0; a<2; a++) {
-                    const theta = this.matVec(this.A_inv[a], this.b[a]);
-                    const mean = this.dot(theta, x);
-                    const AinvX = this.matVec(this.A_inv[a], x);
-                    const variance = Math.max(0, this.dot(x, AinvX));
-                    const ucb = mean + this.alpha * Math.sqrt(variance);
-                    scores.push(ucb);
-                }
-                const chosen = scores[1] > scores[0] ? 1 : 0;
-                return { 
-                    arm: chosen, 
-                    ucb: Math.max(scores[0], scores[1]),
-                    reason: `LINUCB_PARETO_OPTIMAL (Arm ${chosen})`
-                };
-            }
-
-            updateFeedback(arm, x, reward) {
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) {
-                        this.A_inv[arm][i][j] /= this.gamma;
-                    }
-                }
-                const Ax = this.matVec(this.A_inv[arm], x);
-                const denom = 1.0 + this.dot(x, Ax);
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) {
-                        this.A_inv[arm][i][j] -= (Ax[i] * Ax[j]) / denom;
-                    }
-                }
-                for(let i=0; i<this.d; i++) {
-                    this.b[arm][i] += reward * x[i];
-                }
-
-                let norm = 0;
-                for(let i=0; i<this.d; i++) {
-                    for(let j=0; j<this.d; j++) {
-                        norm += this.A_inv[arm][i][j] ** 2;
-                    }
-                }
-                const cond = Math.sqrt(norm);
-                if (cond > 1000) {
-                    for(let i=0; i<this.d; i++) {
-                        for(let j=0; j<this.d; j++) {
-                            this.A_inv[arm][i][j] = Math.max(-10, Math.min(10, this.A_inv[arm][i][j]));
-                        }
-                    }
-                    this.svdHealingCount++;
-                }
-                return cond;
-            }
-        }
-
-        const linUCB = new LinUCBEngine(12, 0.98, 0.35);
-
-        // Initialize Leaflet Tactical Map
-        const map = L.map('leafletMap', {
-            center: [24.9780, 121.9242], // Centered at Yakou Saddle
-            zoom: 16,
-            minZoom: 12,
-            maxZoom: 19,
-            zoomControl: false
-        });
-
-        L.control.zoom({ position: 'topright' }).addTo(map);
-
-        // Tile Providers (NLSC Orthophoto, NLSC EMAP, Esri, CartoDB Dark)
-        const tileProviders = {
-            nlsc: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                maxZoom: 19,
-                attribution: '&copy; 內政部國土測繪圖資服務雲 (PHOTO2)'
-            }),
-            emap: L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                maxZoom: 19,
-                attribution: '&copy; 內政部國土測繪圖資服務雲 (EMAP)'
-            }),
-            esri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                maxZoom: 19,
-                attribution: '&copy; Esri World Imagery'
-            }),
-            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                attribution: '&copy; CartoDB Dark Matter'
-            })
-        };
-
-        let currentTileLayer = tileProviders.nlsc;
-        currentTileLayer.addTo(map);
-
-        document.getElementById('select-tile-layer').addEventListener('change', (e) => {
-            const selected = e.target.value;
-            map.removeLayer(currentTileLayer);
-            currentTileLayer = tileProviders[selected] || tileProviders.nlsc;
-            currentTileLayer.addTo(map);
-            showToast("地圖圖層已切換", `已載入 ${e.target.options[e.target.selectedIndex].text}`, "info");
-        });
-
-        document.getElementById('btn-gps-center').addEventListener('click', () => {
-            map.flyTo([24.9780, 121.9242], 16, { animate: true, duration: 1.2 });
-            showToast("座標定錨", "已將視角鎖定至草嶺古道埡口鞍部 (348m)", "info");
-            playTacticalBeep(1040, 'sine', 0.15);
-        });
-
-        // Draw Real Caoling Trail Geometry
-        const trailLatLngs = TRAIL_WAYPOINTS.map(wp => [wp.lat, wp.lng]);
-
-        // 1. 20m Yellow Warning Corridor
-        const corridor20m = L.polyline(trailLatLngs, {
-            color: '#ffaa00',
-            weight: 30,
-            opacity: 0.28,
-            lineCap: 'round',
-            lineJoin: 'round'
-        }).addTo(map);
-        corridor20m.bindPopup("<b>🟡 20m 預警告示廊道</b><br>偵測到牛群時啟動 LBS 電子告示");
-
-        // 2. 10m Flight Zone Hard Buffer
-        const flightZone10m = L.polyline(trailLatLngs, {
-            color: '#ff2a5f',
-            weight: 16,
-            opacity: 0.45,
-            lineCap: 'round',
-            lineJoin: 'round'
-        }).addTo(map);
-        flightZone10m.bindPopup("<b>🔴 10m 驚嚇安全硬防線 (Flight Zone)</b><br>嚴禁遊客越界逼近！");
-
-        // 3. Main Trail Vector
-        const trailCenterline = L.polyline(trailLatLngs, {
-            color: '#2563eb',
-            weight: 5,
-            opacity: 0.95
-        }).addTo(map);
-
-        // 4. Trail Waypoint Markers
-        TRAIL_WAYPOINTS.forEach(wp => {
-            const isSaddle = wp.id === "NODE_YK" || wp.id === "NODE_HGS";
-            const marker = L.circleMarker([wp.lat, wp.lng], {
-                radius: isSaddle ? 7 : 5,
-                fillColor: isSaddle ? "#ffaa00" : "#00f0ff",
-                color: "#ffffff",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.95
-            }).addTo(map);
-            marker.bindPopup(`<b>📍 ${wp.name}</b> (${wp.elev}m)<br><span style="font-size:11px;color:#94a3b8;">${wp.desc}</span>`);
-        });
-
-        // Dynamic Layer Groups
-        const vectorLayerGroup = L.layerGroup().addTo(map);
-        const buffaloLayerGroup = L.layerGroup().addTo(map);
-
-        function updateVectorProjections() {
-            vectorLayerGroup.clearLayers();
-
-            const vectorCoords = PREDICTED_LOCATIONS.map(loc => loc.pos || [loc.lat, loc.lng]);
-
-            // Future Trajectory Polyline (Dashed Purple, strictly trail-aligned)
-            L.polyline(vectorCoords, {
-                color: '#b026ff',
-                weight: 5,
-                dashArray: '8, 8',
-                opacity: 0.95
-            }).addTo(vectorLayerGroup).bindTooltip(`🧭 沿古道預測移動：${currentBuffalo.vectorAngle}° ➔ 目標：${currentBuffalo.targetName}`);
-
-            // Projection Waypoint Markers
-            PREDICTED_LOCATIONS.forEach((loc, idx) => {
-                if (idx === 0) return; // skip start pos
-                const isDest = idx === PREDICTED_LOCATIONS.length - 1;
-                const iconHtml = `<div class="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${isDest ? 'bg-purple-600 border border-neonPurple text-white shadow-neon-purple' : 'bg-cyan-700 border border-neonCyan text-white shadow-neon-cyan'}"><i class="fa-solid ${isDest ? 'fa-flag' : 'fa-arrow-right'}"></i></div>`;
-                const customIcon = L.divIcon({
-                    className: 'pred-vector-icon',
-                    html: iconHtml,
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
-                });
-
-                L.marker([loc.lat || loc.pos[0], loc.lng || loc.pos[1]], { icon: customIcon })
-                    .addTo(vectorLayerGroup)
-                    .bindPopup(`<b>🎯 預測地點：${loc.name}</b><br>預估抵達時間：<b>${loc.eta}</b><br>${loc.desc}`);
-            });
-        }
-
-        function updateBuffaloMapMarkers() {
-            buffaloLayerGroup.clearLayers();
-
-            const customIcon = L.divIcon({
-                className: 'custom-buffalo-div',
-                html: `
-                    <div class="relative">
-                        <div class="flightzone-radar-pulse"></div>
-                        <div class="buffalo-core-beacon"></div>
-                    </div>
-                `,
-                iconSize: [0, 0],
-                iconAnchor: [0, 0]
-            });
-
-            const marker = L.marker([currentBuffalo.lat, currentBuffalo.lng], { icon: customIcon }).addTo(buffaloLayerGroup);
-
-            // 10m Flight Zone physical radius circle
-            L.circle([currentBuffalo.lat, currentBuffalo.lng], {
-                radius: FLIGHT_ZONE_LIMIT_M,
-                color: '#ff2a5f',
-                weight: 2,
-                fillColor: '#ff2a5f',
-                fillOpacity: 0.4
-            }).addTo(buffaloLayerGroup).bindTooltip(`🔴 10m 驚嚇安全硬防線 | 水牛數量：${currentBuffalo.count} 頭`);
-
-            marker.bindPopup(`
-                <div style="font-family: monospace; font-size: 11px;">
-                    <b style="color: #00f0ff; font-size: 12px;">🦬 水牛即時點位資訊 (埡口草坡)</b><br>
-                    • 即時數量：<b>${currentBuffalo.count}</b> 頭<br>
-                    • FLIR 體表：<span style="color:#ff2a5f; font-weight:bold;">${currentBuffalo.temp_skin}°C</span><br>
-                    • 移動向量：<b>南南東 (${currentBuffalo.vectorAngle}°)</b> (${currentBuffalo.vectorSpeed} m/s)<br>
-                    • 預測目標：${currentBuffalo.targetName}<br>
-                    • 預估抵達：25 分鐘內
-                </div>
-            `);
-        }
-
-        // Distance utility: calculate distance from point to trail polyline in meters
-        function getDistanceToTrailMeters(lat, lng) {
-            let minDistance = Infinity;
-            for(let i=0; i<TRAIL_WAYPOINTS.length - 1; i++) {
-                const p1 = TRAIL_WAYPOINTS[i];
-                const p2 = TRAIL_WAYPOINTS[i+1];
-                
-                const latMid = (p1.lat + p2.lat) / 2 * Math.PI / 180;
-                const m_per_deg_lat = 111132.95;
-                const m_per_deg_lng = 111412.84 * Math.cos(latMid);
-
-                const x1 = 0, y1 = 0;
-                const x2 = (p2.lng - p1.lng) * m_per_deg_lng;
-                const y2 = (p2.lat - p1.lat) * m_per_deg_lat;
-                const px = (lng - p1.lng) * m_per_deg_lng;
-                const py = (lat - p1.lat) * m_per_deg_lat;
-
-                const l2 = x2*x2 + y2*y2;
-                if (l2 === 0) continue;
-                let t = (px * x2 + py * y2) / l2;
-                t = Math.max(0, Math.min(1, t));
-                const projX = x1 + t * x2;
-                const projY = y1 + t * y2;
-                const dist = Math.hypot(px - projX, py - projY);
-                if (dist < minDistance) minDistance = dist;
-            }
-            return minDistance;
-        }
-
-        function computeWindTHI(temp, rh, wind, exp) {
-            const base_thi = 1.8 * temp + 32.0 - (0.55 - 0.55 * (rh / 100.0)) * (1.8 * temp - 26.0);
-            return base_thi - 1.2 * Math.sqrt(Math.max(0, wind)) + 0.15 * exp;
-        }
-
-        function calculateHabitatAndRisk(thi, distToTrail, crowdDensity, tmi, minHumanDist) {
-            const elevFactor = Math.exp(-Math.pow(348 - 450, 2) / (2 * 150 * 150));
-            const slopePenalty = 1.0 / (1.0 + Math.exp(0.3 * (9.5 - 20.0)));
-            const s_spatial = 0.3 * elevFactor * slopePenalty + 0.4 * envState.ndwi + 0.3 * envState.ndvi;
-
-            const alpha = 1.0 / (1.0 + Math.exp(-0.2 * (thi - 78.0)));
-            const beta = 1.0 / (1.0 + Math.exp(0.2 * (thi - 68.0)));
-            const logit = alpha * envState.ndwi + beta * envState.ndvi + 0.3 * 1.0 + 0.2 * s_spatial;
-            const p_buffalo = Math.min(1.0, Math.max(0.0, 1.0 / (1.0 + Math.exp(-5.0 * (logit - 0.4)))));
-
-            const flightPenalty = 1.0 + (FLIGHT_ZONE_LIMIT_M / Math.max(minHumanDist, 0.5));
-            const festivalMult = envState.is_festival ? 2.8 : 1.0;
-            const effectiveCrowd = Math.min(1.0, crowdDensity * festivalMult * 0.5);
-            const r_conflict = p_buffalo * effectiveCrowd * flightPenalty * (1.0 + tmi);
-
-            let physioState = "TRANSIT (動態遷徙)";
-            if (thi > 78.0) physioState = "MUD_BATHING (沼澤泥塘散熱)";
-            else if (thi <= 68.0) physioState = "RIDGE_GRAZING (草坡採食態)";
-
-            return { s_spatial, p_buffalo, r_conflict, physioState, flightPenalty };
-        }
-
-        function buildV12STensor(thi, buffaloCount, crowdDensity, tmi) {
-            return [
-                Math.min(1.0, Math.max(0.0, (thi - 50.0) / 40.0)), // v1: Weather_THI
-                envState.ndwi,                                      // v2: Water_NDWI
-                envState.ndvi,                                      // v3: Veg_NDVI
-                Math.min(1.0, buffaloCount / 10.0),                // v4: IR_Telemetry
-                tmi,                                                // v5: Trail_Mud
-                crowdDensity,                                       // v6: Crowd_Stress
-                0.85,                                               // v7: DEM_Aspect
-                0.70,                                               // v8: GTS_Network
-                0.79,                                               // v9: Carbon_Saved (8.9 kg CO2e)
-                0.90,                                               // v10: AI_Ready
-                0.80,                                               // v11: Sentiment
-                0.88                                                // v12: ESG_Economy
-            ];
-        }
-
-        function recalculateEngine() {
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const dist = getDistanceToTrailMeters(currentBuffalo.lat, currentBuffalo.lng);
-            
-            const { s_spatial, p_buffalo, r_conflict, physioState } = 
-                calculateHabitatAndRisk(thi, dist, envState.crowd_density, envState.tmi, envState.min_human_dist);
-
-            const isRedAlert = dist <= FLIGHT_ZONE_LIMIT_M || r_conflict >= 2.5;
-            const v12s = buildV12STensor(thi, currentBuffalo.count, envState.crowd_density, envState.tmi);
-            const decision = linUCB.selectAction(v12s, isRedAlert);
-
-            // Compute composite Z-score
-            const meanV = v12s.reduce((a, b) => a + b, 0) / 12;
-            const z_comp = (meanV - 0.55) / 0.12;
-            let yiState = "少陽/少陰 (常態動態監測)";
-            let yiPillClass = "bg-cyan-950 text-cyan-300 border-neonCyan/40";
-            if (z_comp >= 2.0) {
-                yiState = "老陽 (極限過載管制)";
-                yiPillClass = "bg-rose-950 text-rose-300 border-neonRed/50 shadow-neon-red";
-            } else if (z_comp <= -2.0) {
-                yiState = "老陰 (氣候極端封閉)";
-                yiPillClass = "bg-indigo-950 text-indigo-300 border-neonPurple/50";
-            }
-
-            // Update DOM
-            document.getElementById('val-thi').innerText = thi.toFixed(1);
-            document.getElementById('val-thi-state').innerText = physioState.split(" ")[0];
-            document.getElementById('val-risk').innerText = r_conflict.toFixed(2);
-            document.getElementById('val-pbuffalo').innerText = p_buffalo.toFixed(3);
-            document.getElementById('val-cond').innerText = (1.2 + Math.abs(z_comp) * 0.4).toFixed(2);
-            document.getElementById('hud-resistance').innerText = `S_spatial=${s_spatial.toFixed(3)} (強吸引)`;
-
-            const yiPill = document.getElementById('yi-state-pill');
-            yiPill.innerText = yiState;
-            yiPill.className = `text-[10px] font-mono px-2 py-0.5 rounded border ${yiPillClass}`;
-            document.getElementById('stat-zscore').innerText = `${z_comp >= 0 ? '+' : ''}${z_comp.toFixed(2)} σ`;
-            document.getElementById('stat-cossim').innerText = (0.9150 + (1 - Math.abs(z_comp)*0.02)).toFixed(4);
-
-            // Update Alert Banner
-            const banner = document.getElementById('canvas-alert-banner');
-            const bannerText = document.getElementById('canvas-alert-text');
-            const riskLevel = document.getElementById('val-risk-level');
-
-            if (isRedAlert) {
-                banner.className = "absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg backdrop-blur-md border font-mono font-bold text-[11px] md:text-xs flex items-center gap-2.5 transition-all duration-300 shadow-neon-red bg-rose-950/95 border-neonRed text-rose-200 z-20 max-w-[94%] md:max-w-none text-center";
-                bannerText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-neonRed animate-ping shrink-0"></span>🔴 RED_ALERT: 侵入10m硬防線！水牛 ${currentBuffalo.count} 頭 @埡口 (強制啟動低碳 E-bike 導流)`;
-                riskLevel.innerText = "紅色極限警戒";
-                riskLevel.className = "text-[9px] px-1 py-0.5 rounded bg-rose-950 text-rose-300 font-semibold border border-neonRed/50 font-mono";
-                document.getElementById('val-linucb-arm').innerText = "Arm 1 (E-Bike)";
-            } else if (r_conflict >= 1.5 || dist <= 20.0) {
-                banner.className = "absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg backdrop-blur-md border font-mono font-bold text-[11px] md:text-xs flex items-center gap-2.5 transition-all duration-300 shadow-neon-amber bg-amber-950/95 border-neonAmber text-amber-200 z-20 max-w-[94%] md:max-w-none text-center";
-                bannerText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-neonAmber animate-ping shrink-0"></span>🟡 YELLOW_ALERT: 20m 預警廊道告示發送中`;
-                riskLevel.innerText = "黃色預警引導";
-                riskLevel.className = "text-[9px] px-1 py-0.5 rounded bg-amber-950 text-amber-300 font-semibold border border-neonAmber/50 font-mono";
-                document.getElementById('val-linucb-arm').innerText = `Arm ${decision.arm}`;
-            } else {
-                banner.className = "absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg backdrop-blur-md border font-mono font-bold text-[11px] md:text-xs flex items-center gap-2.5 transition-all duration-300 shadow-neon-green z-20 bg-emerald-950/90 border-neonGreen text-neonGreen max-w-[94%] md:max-w-none text-center";
-                bannerText.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-neonGreen animate-ping shrink-0"></span>🟢 GREEN_NORMAL: 步道安全動態監測中 (10m 防線完好)`;
-                riskLevel.innerText = "常態安全監測";
-                riskLevel.className = "text-[9px] px-1 py-0.5 rounded bg-emerald-950 text-neonGreen font-semibold border border-neonGreen/40 font-mono";
-                document.getElementById('val-linucb-arm').innerText = `Arm ${decision.arm}`;
-            }
-
-            renderTensorBars(v12s);
-            updateBuffaloMapMarkers();
-            updateVectorProjections();
-        }
-
-        const TENSOR_LABELS = [
-            "v1 Weather_THI", "v2 Water_NDWI", "v3 Veg_NDVI", "v4 IR_Telemetry",
-            "v5 Trail_Mud (TMI)", "v6 Crowd_Stress", "v7 DEM_Aspect", "v8 GTS_Network",
-            "v9 Carbon_Saved", "v10 AI_Ready", "v11 Sentiment", "v12 ESG_Economy"
-        ];
-
-        function renderTensorBars(v12s) {
-            const container = document.getElementById('tensor-bars');
-            container.innerHTML = '';
-            v12s.forEach((val, idx) => {
-                const percent = Math.min(100, Math.max(0, val * 100)).toFixed(0);
-                const color = val > 0.75 ? 'bg-neonRed shadow-neon-red' : (val > 0.4 ? 'bg-neonCyan shadow-neon-cyan' : 'bg-slate-500');
-                const row = document.createElement('div');
-                row.className = "flex items-center gap-2";
-                row.innerHTML = `
-                    <span class="w-24 truncate text-slate-400 text-[10px] font-mono">${TENSOR_LABELS[idx]}</span>
-                    <div class="flex-1 bg-cyberDark h-1.5 rounded overflow-hidden border border-cyberBorder">
-                        <div class="${color} h-full rounded transition-all duration-300" style="width: ${percent}%"></div>
-                    </div>
-                    <span class="w-8 text-right font-mono text-[10px] text-slate-300 font-bold">${val.toFixed(2)}</span>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function showToast(title, msg, type = 'info') {
-            const box = document.getElementById('toast-box');
-            const toast = document.createElement('div');
-            const borderCol = type === 'alert' ? 'border-neonRed text-rose-300 shadow-neon-red' : (type === 'success' ? 'border-neonGreen text-emerald-300 shadow-neon-green' : 'border-neonCyan text-cyan-300 shadow-neon-cyan');
-            toast.className = `p-2.5 rounded bg-cyberPanel/95 border ${borderCol} backdrop-blur-md text-xs font-mono pointer-events-auto transition-all duration-300 flex items-start gap-2 min-w-[240px] max-w-[320px]`;
-            toast.innerHTML = `
-                <i class="fa-solid ${type === 'alert' ? 'fa-triangle-exclamation text-neonRed' : (type === 'success' ? 'fa-circle-check text-neonGreen' : 'fa-info text-neonCyan')} mt-0.5"></i>
-                <div class="flex-1">
-                    <div class="font-bold text-slate-100 text-xs">${title}</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">${msg}</div>
-                </div>
-            `;
-            box.appendChild(toast);
-            playTacticalBeep(type === 'alert' ? 440 : 880, 'sine', 0.18);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 400);
-            }, 3000);
-        }
-
-        // Mobile Tab Switcher Logic
-        const tabMap = document.getElementById('tab-btn-map');
-        const tabVector = document.getElementById('tab-btn-vector');
-        const tabTensor = document.getElementById('tab-btn-tensor');
-        const tabControls = document.getElementById('tab-btn-controls');
-
-        const secMap = document.getElementById('section-map');
-        const secSidebar = document.getElementById('section-sidebar');
-        const secTensorCard = document.getElementById('section-tensor-card');
-        const secControlCard = document.getElementById('section-control-card');
-
-        function setMobileTab(active) {
-            [tabMap, tabVector, tabTensor, tabControls].forEach(t => {
-                t.className = "flex-1 py-1.5 text-slate-400 border-b-2 border-transparent flex items-center justify-center gap-1";
-            });
-
-            if (window.innerWidth < 1024) {
-                secMap.classList.add('hidden');
-                secSidebar.classList.add('hidden');
-                secTensorCard.classList.add('hidden');
-                secControlCard.classList.add('hidden');
-
-                if (active === 'map') {
-                    tabMap.className = "flex-1 py-1.5 text-neonCyan border-b-2 border-neonCyan font-bold flex items-center justify-center gap-1";
-                    secMap.classList.remove('hidden');
-                    map.invalidateSize();
-                } else if (active === 'vector') {
-                    tabVector.className = "flex-1 py-1.5 text-neonCyan border-b-2 border-neonCyan font-bold flex items-center justify-center gap-1";
-                    secMap.classList.remove('hidden');
-                    map.invalidateSize();
-                    map.flyTo([currentBuffalo.lat, currentBuffalo.lng], 16);
-                } else if (active === 'tensor') {
-                    tabTensor.className = "flex-1 py-1.5 text-neonCyan border-b-2 border-neonCyan font-bold flex items-center justify-center gap-1";
-                    secSidebar.classList.remove('hidden');
-                    secTensorCard.classList.remove('hidden');
-                } else if (active === 'controls') {
-                    tabControls.className = "flex-1 py-1.5 text-neonCyan border-b-2 border-neonCyan font-bold flex items-center justify-center gap-1";
-                    secSidebar.classList.remove('hidden');
-                    secControlCard.classList.remove('hidden');
-                }
-            } else {
-                secMap.classList.remove('hidden');
-                secSidebar.classList.remove('hidden');
-                secTensorCard.classList.remove('hidden');
-                secControlCard.classList.remove('hidden');
-                map.invalidateSize();
-            }
-        }
-
-        tabMap.addEventListener('click', () => setMobileTab('map'));
-        tabVector.addEventListener('click', () => setMobileTab('vector'));
-        tabTensor.addEventListener('click', () => setMobileTab('tensor'));
-        tabControls.addEventListener('click', () => setMobileTab('controls'));
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                setMobileTab('desktop');
-            } else {
-                setMobileTab('map');
-            }
-        });
-
-        // Gemini San-Cai Strategic Narrative Synthesis
-        async function triggerGeminiNarrative() {
-            const btn = document.getElementById('btn-call-gemini');
-            const narrativeBox = document.getElementById('narrative-content');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 運算中...`;
-
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const userPrompt = `
-            請以高階 AI 系統架構師兼永續景區營運專家角色，依據 GEM Engine v26.0 草嶺古道即時數據生成 150 字內的「三才戰略導言」：
-            數據：THI=${thi.toFixed(1)}, 氣溫=${envState.temp_c}°C, 移動向量=165度(南南東 0.8m/s), 目標=護管所泥塘, 人潮密度=${envState.crowd_density}, 11月芒花季加權=${envState.is_festival ? '啟動(2.8x)' : '常態'}。
-            結構必須包含：
-            1. 【天時・恆卦】：說明 THI 熱應力與水牛無汗腺體溫調節的生理行為。
-            2. 【地利・艮山】：說明 20m 網格空間阻力 S_spatial、埡口至灣坑頭山高程與泥塘邊界。
-            3. 【人和・離火/賁卦】：指示 PWA LBS 圍欄推播與 E-bike 低碳分流（人均減碳 8.9 kg CO2e）。
-            `;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-            try {
-                if (apiKey) {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: userPrompt }] }],
-                            systemInstruction: { parts: [{ text: "你是 GEM Engine v26.0 首席架構師，語句緊湊、充滿科技與生態哲學。" }] }
-                        })
-                    });
-                    const resJson = await response.json();
-                    const text = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) {
-                        narrativeBox.innerHTML = `<div class="leading-relaxed whitespace-pre-line">${text}</div>`;
-                        showToast("Gemini 導言已更新", "已對接 Google GenAI 模型生成最新三才決策導言", "success");
-                        btn.disabled = false;
-                        btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> 重新合成導言`;
-                        return;
-                    }
-                }
-            } catch (err) {
-                console.warn("Direct API call fallback", err);
-            }
-
-            // Fallback Procedural Synthesizer
-            setTimeout(() => {
-                narrativeBox.innerHTML = `
-                <div class="flex items-start gap-1.5">
-                    <span class="font-mono font-bold text-neonCyan shrink-0">【天時・恆卦】</span>
-                    <p class="inline">鞍部即時 THI_wind 達 ${thi.toFixed(1)}，水牛解剖生理學無汗腺機制強烈觸發散熱驅力，牛群沿步道向量 165° 強制轉移至護管所泥塘。</p>
-                </div>
-                <div class="flex items-start gap-1.5 mt-1.5">
-                    <span class="font-mono font-bold text-neonAmber shrink-0">【地利・艮山】</span>
-                    <p class="inline">埡口涼亭至虎字碑石階呈高阻力；牛群途經埡口南側步道，登道遭遇概率達 85% 爆發點，空間阻力持續緊縮。</p>
-                </div>
-                <div class="flex items-start gap-1.5 mt-1.5">
-                    <span class="font-mono font-bold text-neonGreen shrink-0">【人和・離火/賁卦】</span>
-                    <p class="inline">啟動 PWA 500m 地理圍欄推播，執行 LinUCB Arm 1 分流指令，導引遊客接駁低碳 E-bike，人均減碳 8.9 kg CO₂e，名實對齊完畢。</p>
-                </div>
-                `;
-                showToast("三才戰略導言已合成", "已調用 GEM Engine 本地算子完成三才決策", "info");
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> 重新合成導言`;
-            }, 500);
-        }
-
-        // Sliders & Controls Event Listeners
-        document.getElementById('slider-temp').addEventListener('input', (e) => {
-            envState.temp_c = parseFloat(e.target.value);
-            document.getElementById('lbl-temp').innerText = `${envState.temp_c.toFixed(1)} °C`;
-            recalculateEngine();
-        });
-
-        document.getElementById('slider-crowd').addEventListener('input', (e) => {
-            envState.crowd_density = parseFloat(e.target.value);
-            document.getElementById('lbl-crowd').innerText = `${envState.crowd_density.toFixed(2)} (${envState.crowd_density > 0.75 ? '飽和' : (envState.crowd_density > 0.4 ? '中度' : '流暢')})`;
-            recalculateEngine();
-        });
-
-        document.getElementById('slider-tmi').addEventListener('input', (e) => {
-            envState.tmi = parseFloat(e.target.value);
-            document.getElementById('lbl-tmi').innerText = envState.tmi.toFixed(2);
-            recalculateEngine();
-        });
-
-        document.getElementById('chk-festival').addEventListener('change', (e) => {
-            envState.is_festival = e.target.checked;
-            showToast("芒花季加權切換", envState.is_festival ? "開啟 2.8x 人流爆發加權" : "恢復常態人流權重", "info");
-            recalculateEngine();
-        });
-
-        document.getElementById('btn-inject-flightzone').addEventListener('click', () => {
-            currentBuffalo.lat = 24.9781;
-            currentBuffalo.lng = 121.9241;
-            envState.min_human_dist = 1.2;
-            recalculateEngine();
-            map.flyTo([24.9781, 121.9241], 17);
-            showToast("🔴 驚嚇區侵入警戒！", "埡口水牛群進入步道 1.2m，觸發 Safety Override 強制導流！", "alert");
-        });
-
-        document.getElementById('btn-simulate-vector').addEventListener('click', () => {
-            currentBuffalo.vectorAngle = (currentBuffalo.vectorAngle + 15) % 360;
-            currentBuffalo.lat += (Math.random() - 0.5) * 0.0006;
-            currentBuffalo.lng += (Math.random() - 0.5) * 0.0006;
-            recalculateEngine();
-            map.flyTo([currentBuffalo.lat, currentBuffalo.lng], 16);
-            showToast("向量外推已刷新", `水牛向量更新為: ${currentBuffalo.vectorAngle}° ➔ 重新擬合目標路徑`, "info");
-        });
-
-        document.getElementById('btn-feedback-reward').addEventListener('click', () => {
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const v12s = buildV12STensor(thi, currentBuffalo.count, envState.crowd_density, envState.tmi);
-            const cond = linUCB.updateFeedback(1, v12s, 1.0);
-            
-            // Withdraw slightly
-            currentBuffalo.lat = 24.9785;
-            currentBuffalo.lng = 121.9238;
-            envState.min_human_dist = 15.0;
-
-            recalculateEngine();
-            showToast("🔄 在線學習完成", `接收遊客分流核銷回饋 r_t = +1.0 ➔ 逆矩陣更新完畢 (Cond: ${cond.toFixed(2)})`, "success");
-        });
-
-        document.getElementById('btn-call-gemini').addEventListener('click', triggerGeminiNarrative);
-
-        document.getElementById('btn-sound-toggle').addEventListener('click', () => {
-            soundEnabled = !soundEnabled;
-            const icon = document.querySelector('#btn-sound-toggle i');
-            icon.className = soundEnabled ? 'fa-solid fa-volume-high text-neonCyan' : 'fa-solid fa-volume-xmark text-slate-500';
-            showToast("音效切換", soundEnabled ? "HUD 戰情提示音已開啟" : "HUD 戰情提示音已靜音", "info");
-            playTacticalBeep(600, 'sine', 0.1);
-        });
-
-        // Notion HMAC-SHA256 Audit Modal Generation
-        function generateAuditJson() {
-            const thi = computeWindTHI(envState.temp_c, envState.rh_percent, envState.wind_speed, envState.exposure);
-            const v12s = buildV12STensor(thi, currentBuffalo.count, envState.crowd_density, envState.tmi);
-            const nowIso = new Date().toISOString();
-            const raw = `${nowIso}_PATROL_07_${thi.toFixed(2)}_${envState.crowd_density}`;
-            
-            let hash = 0;
-            for (let i = 0; i < raw.length; i++) hash = ((hash << 5) - hash) + raw.charCodeAt(i) | 0;
-            const hmacStub = "7a9b8c7d" + Math.abs(hash).toString(16).padStart(8, '0') + "e3f2a1b0c9d8e7f6";
-
-            return {
-                project_id: "Caoling_Water_Buffalo_Warning_v26.0",
-                timestamp: nowIso,
-                v12s_tensor: v12s.map(v => parseFloat(v.toFixed(3))),
-                thi_index: parseFloat(thi.toFixed(2)),
-                buffalo_count: currentBuffalo.count,
-                vector_angle: currentBuffalo.vectorAngle,
-                vector_speed_mps: currentBuffalo.vectorSpeed,
-                predicted_target: currentBuffalo.targetName,
-                predicted_buffalo_prob: parseFloat(document.getElementById('val-pbuffalo').innerText),
-                predicted_conflict_risk: parseFloat(document.getElementById('val-risk').innerText),
-                yi_state: document.getElementById('yi-state-pill').innerText,
-                linucb_action: "E_BIKE_REROUTE_ENABLE",
-                carbon_saved_per_capita_kg: 8.9,
-                matrix_cond_number: parseFloat(document.getElementById('val-cond').innerText),
-                hmac_sha256_audit_signature: hmacStub
-            };
-        }
-
-        const auditModal = document.getElementById('modal-audit');
-        document.getElementById('btn-open-audit-modal').addEventListener('click', () => {
-            const data = generateAuditJson();
-            document.getElementById('json-audit-preview').innerText = JSON.stringify(data, null, 2);
-            auditModal.classList.remove('hidden');
-            auditModal.classList.add('flex');
-            playTacticalBeep(920, 'sine', 0.1);
-        });
-
-        document.getElementById('btn-close-audit').addEventListener('click', () => {
-            auditModal.classList.add('hidden');
-            auditModal.classList.remove('flex');
-        });
-
-        document.getElementById('btn-copy-audit').addEventListener('click', () => {
-            const txt = document.getElementById('json-audit-preview').innerText;
-            const textarea = document.createElement('textarea');
-            textarea.value = txt;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast("複製成功", "Notion HMAC-SHA256 存根 JSON 已複製至剪貼簿", "success");
-        });
-
-        document.getElementById('btn-export-geojson').addEventListener('click', () => {
-            const geojson = {
-                type: "FeatureCollection",
-                timestamp: new Date().toISOString(),
-                features: [
-                    {
-                        type: "Feature",
-                        geometry: { type: "Point", coordinates: [currentBuffalo.lng, currentBuffalo.lat] },
-                        properties: {
-                            id: currentBuffalo.id,
-                            count: currentBuffalo.count,
-                            temp_skin: currentBuffalo.temp_skin,
-                            vector_angle: currentBuffalo.vectorAngle,
-                            vector_speed: currentBuffalo.vectorSpeed,
-                            target_name: currentBuffalo.targetName,
-                            flight_zone_limit_m: FLIGHT_ZONE_LIMIT_M,
-                            risk_R: document.getElementById('val-risk').innerText
-                        }
-                    },
-                    ...PREDICTED_LOCATIONS.map((p, idx) => ({
-                        type: "Feature",
-                        geometry: { type: "Point", coordinates: [p.lng || p.pos[1], p.lat || p.pos[0]] },
-                        properties: {
-                            projection_id: `PROJ_${idx + 1}`,
-                            name: p.name,
-                            eta: p.eta,
-                            desc: p.desc
-                        }
-                    }))
-                ]
-            };
-            const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `caoling_buffalo_realtime_${Date.now()}.geojson`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("GeoJSON 匯出成功", "可直接載入 QGIS 進行動態圖層疊加", "success");
-        });
-
-        // Initialize Map & Controls on load
-        window.onload = function() {
-            recalculateEngine();
-            if (window.innerWidth < 1024) {
-                setMobileTab('map');
-            }
-            showToast("GEM Engine v26.0 戰情中心就緒", "已成功載入草嶺古道稜線圖資與水牛預判向量", "success");
-        };
+      setTimeout(function(){ location.reload(); }, 10000);
     </script>
-</body>
+    </body>
+    
+<script>
+    
+    
+            var map_048a8715459fd8f8b6b5c2d0406098b9 = L.map(
+                "map_048a8715459fd8f8b6b5c2d0406098b9",
+                {
+                    center: [24.978, 121.9242],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 16,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_309318c400bb65a9ee7edc65c7a0b8bb = L.tileLayer(
+                "https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u5167\u653f\u90e8\u570b\u571f\u6e2c\u7e6a\u5716\u8cc7\u670d\u52d9\u96f2 (EMAP)",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_309318c400bb65a9ee7edc65c7a0b8bb.addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var tile_layer_9568450fedcfb069696890f170257246 = L.tileLayer(
+                "https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u5167\u653f\u90e8\u570b\u571f\u6e2c\u7e6a\u5716\u8cc7\u670d\u52d9\u96f2 (PHOTO2)",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_9568450fedcfb069696890f170257246.addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var poly_line_d352ba4451409b35218cf76bcd4aace9 = L.polyline(
+                [[25.0034, 121.9318], [24.996, 121.9285], [24.9886, 121.925], [24.9785, 121.924], [24.978, 121.9242], [24.9762, 121.9245], [24.9745, 121.9248], [24.9696, 121.9242], [24.9691, 121.9246]],
+                {"bubblingMouseEvents": true, "color": "#2563eb", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2563eb", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 6}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+        var popup_3500b284bb2a3fbef24334679a33ab33 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_586cffd65e1a9676cf2398fc0c4c69ab = $(`<div id="html_586cffd65e1a9676cf2398fc0c4c69ab" style="width: 100.0%; height: 100.0%;"><b>🚶‍♂️ 草嶺古道主線</b></div>`)[0];
+                popup_3500b284bb2a3fbef24334679a33ab33.setContent(html_586cffd65e1a9676cf2398fc0c4c69ab);
+            
+        
+
+        poly_line_d352ba4451409b35218cf76bcd4aace9.bindPopup(popup_3500b284bb2a3fbef24334679a33ab33)
+        ;
+
+        
+    
+    
+            var poly_line_c6454daaf768ce9dc74697f1e89ebe35 = L.polyline(
+                [[24.9782, 121.924], [24.9762, 121.9245], [24.9745, 121.9248]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": "8, 8", "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.95, "smoothFactor": 1.0, "stroke": true, "weight": 6}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+        var popup_9a2220b6ea8bdfe61e8f704a7006032a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_7eb556a7b6254bcbf9959cb661348a54 = $(`<div id="html_7eb556a7b6254bcbf9959cb661348a54" style="width: 100.0%; height: 100.0%;"><b>🧭 未來移動向量</b><br>方向: 南南東 (165°)<br>速度: 0.8 m/s</div>`)[0];
+                popup_9a2220b6ea8bdfe61e8f704a7006032a.setContent(html_7eb556a7b6254bcbf9959cb661348a54);
+            
+        
+
+        poly_line_c6454daaf768ce9dc74697f1e89ebe35.bindPopup(popup_9a2220b6ea8bdfe61e8f704a7006032a)
+        ;
+
+        
+    
+    
+            poly_line_c6454daaf768ce9dc74697f1e89ebe35.bindTooltip(
+                `<div>
+                     🧭 沿古道預測移動：南南東 (165°) ➔ 目標：護管所泥塘散熱區 (預測終點)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_96a7250fb2f18af123ed6b86b4dc9886 = L.marker(
+                [24.9762, 121.9245],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_7a6dbe61c336882759930ea714d5b905 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "cadetblue",
+  "iconColor": "white",
+  "icon": "arrow-right",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3d5c2a899d1899af1073c17f80ed5894 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_0529f3e30d69093668ddb4ee0d7741c2 = $(`<div id="html_0529f3e30d69093668ddb4ee0d7741c2" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：埡口南側步道 (預測途經點)</b><br>預估抵達時間：+10 分鐘<br>說明：沿草嶺古道步道順向移動</div>`)[0];
+                popup_3d5c2a899d1899af1073c17f80ed5894.setContent(html_0529f3e30d69093668ddb4ee0d7741c2);
+            
+        
+
+        marker_96a7250fb2f18af123ed6b86b4dc9886.bindPopup(popup_3d5c2a899d1899af1073c17f80ed5894)
+        ;
+
+        
+    
+    
+            marker_96a7250fb2f18af123ed6b86b4dc9886.bindTooltip(
+                `<div>
+                     📍 步道預測地點：<b>埡口南側步道 (預測途經點)</b> (+10 分鐘)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_96a7250fb2f18af123ed6b86b4dc9886.setIcon(icon_7a6dbe61c336882759930ea714d5b905);
+            
+    
+            var marker_8c6cf482e89b4d6c97810b8ffd44e611 = L.marker(
+                [24.9745, 121.9248],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_98b5aeecb15b74cf4611e70a22da5ba8 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "purple",
+  "iconColor": "white",
+  "icon": "flag",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_61103255c72ca9469db9fee43e1e7c88 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_21c8fd2b9f2f2084b04096c7b4c2aba0 = $(`<div id="html_21c8fd2b9f2f2084b04096c7b4c2aba0" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：護管所泥塘散熱區 (預測終點)</b><br>預估抵達時間：+25 分鐘<br>說明：高溫 THI 驅動泥塘泡水目的地</div>`)[0];
+                popup_61103255c72ca9469db9fee43e1e7c88.setContent(html_21c8fd2b9f2f2084b04096c7b4c2aba0);
+            
+        
+
+        marker_8c6cf482e89b4d6c97810b8ffd44e611.bindPopup(popup_61103255c72ca9469db9fee43e1e7c88)
+        ;
+
+        
+    
+    
+            marker_8c6cf482e89b4d6c97810b8ffd44e611.bindTooltip(
+                `<div>
+                     📍 步道預測地點：<b>護管所泥塘散熱區 (預測終點)</b> (+25 分鐘)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_8c6cf482e89b4d6c97810b8ffd44e611.setIcon(icon_98b5aeecb15b74cf4611e70a22da5ba8);
+            
+    
+            var circle_647d939f5289f99787199c52ab098b8b = L.circle(
+                [24.9782, 121.924],
+                {"bubblingMouseEvents": true, "color": "#ef4444", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            circle_647d939f5289f99787199c52ab098b8b.bindTooltip(
+                `<div>
+                     🔴 10m 硬防線 | 水牛數量：7 頭
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_97b0f90117f86a863d5faa68a5f7c7c2 = L.marker(
+                [24.9782, 121.924],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_88b9268ab3627e5eecf04faf696c9248 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "warning",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5ca55b8890fb6756dc7ba5fbcf093ac9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1daab487be68c70d486a2798349ef07f = $(`<div id="html_1daab487be68c70d486a2798349ef07f" style="width: 100.0%; height: 100.0%;">🦬 <b>水牛即時點位資訊</b><br>• 即時數量：7 頭<br>• 移動向量：南南東 (165°) (0.8 m/s)<br>• 預測地點：護管所泥塘散熱區 (預測終點)<br>• 預估抵達：25 分鐘內</div>`)[0];
+                popup_5ca55b8890fb6756dc7ba5fbcf093ac9.setContent(html_1daab487be68c70d486a2798349ef07f);
+            
+        
+
+        marker_97b0f90117f86a863d5faa68a5f7c7c2.bindPopup(popup_5ca55b8890fb6756dc7ba5fbcf093ac9)
+        ;
+
+        
+    
+    
+            marker_97b0f90117f86a863d5faa68a5f7c7c2.bindTooltip(
+                `<div>
+                     🦬 <b>水牛數量：7 頭</b><br>向量方向：南南東 (165°)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_97b0f90117f86a863d5faa68a5f7c7c2.setIcon(icon_88b9268ab3627e5eecf04faf696c9248);
+            
+    
+            var marker_f0809aeafead80a607c5f6781f13d21a = L.marker(
+                [25.0034, 121.9318],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_de79cfd5ae0739a0d97f2d218f91ee1b = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_d725ceeee82bd21065f646f9f59c11d4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9e8649d76ac47041a2f915da8781680c = $(`<div id="html_9e8649d76ac47041a2f915da8781680c" style="width: 100.0%; height: 100.0%;"><b>📍 遠望坑入口</b></div>`)[0];
+                popup_d725ceeee82bd21065f646f9f59c11d4.setContent(html_9e8649d76ac47041a2f915da8781680c);
+            
+        
+
+        marker_f0809aeafead80a607c5f6781f13d21a.bindPopup(popup_d725ceeee82bd21065f646f9f59c11d4)
+        ;
+
+        
+    
+    
+            marker_f0809aeafead80a607c5f6781f13d21a.bindTooltip(
+                `<div>
+                     📍 遠望坑入口
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_f0809aeafead80a607c5f6781f13d21a.setIcon(icon_de79cfd5ae0739a0d97f2d218f91ee1b);
+            
+    
+            var marker_bc97546764b356bbcc681556d0e6eb06 = L.marker(
+                [24.996, 121.9285],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_a6f5dd189acfe3fd25d1fd7d63224536 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_823bf72ec4529814c0180b34a556b4f9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_16a219e1cd639305fc794cae17a0b8ae = $(`<div id="html_16a219e1cd639305fc794cae17a0b8ae" style="width: 100.0%; height: 100.0%;"><b>📍 跌死馬橋</b></div>`)[0];
+                popup_823bf72ec4529814c0180b34a556b4f9.setContent(html_16a219e1cd639305fc794cae17a0b8ae);
+            
+        
+
+        marker_bc97546764b356bbcc681556d0e6eb06.bindPopup(popup_823bf72ec4529814c0180b34a556b4f9)
+        ;
+
+        
+    
+    
+            marker_bc97546764b356bbcc681556d0e6eb06.bindTooltip(
+                `<div>
+                     📍 跌死馬橋
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_bc97546764b356bbcc681556d0e6eb06.setIcon(icon_a6f5dd189acfe3fd25d1fd7d63224536);
+            
+    
+            var marker_f9bdab47b201eed3e2cfc8877c60d3e3 = L.marker(
+                [24.9886, 121.925],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_3cc1382c052312a1aae514f7e880cae7 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_c64ddbbe916e30cfc43eab295b755064 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b50a8c8ae716d31f5e030915e9b1abfb = $(`<div id="html_b50a8c8ae716d31f5e030915e9b1abfb" style="width: 100.0%; height: 100.0%;"><b>📍 雄鎮蠻煙碑</b></div>`)[0];
+                popup_c64ddbbe916e30cfc43eab295b755064.setContent(html_b50a8c8ae716d31f5e030915e9b1abfb);
+            
+        
+
+        marker_f9bdab47b201eed3e2cfc8877c60d3e3.bindPopup(popup_c64ddbbe916e30cfc43eab295b755064)
+        ;
+
+        
+    
+    
+            marker_f9bdab47b201eed3e2cfc8877c60d3e3.bindTooltip(
+                `<div>
+                     📍 雄鎮蠻煙碑
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_f9bdab47b201eed3e2cfc8877c60d3e3.setIcon(icon_3cc1382c052312a1aae514f7e880cae7);
+            
+    
+            var marker_afaf346451680fc6a9e31f7feb0dc50f = L.marker(
+                [24.9785, 121.924],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_99f089d6acd8a93d026335c625ccf315 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_0b969b8c114a1dded2beae2deb1029b8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4194ded48560cec2aabbe2aee0704172 = $(`<div id="html_4194ded48560cec2aabbe2aee0704172" style="width: 100.0%; height: 100.0%;"><b>📍 虎字碑</b></div>`)[0];
+                popup_0b969b8c114a1dded2beae2deb1029b8.setContent(html_4194ded48560cec2aabbe2aee0704172);
+            
+        
+
+        marker_afaf346451680fc6a9e31f7feb0dc50f.bindPopup(popup_0b969b8c114a1dded2beae2deb1029b8)
+        ;
+
+        
+    
+    
+            marker_afaf346451680fc6a9e31f7feb0dc50f.bindTooltip(
+                `<div>
+                     📍 虎字碑
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_afaf346451680fc6a9e31f7feb0dc50f.setIcon(icon_99f089d6acd8a93d026335c625ccf315);
+            
+    
+            var marker_aad14dee979a0f7b176fb7e7841d7346 = L.marker(
+                [24.978, 121.9242],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_4b7f1e59c915aef6a2872160907164f2 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_7278c8febda243ebca1eaee1efca704d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_266d5df2dbaccce6dc7ef4f74896bb6f = $(`<div id="html_266d5df2dbaccce6dc7ef4f74896bb6f" style="width: 100.0%; height: 100.0%;"><b>📍 埡口涼亭 (鞍部核心區)</b></div>`)[0];
+                popup_7278c8febda243ebca1eaee1efca704d.setContent(html_266d5df2dbaccce6dc7ef4f74896bb6f);
+            
+        
+
+        marker_aad14dee979a0f7b176fb7e7841d7346.bindPopup(popup_7278c8febda243ebca1eaee1efca704d)
+        ;
+
+        
+    
+    
+            marker_aad14dee979a0f7b176fb7e7841d7346.bindTooltip(
+                `<div>
+                     📍 埡口涼亭 (鞍部核心區)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_aad14dee979a0f7b176fb7e7841d7346.setIcon(icon_4b7f1e59c915aef6a2872160907164f2);
+            
+    
+            var marker_91b68a3637085c4d3d5217fe97f4bad1 = L.marker(
+                [24.9745, 121.9248],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_6dc39f963d7db873dbc690dd239388a0 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3f808881f04781a40cc6e2798cc2f31e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9514595df126190476dbcfc51978c758 = $(`<div id="html_9514595df126190476dbcfc51978c758" style="width: 100.0%; height: 100.0%;"><b>📍 護管所 (泥塘散熱區)</b></div>`)[0];
+                popup_3f808881f04781a40cc6e2798cc2f31e.setContent(html_9514595df126190476dbcfc51978c758);
+            
+        
+
+        marker_91b68a3637085c4d3d5217fe97f4bad1.bindPopup(popup_3f808881f04781a40cc6e2798cc2f31e)
+        ;
+
+        
+    
+    
+            marker_91b68a3637085c4d3d5217fe97f4bad1.bindTooltip(
+                `<div>
+                     📍 護管所 (泥塘散熱區)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_91b68a3637085c4d3d5217fe97f4bad1.setIcon(icon_6dc39f963d7db873dbc690dd239388a0);
+            
+    
+            var marker_0f409e630749ec0df05d807d99aab821 = L.marker(
+                [24.9696, 121.9242],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_42ae94e8653ddbf2fd29c46c2ca66661 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_43278c2d4dc4ccc04e6965d7d46a87bf = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_07d819b02cad3e53182eceeda392e17f = $(`<div id="html_07d819b02cad3e53182eceeda392e17f" style="width: 100.0%; height: 100.0%;"><b>📍 大里天公廟</b></div>`)[0];
+                popup_43278c2d4dc4ccc04e6965d7d46a87bf.setContent(html_07d819b02cad3e53182eceeda392e17f);
+            
+        
+
+        marker_0f409e630749ec0df05d807d99aab821.bindPopup(popup_43278c2d4dc4ccc04e6965d7d46a87bf)
+        ;
+
+        
+    
+    
+            marker_0f409e630749ec0df05d807d99aab821.bindTooltip(
+                `<div>
+                     📍 大里天公廟
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_0f409e630749ec0df05d807d99aab821.setIcon(icon_42ae94e8653ddbf2fd29c46c2ca66661);
+            
+    
+            var marker_95af707450ccbd91a9449413c4524834 = L.marker(
+                [24.9691, 121.9246],
+                {
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+        
+    
+            var icon_25c6ee46d8c73440028be5fedb08f200 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_b53d6bb0e42c3672fe9b7908130b4640 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3d8340b811dfb21a08ed3fe350bc613e = $(`<div id="html_3d8340b811dfb21a08ed3fe350bc613e" style="width: 100.0%; height: 100.0%;"><b>📍 大里遊客中心</b></div>`)[0];
+                popup_b53d6bb0e42c3672fe9b7908130b4640.setContent(html_3d8340b811dfb21a08ed3fe350bc613e);
+            
+        
+
+        marker_95af707450ccbd91a9449413c4524834.bindPopup(popup_b53d6bb0e42c3672fe9b7908130b4640)
+        ;
+
+        
+    
+    
+            marker_95af707450ccbd91a9449413c4524834.bindTooltip(
+                `<div>
+                     📍 大里遊客中心
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_95af707450ccbd91a9449413c4524834.setIcon(icon_25c6ee46d8c73440028be5fedb08f200);
+            
+    
+            var layer_control_fbce7b592d3d303098ade1051c842a40_layers = {
+                base_layers : {
+                    "\ud83d\uddfa\ufe0f \u570b\u571f\u901a\u7528\u96fb\u5b50\u5730\u5716" : tile_layer_309318c400bb65a9ee7edc65c7a0b8bb,
+                    "\ud83d\udef0\ufe0f \u570b\u571f\u885b\u661f\u822a\u7167\u5716" : tile_layer_9568450fedcfb069696890f170257246,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_fbce7b592d3d303098ade1051c842a40 = L.control.layers(
+                layer_control_fbce7b592d3d303098ade1051c842a40_layers.base_layers,
+                layer_control_fbce7b592d3d303098ade1051c842a40_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+
+        
+</script>
 </html>
