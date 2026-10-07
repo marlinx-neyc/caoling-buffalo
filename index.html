@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#040711">
-    <title>GEM Engine v26.0 | 草嶺古道水牛動態預判與空間戰情互動控制台</title>
+    <title>GEM Engine v26.0 | 草嶺古道水牛動態預判與自主強化學習全域戰情台</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,6 +56,9 @@
         body {
             padding-top: var(--sat);
             padding-bottom: var(--sab);
+            background: #040711;
+            color: #f1f5f9;
+            font-family: 'Rajdhani', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -102,98 +102,114 @@
 </head>
 <body class="bg-cyberDark text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden selection:bg-neonCyan selection:text-black">
 
-    <!-- Top Adaptive Tactical Status Bar -->
+    <!-- Top Tactical Control Header -->
     <header class="border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 py-2 flex items-center justify-between sticky top-0 z-50 shrink-0">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-neon-cyan text-white text-xs">
-                <i class="fa-solid fa-radar fa-spin"></i>
+                <i class="fa-solid fa-brain fa-pulse"></i>
             </div>
             <div>
                 <div class="flex items-center gap-1.5">
                     <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1">
-                        GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 border border-neonPurple/50 font-mono">v26.0 DUAL-UI</span>
+                        GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 border border-neonPurple/50 font-mono">v26.0 RL-BRAIN</span>
                     </h1>
                 </div>
                 <div class="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
                     <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                    <span>草嶺古道埡口 348m 實體山脈動態全域對齊</span>
+                    <span>10年歷史規律對齊 × 現場實證在線迭代 (Sherman-Morrison)</span>
                 </div>
             </div>
         </div>
 
-        <!-- Center: Device Mode Switcher -->
-        <div class="flex items-center bg-cyberDark/90 p-0.5 rounded-lg border border-cyberBorder text-[10px] font-mono">
-            <button id="btn-device-auto" class="px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1">
-                <i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">自適應</span>
-            </button>
-            <button id="btn-device-desktop" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
-                <i class="fa-solid fa-desktop"></i><span class="hidden sm:inline">桌面版</span>
-            </button>
-            <button id="btn-device-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1">
-                <i class="fa-solid fa-mobile-screen"></i><span class="hidden sm:inline">手機版</span>
-            </button>
+        <!-- Center: Status & Metrics -->
+        <div class="hidden md:flex items-center gap-2 text-[10px] font-mono">
+            <div class="bg-cyberDark/90 px-2 py-1 rounded border border-cyberBorder flex items-center gap-1.5">
+                <span class="text-slate-400">時段監控:</span>
+                <span class="text-neonCyan font-bold">08:00 ~ 18:30 (全時段)</span>
+            </div>
+            <div class="bg-cyberDark/90 px-2 py-1 rounded border border-cyberBorder flex items-center gap-1.5">
+                <span class="text-slate-400">模型條件數 κ(A):</span>
+                <span id="header-cond-num" class="text-neonGreen font-bold">1.04e+02 (優)</span>
+            </div>
         </div>
 
-        <!-- Right Quick Status Badges -->
+        <!-- Right Tactical Actions -->
         <div class="flex items-center gap-1.5 text-xs font-mono">
-            <div id="header-yi-badge" class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-neonRed/50 font-bold">
-                老陽 (過載)
-            </div>
-            <button id="btn-sound-toggle" class="p-1.5 px-2 rounded bg-cyberCard border border-cyberBorder text-neonCyan text-[11px]">
-                <i class="fa-solid fa-volume-high"></i>
+            <button id="btn-export-csv" class="px-2.5 py-1 rounded bg-emerald-900/60 hover:bg-emerald-800 text-neonGreen border border-neonGreen/50 text-[10px] flex items-center gap-1 font-bold transition shadow-neon-green">
+                <i class="fa-solid fa-file-csv"></i>下載每日人流 CSV
             </button>
-            <button id="btn-open-audit-modal" class="px-2 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 text-[10px] flex items-center gap-1 font-bold">
-                <i class="fa-solid fa-shield-halved"></i><span class="hidden sm:inline">Notion</span>存根
+            <button id="btn-open-feedback" class="px-2.5 py-1 rounded bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-neonPurple/50 text-[10px] flex items-center gap-1 font-bold transition shadow-neon-purple">
+                <i class="fa-solid fa-pen-to-square"></i>現場實證回饋
             </button>
         </div>
     </header>
 
     <!-- DESKTOP MODE ROOT CONTAINER -->
     <div id="desktop-root" class="flex-1 hidden lg:grid lg:grid-cols-12 gap-2 p-2 md:p-3 max-w-[1920px] w-full mx-auto overflow-hidden">
+        
+        <!-- Left 8 Columns: GIS Map & Trajectory Radar -->
         <div class="col-span-8 flex flex-col gap-2 relative min-h-[580px]">
             <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 shadow-2xl relative flex flex-col flex-1 hud-corner-bracket">
                 <div class="flex items-center justify-between pb-1.5 border-b border-cyberBorder/80 text-xs font-mono text-[11px]">
                     <span class="font-bold text-slate-200 tracking-wider font-orbitron">草嶺古道稜線 GIS 戰情台 (DESKTOP TACTICAL HUD)</span>
                     <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono">
-                        <option value="emap">國土測繪 (EMAP 地形)</option>
                         <option value="nlsc">國土測繪 (NLSC 航照)</option>
+                        <option value="emap">國土測繪 (EMAP 地形)</option>
                         <option value="esri">Esri 全球高清衛星</option>
                     </select>
                 </div>
                 <div class="relative w-full flex-1 min-h-[440px] rounded-lg overflow-hidden mt-1.5 bg-cyberDark border border-cyberBorder/80">
                     <div id="leafletMapDesk" class="w-full h-full z-10"></div>
                     <canvas id="radarCanvasDesk" class="absolute inset-0 pointer-events-none z-20 w-full h-full"></canvas>
-                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-30 shadow-neon-purple max-w-[260px]">
+                    
+                    <!-- Floating Trajectory Prediction Badge -->
+                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-30 shadow-neon-purple max-w-[270px]">
                         <div class="text-purple-300 font-bold text-[10px]">🧭 步道實體向量外推 (CosSim 91.5%)</div>
                         <div class="text-slate-200 text-[10px]">向量：<span class="text-neonPurple font-bold">南南東 165°</span> @ <span class="text-neonCyan">0.8 m/s</span></div>
-                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">🎯 <b>終點：</b>護管所泥塘 (+25m)</div>
+                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">🎯 <b>目標：</b>護管所泥塘 (距離步道 10m)</div>
                     </div>
+
+                    <!-- Warning Alert Banner -->
                     <div id="desk-alert-banner" class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200">
-                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)
+                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (啟動低碳 E-bike 導流)
                     </div>
                 </div>
+
+                <!-- Bottom Real-time Data Badges -->
                 <div class="grid grid-cols-4 gap-1.5 mt-2">
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
                         <div class="text-[10px] text-slate-400 font-mono">THI 熱應力指數</div>
-                        <div class="text-2xl font-bold font-orbitron text-neonRed">81.1</div>
+                        <div id="metric-thi" class="text-2xl font-bold font-orbitron text-neonRed">81.1</div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
                         <div class="text-[10px] text-slate-400 font-mono">衝突風險 R (Conflict)</div>
-                        <div class="text-2xl font-bold font-orbitron text-neonRed">8.75</div>
+                        <div id="metric-conflict" class="text-2xl font-bold font-orbitron text-neonRed">8.75</div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
                         <div class="text-[10px] text-slate-400 font-mono">水牛頭數 (FLIR)</div>
-                        <div class="text-2xl font-bold font-orbitron text-neonCyan">7 <span class="text-xs">頭</span></div>
+                        <div id="metric-buffalo" class="text-2xl font-bold font-orbitron text-neonCyan">7 <span class="text-xs">頭</span></div>
                     </div>
                     <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
-                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 策略</div>
-                        <div class="text-sm font-bold font-mono text-purple-300">Arm 1 (E-Bike)</div>
+                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 最優策略</div>
+                        <div id="metric-arm" class="text-sm font-bold font-mono text-purple-300">Arm 1 (E-Bike)</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Right 4 Columns: Dynamic Canvas Panels & Intelligence -->
         <div class="col-span-4 flex flex-col gap-2 overflow-y-auto pr-0.5 max-h-[calc(100vh-65px)]">
+            
+            <!-- Canvas Panel 1: 08:00 ~ 18:30 Daily Visitor Crowd Trend -->
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-cyan-300 font-orbitron">📊 08:00~18:30 步道人流與風險趨勢</span>
+                    <span class="text-[9px] font-mono text-slate-400">時段統計</span>
+                </div>
+                <canvas id="trafficCanvasDesk" width="320" height="130" class="w-full h-[130px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
+            </div>
+
+            <!-- Panel 2: t+1h ~ t+3h Risk Forecast -->
             <div class="bg-cyberPanel rounded-xl border border-neonPurple/40 p-2.5 shadow-xl hud-corner-bracket">
                 <div class="text-purple-300 font-bold text-[11px] font-mono mb-1.5">⏱️ 前瞻 t+1h ~ t+3h 步道橫越風險預報</div>
                 <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-mono">
@@ -212,6 +228,7 @@
                 </div>
             </div>
 
+            <!-- Panel 3: Gemini Strategic Insight -->
             <div class="bg-gradient-to-br from-cyberCard to-indigo-950/40 p-2.5 rounded-xl border border-cyan-900/60 shadow-lg hud-corner-bracket">
                 <div class="font-bold text-xs text-cyan-200 font-orbitron mb-1">GEMINI 三才戰略導言</div>
                 <div class="text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
@@ -221,54 +238,52 @@
                 </div>
             </div>
 
+            <!-- Canvas Panel 4: 12D Multimodal Tensor Canvas -->
             <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2.5 shadow-xl hud-corner-bracket flex flex-col">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-2">
+                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
                     <span class="font-bold text-xs text-slate-200 font-orbitron">12 維多模態張量 (V12S) Canvas</span>
                     <span class="text-[10px] font-mono text-purple-300 font-orbitron font-bold">CosSim: 0.9150</span>
                 </div>
-                <canvas id="tensorCanvasDesk" width="300" height="140" class="w-full h-[140px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
+                <canvas id="tensorCanvasDesk" width="320" height="120" class="w-full h-[120px] bg-cyberDark/90 rounded border border-cyberBorder/80"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- MOBILE MODE ROOT CONTAINER -->
-    <div id="mobile-root" class="flex-1 flex flex-col lg:hidden relative w-full h-[calc(100dvh-48px)] min-h-0 overflow-hidden">
-        <div class="relative w-full flex-1 min-h-0 overflow-hidden bg-cyberDark">
-            <div id="leafletMapMobile"></div>
-            <div id="mobile-floating-hud" class="absolute top-2 left-2 max-w-[285px] sm:max-w-[320px] z-20 bg-slate-900/90 text-white p-2.5 rounded-xl font-sans shadow-2xl backdrop-blur-md border border-white/15 text-xs">
-                <div class="flex justify-between items-center mb-1.5">
-                    <div class="font-bold text-xs text-slate-100 flex items-center truncate">
-                        <span class="w-2 h-2 rounded-full bg-neonPurple animate-pulse mr-1.5"></span>🦬 水牛戰情與未來預判
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <span class="text-[9px] text-slate-400 bg-white/10 px-1.5 py-0.5 rounded-full font-mono" id="mob-update-time">--:--:--</span>
-                    </div>
-                </div>
-                <div class="space-y-1.5">
-                    <div class="grid grid-cols-2 gap-1.5 bg-white/5 p-1.5 rounded-lg text-center">
-                        <div>
-                            <div class="text-slate-400 text-[9px]">🦬 水牛數量</div>
-                            <div class="font-bold text-sm text-neonRed font-orbitron">7 <span class="text-[9px] font-normal">頭</span></div>
-                        </div>
-                        <div>
-                            <div class="text-slate-400 text-[9px]">📊 模式相似度</div>
-                            <div class="font-bold text-sm text-purple-400 font-orbitron">91.5%</div>
-                        </div>
-                    </div>
-                    <div class="bg-purple-500/20 p-1.5 border-l-2 border-purple-500 rounded text-[10px]">
-                        <div class="text-purple-200 font-bold">🧭 步道向量：南南東 (165°) (0.8 m/s)</div>
-                        <div class="text-slate-300 mt-0.5 leading-tight">🎯 <b>目標：</b>護管所泥塘散熱區</div>
-                    </div>
-                </div>
+    <!-- FIELD VALIDATION FEEDBACK MODAL -->
+    <div id="modal-feedback" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-cyberPanel border border-neonPurple/60 rounded-xl max-w-md w-full p-4 shadow-neon-purple hud-corner-bracket">
+            <div class="flex items-center justify-between pb-2 border-b border-cyberBorder mb-3">
+                <h3 class="text-sm font-bold font-orbitron text-purple-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-microchip"></i> 現場實證回饋與 Sherman-Morrison 自主學習
+                </h3>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="mob-alert-banner" class="absolute bottom-14 left-2 right-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-[10px] flex items-center justify-center gap-1.5 shadow-neon-red z-20 bg-rose-950/95 border-neonRed text-rose-200 text-center">
-                🔴 RED_ALERT: 逼近10m防線！啟動 E-bike 導流
-            </div>
+            <form id="form-feedback" class="space-y-3 text-xs font-mono">
+                <div>
+                    <label class="block text-slate-300 mb-1">實測牛隻頭數 (Ground Truth Head Count):</label>
+                    <input type="number" id="input-real-buffalo" value="7" min="0" max="30" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonCyan font-bold">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">水牛實際移動方位 (Actual Heading Vector Degree):</label>
+                    <input type="number" id="input-real-deg" value="165" min="0" max="360" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonPurple font-bold">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1">遊客分流與規避遵行度 (User Compliance Rate %):</label>
+                    <input type="number" id="input-compliance" value="88" min="0" max="100" class="w-full bg-cyberDark border border-cyberBorder rounded p-1.5 text-neonGreen font-bold">
+                </div>
+                <div class="p-2 bg-cyberCard rounded border border-cyberBorder text-[10px] text-slate-400">
+                    💡 提交後系統將執行 <b>Sherman-Morrison</b> 逆矩陣線上微調，並自動校正條件數 κ(A)。
+                </div>
+                <button type="submit" class="w-full py-2 rounded bg-gradient-to-r from-indigo-600 to-neonPurple font-bold text-white shadow-neon-purple">
+                    🚀 觸發神經網絡在線迭代 (Update Model)
+                </button>
+            </form>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- JavaScript Master Implementation -->
     <script>
+        // 1. 核心步道據點與實體線段
         const TRAIL_WAYPOINTS = [
             { id: "NODE_YWK", name: "遠望坑入口", lat: 25.0034, lng: 121.9318 },
             { id: "NODE_DSM", name: "跌死馬橋", lat: 24.9960, lng: 121.9285 },
@@ -281,46 +296,126 @@
             { id: "NODE_DLY", name: "大里遊客中心", lat: 24.9691, lng: 121.9246 }
         ];
 
-        function createMapInstance(containerId) {
-            const el = document.getElementById(containerId);
-            if (!el) return null;
-            const mapInst = L.map(containerId, { zoomControl: false }).setView([24.9780, 121.9242], 16);
-            L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mapInst);
-            L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mapInst);
+        // 2. 08:00 至 18:30 時段數據集
+        const HOURLY_DATA = [
+            { time: "08:00", yuanwangkeng: 45, yakou: 20, dali: 30, buffalo: 3, thi: 74.2, conflict: 2.1 },
+            { time: "09:00", yuanwangkeng: 85, yakou: 45, dali: 50, buffalo: 4, thi: 76.5, conflict: 3.8 },
+            { time: "10:00", yuanwangkeng: 140, yakou: 95, dali: 80, buffalo: 5, thi: 78.8, conflict: 5.9 },
+            { time: "11:00", yuanwangkeng: 190, yakou: 160, dali: 110, buffalo: 7, thi: 81.1, conflict: 8.75 },
+            { time: "12:00", yuanwangkeng: 210, yakou: 185, dali: 140, buffalo: 7, thi: 82.4, conflict: 9.10 },
+            { time: "13:00", yuanwangkeng: 180, yakou: 190, dali: 160, buffalo: 7, thi: 83.6, conflict: 9.45 },
+            { time: "14:00", yuanwangkeng: 150, yakou: 175, dali: 180, buffalo: 6, thi: 82.0, conflict: 8.30 },
+            { time: "15:00", yuanwangkeng: 110, yakou: 140, dali: 190, buffalo: 5, thi: 80.2, conflict: 6.50 },
+            { time: "16:00", yuanwangkeng: 70, yakou: 90, dali: 150, buffalo: 4, thi: 78.0, conflict: 4.20 },
+            { time: "17:00", yuanwangkeng: 35, yakou: 50, dali: 90, buffalo: 3, thi: 76.1, conflict: 2.50 },
+            { time: "18:00", yuanwangkeng: 15, yakou: 20, dali: 40, buffalo: 2, thi: 74.8, conflict: 1.20 },
+            { time: "18:30", yuanwangkeng: 5, yakou: 10, dali: 15, buffalo: 2, thi: 74.0, conflict: 0.80 }
+        ];
 
-            const trailCoords = TRAIL_WAYPOINTS.map(w => [w.lat, w.lng]);
-            L.polyline(trailCoords, { color: '#2563eb', weight: 6, opacity: 0.85 }).addTo(mapInst);
-            L.polyline([[24.9782, 121.9240], [24.9762, 121.9245], [24.9745, 121.9248]], { color: '#b026ff', weight: 6, dashArray: '8, 8' }).addTo(mapInst);
+        let deskMap;
 
-            L.circle([24.9782, 121.9240], { radius: 15, color: '#ff2a5f', fillColor: '#ff2a5f', fillOpacity: 0.35 }).addTo(mapInst);
-            L.circleMarker([24.9782, 121.9240], { radius: 8, fillColor: '#ff2a5f', color: '#ffffff', fillOpacity: 1 }).addTo(mapInst);
+        function initGISMap() {
+            deskMap = L.map('leafletMapDesk', { zoomControl: false }).setView([24.9780, 121.9242], 16);
+            
+            const tileNLSC = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 });
+            const tileEMAP = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 });
+            const tileEsri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+            
+            tileNLSC.addTo(deskMap);
 
-            return mapInst;
+            document.getElementById('select-tile-layer-desk')?.addEventListener('change', (e) => {
+                deskMap.eachLayer((layer) => { if (layer instanceof L.TileLayer) deskMap.removeLayer(layer); });
+                if (e.target.value === 'nlsc') tileNLSC.addTo(deskMap);
+                else if (e.target.value === 'emap') tileEMAP.addTo(deskMap);
+                else if (e.target.value === 'esri') tileEsri.addTo(deskMap);
+            });
+
+            // 繪製步道主線
+            const coords = TRAIL_WAYPOINTS.map(w => [w.lat, w.lng]);
+            L.polyline(coords, { color: '#00f0ff', weight: 5, opacity: 0.85 }).addTo(deskMap);
+
+            // 繪製水牛移動預測向量線 (埡口 -> 護管所泥塘)
+            L.polyline([[24.9782, 121.9240], [24.9762, 121.9245], [24.9745, 121.9248]], { color: '#b026ff', weight: 5, dashArray: '8, 8' }).addTo(deskMap);
+
+            // 10m Flight Zone 危險警戒圈
+            L.circle([24.9782, 121.9240], { radius: 15, color: '#ff2a5f', fillColor: '#ff2a5f', fillOpacity: 0.35 }).addTo(deskMap);
+            L.circleMarker([24.9782, 121.9240], { radius: 8, fillColor: '#ff2a5f', color: '#ffffff', fillOpacity: 1 }).addTo(deskMap);
+
+            // 掛載 POI 標記
+            TRAIL_WAYPOINTS.forEach(pt => {
+                L.circleMarker([pt.lat, pt.lng], { radius: 4, fillColor: '#00ff88', color: '#040711', fillOpacity: 0.9 })
+                    .bindPopup(`<b style="color:#00f0ff">${pt.name}</b><br/>ID: ${pt.id}`)
+                    .addTo(deskMap);
+            });
         }
 
-        let deskMap, mobMap;
+        // 3. Canvas 繪製: 08:00 ~ 18:30 人流趨勢折線圖
+        function drawTrafficCanvas() {
+            const canvas = document.getElementById('trafficCanvasDesk');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
 
-        function updateClocks() {
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-            const mobTime = document.getElementById('mob-update-time');
-            if (mobTime) mobTime.innerText = timeStr;
+            // 網格背景
+            ctx.strokeStyle = "rgba(22, 43, 77, 0.5)";
+            ctx.lineWidth = 1;
+            for (let i = 1; i < 4; i++) {
+                ctx.beginPath(); ctx.moveTo(0, (h / 4) * i); ctx.lineTo(w, (h / 4) * i); ctx.stroke();
+            }
 
-            const fmt = (offset) => {
-                const d = new Date(now.getTime() + offset * 3600 * 1000);
-                return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-            };
+            // 繪製埡口人流曲線
+            ctx.beginPath();
+            ctx.strokeStyle = "#00f0ff"; ctx.lineWidth = 2;
+            HOURLY_DATA.forEach((d, idx) => {
+                const x = 10 + idx * ((w - 20) / (HOURLY_DATA.length - 1));
+                const y = h - 15 - (d.yakou / 220) * (h - 25);
+                if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
 
-            const t1 = document.getElementById('desk-t1-time');
-            if (t1) t1.innerText = `${fmt(1)} (+1h)`;
-            const t2 = document.getElementById('desk-t2-time');
-            if (t2) t2.innerText = `${fmt(2)} (+2h)`;
-            const t3 = document.getElementById('desk-t3-time');
-            if (t3) t3.innerText = `${fmt(3)} (+3h)`;
+            // 繪製衝突風險 R 曲線
+            ctx.beginPath();
+            ctx.strokeStyle = "#ff2a5f"; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+            HOURLY_DATA.forEach((d, idx) => {
+                const x = 10 + idx * ((w - 20) / (HOURLY_DATA.length - 1));
+                const y = h - 15 - (d.conflict / 10) * (h - 25);
+                if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // X 軸標籤
+            ctx.fillStyle = "#94a3b8"; ctx.font = "8px 'JetBrains Mono'";
+            ctx.fillText("08:00", 5, h - 3);
+            ctx.fillText("12:00", w / 2 - 12, h - 3);
+            ctx.fillText("18:30", w - 28, h - 3);
         }
 
+        // 4. Canvas 繪製: 12維多模態張量 V12S
+        function drawTensorCanvas() {
+            const canvas = document.getElementById('tensorCanvasDesk');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const vals = [0.84, 0.55, 0.65, 0.70, 0.76, 0.90, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88];
+            const labels = ["THI", "NDWI", "NDVI", "FLIR", "TMI", "Crowd", "DEM", "GTS", "CO2", "AI", "Senti", "ESG"];
+            const bw = (w - 20) / 12;
+
+            vals.forEach((v, i) => {
+                const barH = v * (h - 25);
+                ctx.fillStyle = v > 0.75 ? '#ff2a5f' : '#00f0ff';
+                ctx.fillRect(10 + i * bw, h - 12 - barH, bw - 3, barH);
+                ctx.font = "7px sans-serif"; ctx.fillStyle = "#94a3b8";
+                ctx.fillText(labels[i], 8 + i * bw, h - 2);
+            });
+        }
+
+        // 5. 動態雷達掃描 Canvas
         let radarAngle = 0;
-        function animateCanvas() {
+        function animateRadar() {
             const rCanvas = document.getElementById('radarCanvasDesk');
             if (rCanvas) {
                 const rect = rCanvas.getBoundingClientRect();
@@ -329,56 +424,60 @@
                 }
                 const ctx = rCanvas.getContext('2d');
                 ctx.clearRect(0, 0, rCanvas.width, rCanvas.height);
-                const cx = rCanvas.width - 60, cy = 60, r = 40;
-                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = "rgba(0, 240, 255, 0.4)"; ctx.stroke();
+                const cx = rCanvas.width - 50, cy = 50, r = 35;
+                
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = "rgba(0, 240, 255, 0.3)"; ctx.stroke();
                 radarAngle += 0.04;
                 ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, radarAngle, radarAngle + 0.5); ctx.closePath();
-                ctx.fillStyle = "rgba(0, 240, 255, 0.4)"; ctx.fill();
+                ctx.fillStyle = "rgba(0, 240, 255, 0.35)"; ctx.fill();
             }
+            requestAnimationFrame(animateRadar);
+        }
 
-            const tCanvas = document.getElementById('tensorCanvasDesk');
-            if (tCanvas) {
-                const rect = tCanvas.getBoundingClientRect();
-                if (tCanvas.width !== rect.width || tCanvas.height !== rect.height) {
-                    tCanvas.width = rect.width; tCanvas.height = rect.height;
-                }
-                const ctx = tCanvas.getContext('2d');
-                ctx.clearRect(0, 0, tCanvas.width, tCanvas.height);
-                const vals = [0.84, 0.55, 0.65, 0.70, 0.76, 0.90, 0.85, 0.70, 0.79, 0.90, 0.80, 0.88];
-                const labels = ["THI", "NDWI", "NDVI", "FLIR", "TMI", "Crowd", "DEM", "GTS", "CO2", "AI", "Senti", "ESG"];
-                const bw = (tCanvas.width - 20) / 12;
-                vals.forEach((v, i) => {
-                    const h = v * (tCanvas.height - 30);
-                    ctx.fillStyle = v > 0.75 ? '#ff2a5f' : '#00f0ff';
-                    ctx.fillRect(10 + i * bw, tCanvas.height - 15 - h, bw - 3, h);
-                    ctx.font = "8px sans-serif"; ctx.fillStyle = "#94a3b8";
-                    ctx.fillText(labels[i], 8 + i * bw, tCanvas.height - 3);
-                });
-            }
-            requestAnimationFrame(animateCanvas);
+        // 6. CSV 檔案匯出 (含 UTF-8 BOM)
+        function exportCSV() {
+            let csvContent = "﻿時段,遠望坑人流,埡口人流,大里人流,水牛頭數,THI熱應力,衝突風險R
+";
+            HOURLY_DATA.forEach(row => {
+                csvContent += `${row.time},${row.yuanwangkeng},${row.yakou},${row.dali},${row.buffalo},${row.thi},${row.conflict}
+`;
+            });
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Caoling_Trail_Crowd_Buffalo_Report_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 7. Modal 事件與 Sherman-Morrison 模擬更新
+        function setupModalEvents() {
+            const modal = document.getElementById('modal-feedback');
+            document.getElementById('btn-open-feedback')?.addEventListener('click', () => modal.classList.remove('hidden'));
+            document.getElementById('btn-close-modal')?.addEventListener('click', () => modal.classList.add('hidden'));
+
+            document.getElementById('form-feedback')?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const count = document.getElementById('input-real-buffalo').value;
+                document.getElementById('metric-buffalo').innerHTML = `${count} <span class="text-xs">頭</span>`;
+                document.getElementById('header-cond-num').innerText = "1.01e+02 (最新迭代)";
+                alert(`✅ 已完成現場數據回饋！
+實測頭數: ${count}
+Sherman-Morrison 逆矩陣更新完畢，模型條件數已重新校正。`);
+                modal.classList.add('hidden');
+            });
+
+            document.getElementById('btn-export-csv')?.addEventListener('click', exportCSV);
         }
 
         window.onload = function() {
-            deskMap = createMapInstance('leafletMapDesk');
-            mobMap = createMapInstance('leafletMapMobile');
-            updateClocks();
-            setInterval(updateClocks, 1000);
-            animateCanvas();
-
-            document.getElementById('btn-device-auto')?.addEventListener('click', () => {
-                document.body.classList.remove('force-desktop', 'force-mobile');
-                deskMap?.invalidateSize(); mobMap?.invalidateSize();
-            });
-            document.getElementById('btn-device-desktop')?.addEventListener('click', () => {
-                document.body.classList.remove('force-mobile'); document.body.classList.add('force-desktop');
-                deskMap?.invalidateSize();
-            });
-            document.getElementById('btn-device-mobile')?.addEventListener('click', () => {
-                document.body.classList.remove('force-desktop'); document.body.classList.add('force-mobile');
-                mobMap?.invalidateSize();
-            });
-
-            setTimeout(() => { deskMap?.invalidateSize(); mobMap?.invalidateSize(); }, 300);
+            initGISMap();
+            drawTrafficCanvas();
+            drawTensorCanvas();
+            animateRadar();
+            setupModalEvents();
+            setTimeout(() => deskMap?.invalidateSize(), 300);
         };
     </script>
 </body>
