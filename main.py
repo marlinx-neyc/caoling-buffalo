@@ -1,298 +1,147 @@
-from datetime import datetime, timedelta
-import folium
-
-# ==========================================
-# 1. 完全收斂於陸地山區之 WGS84 真實據點與步道節點
-# ==========================================
-LANDMARKS = {
-    "遠望坑入口": [25.0034, 121.9318],
-    "跌死馬橋": [24.9960, 121.9285],
-    "雄鎮蠻煙碑": [24.9886, 121.9250],
-    "虎字碑": [24.9785, 121.9240],
-    "埡口涼亭 (鞍部核心區)": [24.9780, 121.9242],
-    "護管所 (泥塘散熱區)": [24.9745, 121.9248],
-    "大里天公廟": [24.9696, 121.9242],
-    "大里遊客中心": [24.9691, 121.9246],
-}
-
-# 🚶‍♂️ 草嶺古道主線折線
-TRAIL_PATH = [
-    [25.0034, 121.9318],
-    [24.9960, 121.9285],
-    [24.9886, 121.9250],
-    [24.9785, 121.9240],
-    [24.9780, 121.9242],
-    [24.9762, 121.9245],
-    [24.9745, 121.9248],
-    [24.9696, 121.9242],
-    [24.9691, 121.9246],
-]
-
-BUFFALO_COUNT = 7
-BUFFALO_POS = [24.9782, 121.9240]  # 埡口涼亭草坡
-VECTOR_BEARING = "南南東 (165°)"
-VECTOR_SPEED = "0.8 m/s"
-
-# 🎯 預測移動路徑（嚴格貼合步道折線）
-PREDICTED_LOCATIONS = [
-    {
-        "name": "埡口草坡 (當前起點)",
-        "pos": [24.9782, 121.9240],
-        "eta": "0 分鐘",
-        "desc": "即時出沒點",
-    },
-    {
-        "name": "埡口南側步道 (預測途經點)",
-        "pos": [24.9762, 121.9245],
-        "eta": "+10 分鐘",
-        "desc": "沿草嶺古道步道順向移動",
-    },
-    {
-        "name": "護管所泥塘散熱區 (預測終點)",
-        "pos": [24.9745, 121.9248],
-        "eta": "+25 分鐘",
-        "desc": "高溫 THI 驅動泥塘泡水目的地",
-    },
-]
-
-HISTORICAL_COS_SIM = 91.5
-
-
+# main.py - GEM ENGINE v26.0 Master Output
 def build_map(output_html="index.html"):
-  """繪製並輸出支援全前端 JavaScript 動態時間推算之草嶺古道水牛即時戰情圖台"""
-  m = folium.Map(
-      location=LANDMARKS["埡口涼亭 (鞍部核心區)"],
-      zoom_start=16,
-      tiles=None,
-      zoom_control=True,
-  )
-
-  # 1. 內政部國土通用電子地圖 (EMAP)
-  folium.TileLayer(
-      tiles="https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}",
-      attr="&copy; 內政部國土測繪圖資服務雲 (EMAP)",
-      name="🗺️ 國土通用電子地圖",
-      max_zoom=19,
-      overlay=False,
-  ).add_to(m)
-
-  # 2. 衛星航照圖 (PHOTO2)
-  folium.TileLayer(
-      tiles="https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
-      attr="&copy; 內政部國土測繪圖資服務雲 (PHOTO2)",
-      name="🛰️ 國土衛星航照圖",
-      max_zoom=19,
-      overlay=False,
-  ).add_to(m)
-
-  # 3. 步道主線
-  folium.PolyLine(
-      TRAIL_PATH,
-      color="#2563eb",
-      weight=6,
-      opacity=0.8,
-      popup="<b>🚶‍♂️ 草嶺古道主線</b>",
-  ).add_to(m)
-
-  # 4. 未來移動向量 (紫色虛線對齊步道)
-  predicted_path_coords = [loc["pos"] for loc in PREDICTED_LOCATIONS]
-  dest_name = PREDICTED_LOCATIONS[-1]["name"]
-  via_name = PREDICTED_LOCATIONS[1]["name"]
-  via_eta = PREDICTED_LOCATIONS[1]["eta"]
-
-  folium.PolyLine(
-      predicted_path_coords,
-      color="#a855f7",
-      weight=6,
-      opacity=0.95,
-      dash_array="8, 8",
-      popup=f"<b>🧭 未來移動向量</b><br>方向: {VECTOR_BEARING}<br>速度: {VECTOR_SPEED}",
-      tooltip=f"🧭 沿古道預測移動：{VECTOR_BEARING} ➔ 目標：{dest_name}",
-  ).add_to(m)
-
-  # 5. 標示預測地點 Marker
-  for i, loc in enumerate(PREDICTED_LOCATIONS):
-    if i == 0:
-      continue
-    icon_color = "purple" if i == len(PREDICTED_LOCATIONS) - 1 else "cadetblue"
-    icon_type = "flag" if i == len(PREDICTED_LOCATIONS) - 1 else "arrow-right"
-    folium.Marker(
-        loc["pos"],
-        tooltip=f"📍 步道預測地點：<b>{loc['name']}</b> ({loc['eta']})",
-        popup=f"<b>🎯 預測地點：{loc['name']}</b><br>預估抵達時間：{loc['eta']}<br>說明：{loc['desc']}",
-        icon=folium.Icon(color=icon_color, icon=icon_type),
-    ).add_to(m)
-
-  # 6. 水牛當前點位與 Hover 氣泡
-  folium.Circle(
-      BUFFALO_POS,
-      radius=10,
-      color="#ef4444",
-      fill=True,
-      fill_color="#ef4444",
-      fill_opacity=0.4,
-      tooltip=f"🔴 10m 硬防線 | 水牛數量：{BUFFALO_COUNT} 頭",
-  ).add_to(m)
-
-  folium.Marker(
-      BUFFALO_POS,
-      tooltip=f"🦬 <b>水牛數量：{BUFFALO_COUNT} 頭</b><br>向量方向：{VECTOR_BEARING}",
-      popup=f"🦬 <b>水牛即時點位資訊</b><br>• 即時數量：{BUFFALO_COUNT} 頭<br>• 移動向量：{VECTOR_BEARING} ({VECTOR_SPEED})<br>• 預測地點：{dest_name}<br>• 預估抵達：25 分鐘內",
-      icon=folium.Icon(color="red", icon="warning"),
-  ).add_to(m)
-
-  # 7. 沿線據點 Marker
-  for name, pos in LANDMARKS.items():
-    folium.Marker(
-        pos,
-        popup=f"<b>📍 {name}</b>",
-        tooltip=f"📍 {name}",
-        icon=folium.Icon(
-            color="orange" if "埡口" in name or "護管所" in name else "green",
-            icon="info-sign",
-        ),
-    ).add_to(m)
-
-  folium.LayerControl(position="topright", collapsed=True).add_to(m)
-
-  m.save(output_html)
-
-  # 8. 前端 JavaScript 完全動態計算時間 UI
-  dynamic_ui = f"""
+  html_content = """<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GEM Engine v26.0 | 草嶺古道水牛動態預判與空間戰情互動控制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { orbitron: ['Orbitron', 'sans-serif'], rajdhani: ['Rajdhani', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] },
+                    colors: { cyberDark: '#040711', cyberPanel: 'rgba(8, 14, 28, 0.94)', cyberCard: 'rgba(13, 24, 46, 0.88)', cyberBorder: '#162b4d', neonCyan: '#00f0ff', neonPurple: '#b026ff', neonAmber: '#ffaa00', neonRed: '#ff2a5f', neonGreen: '#00ff88' },
+                    boxShadow: { 'neon-cyan': '0 0 15px rgba(0, 240, 255, 0.45)', 'neon-purple': '0 0 18px rgba(176, 38, 255, 0.45)', 'neon-red': '0 0 20px rgba(255, 42, 95, 0.55)', 'neon-green': '0 0 15px rgba(0, 255, 136, 0.45)' }
+                }
+            }
+        }
+    </script>
     <style>
-      @keyframes pulse-ring {{
-        0% {{ transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }}
-        70% {{ transform: scale(1.05); box-shadow: 0 0 0 6px rgba(168, 85, 247, 0); }}
-        100% {{ transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }}
-      }}
-      .purple-dot {{
-        display: inline-block; width: 8px; height: 8px; background-color: #a855f7;
-        border-radius: 50%; margin-right: 6px; animation: pulse-ring 1.5s infinite; vertical-align: middle;
-      }}
-      
-      #responsive-dashboard {{
-        position: fixed; top: 12px; left: 12px; width: 320px; z-index: 9999;
-        background: rgba(15, 23, 42, 0.92); color: white; padding: 12px 14px;
-        border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.45); backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.15); font-size: 12px; line-height: 1.4;
-        transition: all 0.3s ease;
-      }}
-
-      @media (max-width: 599px) {{
-        #responsive-dashboard {{
-          top: auto; bottom: 12px; left: 50%; transform: translateX(-50%);
-          width: calc(100% - 24px); max-width: 420px; padding: 10px 12px; border-radius: 14px;
-        }}
-      }}
-
-      .leaflet-top.leaflet-right {{ top: 10px; right: 10px; }}
-      .toggle-btn {{
-        background: rgba(255,255,255,0.18); border: none; color: white;
-        border-radius: 6px; padding: 2px 8px; font-size: 11px; cursor: pointer;
-      }}
+        body { background: #040711; color: #f1f5f9; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #040711; }
+        ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
+        .hud-corner-bracket { position: relative; }
+        .hud-corner-bracket::before { content: ''; position: absolute; top: -1px; left: -1px; width: 8px; height: 8px; border-top: 2px solid #00f0ff; border-left: 2px solid #00f0ff; pointer-events: none; z-index: 30; }
+        .hud-corner-bracket::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-bottom: 2px solid #00f0ff; border-right: 2px solid #00f0ff; pointer-events: none; z-index: 30; }
+        .leaflet-container { background: #040711 !important; font-family: 'Rajdhani', sans-serif !important; width: 100% !important; height: 100% !important; }
+        body.force-mobile #desktop-root { display: none !important; }
+        body.force-mobile #mobile-root { display: flex !important; }
+        body.force-desktop #desktop-root { display: grid !important; }
+        body.force-desktop #mobile-root { display: none !important; }
+        #leafletMapDesk, #leafletMapMobile { position: absolute !important; top: 0; left: 0; right: 0; bottom: 0; width: 100% !important; height: 100% !important; z-index: 10; }
     </style>
+</head>
+<body class="bg-cyberDark text-slate-100 font-rajdhani min-h-screen flex flex-col overflow-x-hidden">
 
-    <div id="responsive-dashboard">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <div style="font-weight: bold; font-size: 13px; color: #f8fafc; display: flex; align-items: center;">
-          <span class="purple-dot"></span>🦬 水牛戰情與未來動態預判
-        </div>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 8px;">
-            <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
-          </div>
-          <button class="toggle-btn" onclick="toggleDashboard()">收合</button>
-        </div>
-      </div>
-
-      <div id="dashboard-content">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.06); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
-          <div>
-            <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
-            <div style="font-weight: bold; font-size: 15px; color: #f87171;">{BUFFALO_COUNT} <span style="font-size: 10px;">頭</span></div>
-          </div>
-          <div>
-            <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
-            <div style="font-weight: bold; font-size: 15px; color: #c084fc;">{HISTORICAL_COS_SIM}%</div>
-          </div>
-        </div>
-
-        <div style="background: rgba(168, 85, 247, 0.18); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
-          <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 向量：{VECTOR_BEARING} ({VECTOR_SPEED})</div>
-          <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
-            🎯 <b>預測目標：</b>{dest_name}
-            <br><span style="color: #38bdf8; font-size: 10px;">途經：{via_name} ({via_eta})</span>
-          </div>
-        </div>
-
-        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 5px;">
-          <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險動態時序：</b></div>
-          <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
-            <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-              <div id="t1-time" style="color: #cbd5e1;">--:-- (+1h)</div>
-              <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+    <header class="border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 py-2 flex items-center justify-between sticky top-0 z-50 shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-neon-cyan text-white text-xs">
+                <i class="fa-solid fa-radar fa-spin"></i>
             </div>
-            <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-              <div id="t2-time" style="color: #cbd5e1;">--:-- (+2h)</div>
-              <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+            <div>
+                <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1">
+                    GEM<span class="text-neonCyan">ENGINE</span> <span class="text-[8px] px-1 py-0.2 rounded bg-purple-950 text-purple-300 border border-neonPurple/50 font-mono">v26.0 DUAL-UI</span>
+                </h1>
+                <div class="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
+                    <span>草嶺古道埡口 348m 實體山脈動態全域對齊</span>
+                </div>
             </div>
-            <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-              <div id="t3-time" style="color: #cbd5e1;">--:-- (+3h)</div>
-              <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="flex items-center bg-cyberDark/90 p-0.5 rounded-lg border border-cyberBorder text-[10px] font-mono">
+            <button id="btn-device-auto" class="px-2 py-0.5 rounded bg-cyan-950 text-neonCyan font-bold transition flex items-center gap-1"><i class="fa-solid fa-wand-magic-sparkles"></i><span class="hidden sm:inline">自適應</span></button>
+            <button id="btn-device-desktop" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1"><i class="fa-solid fa-desktop"></i><span class="hidden sm:inline">桌面版</span></button>
+            <button id="btn-device-mobile" class="px-2 py-0.5 rounded text-slate-400 hover:text-white transition flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i><span class="hidden sm:inline">手機版</span></button>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs font-mono">
+            <div id="header-yi-badge" class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-neonRed/50 font-bold">老陽 (過載)</div>
+        </div>
+    </header>
+
+    <div id="desktop-root" class="flex-1 hidden lg:grid lg:grid-cols-12 gap-2 p-2 md:p-3 max-w-[1920px] w-full mx-auto overflow-hidden">
+        <div class="col-span-8 flex flex-col gap-2 relative min-h-[580px]">
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 shadow-2xl relative flex flex-col flex-1 hud-corner-bracket">
+                <div class="flex items-center justify-between pb-1.5 border-b border-cyberBorder/80 text-xs font-mono text-[11px]">
+                    <span class="font-bold text-slate-200 tracking-wider font-orbitron">草嶺古道稜線 GIS 戰情台 (DESKTOP TACTICAL HUD)</span>
+                    <select id="select-tile-layer-desk" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 text-[10px] font-mono">
+                        <option value="nlsc">國土測繪 (NLSC 航照)</option>
+                        <option value="emap">國土測繪 (EMAP 地形)</option>
+                        <option value="esri">Esri 全球高清衛星</option>
+                    </select>
+                </div>
+                <div class="relative w-full flex-1 min-h-[440px] rounded-lg overflow-hidden mt-1.5 bg-cyberDark border border-cyberBorder/80">
+                    <div id="leafletMapDesk" class="w-full h-full z-10"></div>
+                    <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2 pointer-events-none text-xs font-mono space-y-0.5 z-30 shadow-neon-purple max-w-[260px]">
+                        <div class="text-purple-300 font-bold text-[10px]">🧭 步道實體向量外推 (CosSim 91.5%)</div>
+                        <div class="text-slate-200 text-[10px]">向量：<span class="text-neonPurple font-bold">南南東 165°</span> @ <span class="text-neonCyan">0.8 m/s</span></div>
+                        <div class="text-[9px] text-slate-300 bg-cyberCard/80 p-1 rounded border border-cyberBorder">🎯 <b>終點：</b>護管所泥塘 (+25m)</div>
+                    </div>
+                    <div id="desk-alert-banner" class="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 shadow-neon-red z-30 bg-rose-950/95 border-neonRed text-rose-200">
+                        🔴 RED_ALERT: 侵入10m硬防線！水牛 7 頭 @埡口 (強制啟動低碳 E-bike 導流)
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-1.5 mt-2">
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">THI 熱應力指數</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonRed">81.1</div>
+                    </div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">衝突風險 R (Conflict)</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonRed">8.75</div>
+                    </div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">水牛頭數 (FLIR)</div>
+                        <div class="text-2xl font-bold font-orbitron text-neonCyan">7 <span class="text-xs">頭</span></div>
+                    </div>
+                    <div class="bg-cyberCard p-2 rounded-lg border border-cyberBorder">
+                        <div class="text-[10px] text-slate-400 font-mono">LinUCB 策略</div>
+                        <div class="text-sm font-bold font-mono text-purple-300">Arm 1 (E-Bike)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-4 flex flex-col gap-2 overflow-y-auto pr-0.5 max-h-[calc(100vh-65px)]">
+            <div class="bg-cyberPanel rounded-xl border border-neonPurple/40 p-2.5 shadow-xl hud-corner-bracket">
+                <div class="text-purple-300 font-bold text-[11px] font-mono mb-1.5">⏱️ 前瞻 t+1h ~ t+3h 步道橫越風險預報</div>
+                <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-mono">
+                    <div class="bg-rose-950/40 border border-neonRed/50 p-1.5 rounded">
+                        <div class="text-slate-400 text-[9px]" id="desk-t1-time">--:-- (+1h)</div>
+                        <div class="text-neonRed font-bold text-sm font-orbitron">85% (高)</div>
+                    </div>
+                    <div class="bg-amber-950/40 border border-neonAmber/50 p-1.5 rounded">
+                        <div class="text-slate-400 text-[9px]" id="desk-t2-time">--:-- (+2h)</div>
+                        <div class="text-neonAmber font-bold text-sm font-orbitron">60% (中)</div>
+                    </div>
+                    <div class="bg-emerald-950/40 border border-neonGreen/50 p-1.5 rounded">
+                        <div class="text-slate-400 text-[9px]" id="desk-t3-time">--:-- (+3h)</div>
+                        <div class="text-neonGreen font-bold text-sm font-orbitron">20% (低)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-cyberCard to-indigo-950/40 p-2.5 rounded-xl border border-cyan-900/60 shadow-lg hud-corner-bracket">
+                <div class="font-bold text-xs text-cyan-200 font-orbitron mb-1">GEMINI 三才戰略導言</div>
+                <div class="text-[11px] text-slate-300 leading-relaxed font-sans bg-cyberDark/80 p-2 rounded border border-cyberBorder/80 space-y-1">
+                    <div><span class="font-mono font-bold text-neonCyan">【天時・恆卦】</span> THI 達 83.6，突破無汗腺體熱閾值。水牛沿 165° 谷線往護管所泥塘散熱。</div>
+                    <div><span class="font-mono font-bold text-neonAmber">【地利・艮山】</span> 水牛距步道僅 10m，途經埡口南側，登道遭遇概率達 85% 爆發點。</div>
+                    <div><span class="font-mono font-bold text-neonGreen">【人和・離火】</span> 啟動 LBS 圍欄推播與 E-bike 分流，人均減碳 8.9 kg CO₂e，名實對齊完畢。</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-      function updateLiveDynamicTimes() {{
-        let now = new Date();
-        document.getElementById('update-time').innerText = now.toTimeString().split(' ')[0];
+        const mapDesk = L.map('leafletMapDesk', { zoomControl: false }).setView([24.9780, 121.9242], 16);
+        L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(mapDesk);
 
-        let fmt = (d) => d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-        
-        let t1 = new Date(now.getTime() + 1 * 3600 * 1000);
-        let t2 = new Date(now.getTime() + 2 * 3600 * 1000);
-        let t3 = new Date(now.getTime() + 3 * 3600 * 1000);
-
-        document.getElementById('t1-time').innerText = fmt(t1) + ' (+1h)';
-        document.getElementById('t2-time').innerText = fmt(t2) + ' (+2h)';
-        document.getElementById('t3-time').innerText = fmt(t3) + ' (+3h)';
-      }}
-
-      let count = parseInt(localStorage.getItem('caoling_map_refresh_count') || '0') + 1;
-      localStorage.setItem('caoling_map_refresh_count', count);
-      document.getElementById('refresh-count').innerText = '#' + count;
-
-      updateLiveDynamicTimes();
-      setTimeout(function(){{ location.reload(); }}, 10000);
-
-      function toggleDashboard() {{
-        let content = document.getElementById('dashboard-content');
-        let btn = document.querySelector('.toggle-btn');
-        if (content.style.display === 'none') {{
-          content.style.display = 'block';
-          btn.innerText = '收合';
-        }} else {{
-          content.style.display = 'none';
-          btn.innerText = '展開';
-        }}
-      }}
-    </script>
-    </body>
-    """
-
-  with open(output_html, "r", encoding="utf-8") as f:
-    content = f.read().replace("</body>", dynamic_ui)
-  with open(output_html, "w", encoding="utf-8") as f:
-    f.write(content)
-
-  print(
-      f"✅ [main.py] 成功產出包含 JS 前端動態時間推算之戰情圖台: {output_html}"
-  )
-
-
-if __name__ == "__main__":
-  build_map("index.html")
+        const trail = [[25.0034, 121.9318], [24.9960, 121.9285], [24.9886, 121.9250], [24.9785, 121.9240], [24.9780, 121.9242], [24.9762, 121.9245], [24.9745, 121.9248], [24.9696, 121.9242], [24.9691, 121.9246]];
+        L.polyline(trail, { color: '#2563eb', weight: 6, opacity: 0.85 }).addTo(mapDesk);
