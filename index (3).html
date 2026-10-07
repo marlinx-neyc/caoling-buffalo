@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ef237a012690c7c24f6aa2a68c502720 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_ef237a012690c7c24f6aa2a68c502720" ></div>
+        
+
+    <!-- 手機頂部即時戰情卡片 -->
+    <div id="mobile-dashboard" style="
+        position: fixed; top: 10px; left: 10px; right: 10px; z-index: 9999;
+        background: rgba(15, 23, 42, 0.9); color: white; padding: 12px 16px;
+        border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.1);
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: bold; font-size: 15px; color: #f8fafc;">🦬 草嶺水牛即時戰情</span>
+        <span style="font-size: 11px; background: #334155; padding: 2px 8px; border-radius: 20px; color: #94a3b8;">
+            更新於 04:17:45
+        </span>
+      </div>
+      <div style="margin-top: 8px; font-size: 13px; line-height: 1.5;">
+        <div><b>警戒狀態：</b><span style="color: #f87171; font-weight: bold;">🔴 RED_ALERT (侵入 10m 防線)</span></div>
+        <div><b>步道距離：</b>3.5 公尺 (衝突風險 R: 3.24)</div>
+      </div>
+    </div>
+
+    <script>
+      // 10 秒自動刷新頁面，維持數據最新
+      setTimeout(function(){ location.reload(); }, 10000);
+
+      // 手機即時 GPS 定位顯示
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(function(position) {
+          console.log("手機當前位置:", position.coords.latitude, position.coords.longitude);
+        }, function(err){ console.warn("GPS 定位關閉或失敗"); }, { enableHighAccuracy: true });
+      }
+    </script>
+    </body>
+    
+<script>
+    
+    
+            var map_ef237a012690c7c24f6aa2a68c502720 = L.map(
+                "map_ef237a012690c7c24f6aa2a68c502720",
+                {
+                    center: [24.9683, 121.925],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 18,
+  "zoomControl": false,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_5f55cfd0554f07a65ed7ce291d1e6955 = L.tileLayer(
+                "https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u570b\u571f\u6e2c\u7e6a\u5716\u8cc7\u670d\u52d9\u96f2",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_5f55cfd0554f07a65ed7ce291d1e6955.addTo(map_ef237a012690c7c24f6aa2a68c502720);
+        
+    
+            var circle_4409868f990e6e7083f64743f8df678e = L.circle(
+                [24.9683, 121.925],
+                {"bubblingMouseEvents": true, "color": "#ef4444", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.35, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(map_ef237a012690c7c24f6aa2a68c502720);
+        
+    
+        var popup_47dfecc630ff880e4acdb0280e28c353 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d80ce1eb9926eb7564a01421598e03a7 = $(`<div id="html_d80ce1eb9926eb7564a01421598e03a7" style="width: 100.0%; height: 100.0%;"><b>10m 水牛驚嚇安全硬防線</b></div>`)[0];
+                popup_47dfecc630ff880e4acdb0280e28c353.setContent(html_d80ce1eb9926eb7564a01421598e03a7);
+            
+        
+
+        circle_4409868f990e6e7083f64743f8df678e.bindPopup(popup_47dfecc630ff880e4acdb0280e28c353)
+        ;
+
+        
+    
+    
+            var circle_5024d6fc5e2488a333fd6e00e16cb230 = L.circle(
+                [24.9683, 121.925],
+                {"bubblingMouseEvents": true, "color": "#f59e0b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 20, "stroke": true, "weight": 3}
+            ).addTo(map_ef237a012690c7c24f6aa2a68c502720);
+        
+    
+        var popup_9ebda212d6489613e1f420d77dc9c0fe = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_98b742d29f98ac3ac367535811958973 = $(`<div id="html_98b742d29f98ac3ac367535811958973" style="width: 100.0%; height: 100.0%;"><b>20m 告警廊道</b></div>`)[0];
+                popup_9ebda212d6489613e1f420d77dc9c0fe.setContent(html_98b742d29f98ac3ac367535811958973);
+            
+        
+
+        circle_5024d6fc5e2488a333fd6e00e16cb230.bindPopup(popup_9ebda212d6489613e1f420d77dc9c0fe)
+        ;
+
+        
+    
+    
+            var marker_24c31416d577a8b6a38a0143d2394965 = L.marker(
+                [24.9683, 121.925],
+                {
+}
+            ).addTo(map_ef237a012690c7c24f6aa2a68c502720);
+        
+    
+            var icon_141cf2bbe74004491bbee7691f826e1a = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "warning",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_88bac3d7fa48239f874eaeaf30a535fc = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d8b19e510eec2dd7a3d28d7162594c1c = $(`<div id="html_d8b19e510eec2dd7a3d28d7162594c1c" style="width: 100.0%; height: 100.0%;">🦬 水牛即時點位<br>距步道: 3.5m<br>風險 R: 3.24</div>`)[0];
+                popup_88bac3d7fa48239f874eaeaf30a535fc.setContent(html_d8b19e510eec2dd7a3d28d7162594c1c);
+            
+        
+
+        marker_24c31416d577a8b6a38a0143d2394965.bindPopup(popup_88bac3d7fa48239f874eaeaf30a535fc)
+        ;
+
+        
+    
+    
+                marker_24c31416d577a8b6a38a0143d2394965.setIcon(icon_141cf2bbe74004491bbee7691f826e1a);
+            
+</script>
+</html>
