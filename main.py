@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import folium
 
 # ==========================================
-# 1. 精確收斂於陸地山區之 WGS84 據點與步道節點
+# 1. 完全收斂於陸地山區之 WGS84 真實據點與步道節點
 # ==========================================
 LANDMARKS = {
     "遠望坑入口": [25.0034, 121.9318],
@@ -15,7 +15,7 @@ LANDMARKS = {
     "大里遊客中心": [24.9691, 121.9246],
 }
 
-# 草嶺古道主線折線
+# 🚶‍♂️ 草嶺古道主線折線
 TRAIL_PATH = [
     [25.0034, 121.9318],
     [24.9960, 121.9285],
@@ -29,11 +29,11 @@ TRAIL_PATH = [
 ]
 
 BUFFALO_COUNT = 7
-BUFFALO_POS = [24.9782, 121.9240]
+BUFFALO_POS = [24.9782, 121.9240]  # 埡口涼亭草坡
 VECTOR_BEARING = "南南東 (165°)"
 VECTOR_SPEED = "0.8 m/s"
 
-# 預測移動路徑（嚴格貼合步道折線）
+# 🎯 預測移動路徑（嚴格貼合步道折線）
 PREDICTED_LOCATIONS = [
     {
         "name": "埡口草坡 (當前起點)",
@@ -64,7 +64,7 @@ T3_TIME = (now_time + timedelta(hours=3)).strftime("%H:%M")
 
 
 def build_map(output_html="index.html"):
-  """繪製並輸出草嶺古道水牛即時戰情與向量圖台"""
+  """繪製並輸出跨桌面與手機雙平台之草嶺古道水牛即時戰情圖台"""
   m = folium.Map(
       location=LANDMARKS["埡口涼亭 (鞍部核心區)"],
       zoom_start=16,
@@ -158,12 +158,12 @@ def build_map(output_html="index.html"):
         ),
     ).add_to(m)
 
-  folium.LayerControl(position="topright", collapsed=False).add_to(m)
+  folium.LayerControl(position="topright", collapsed=True).add_to(m)
 
   m.save(output_html)
 
-  # 8. 注入 UI 面板
-  vector_ui = f"""
+  # 8. 桌面/手機跨平台雙向自適應 UI (RWD 媒體查詢)
+  responsive_ui = f"""
     <style>
       @keyframes pulse-ring {{
         0% {{ transform: scale(0.95); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }}
@@ -174,57 +174,106 @@ def build_map(output_html="index.html"):
         display: inline-block; width: 8px; height: 8px; background-color: #a855f7;
         border-radius: 50%; margin-right: 6px; animation: pulse-ring 1.5s infinite; vertical-align: middle;
       }}
+      
+      /* 預設：桌面電腦版樣式 (寬度 >= 600px) */
+      #responsive-dashboard {{
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: 320px;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.92);
+        color: white;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+        font-size: 12px;
+        line-height: 1.4;
+        transition: all 0.3s ease;
+      }}
+
+      /* 手機版 RWD 樣式 (寬度 < 600px 自動切換至底部) */
+      @media (max-width: 599px) {{
+        #responsive-dashboard {{
+          top: auto;
+          bottom: 12px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: calc(100% - 24px);
+          max-width: 420px;
+          padding: 10px 12px;
+          border-radius: 14px;
+        }}
+      }}
+
+      /* 控制層選單不重疊 */
+      .leaflet-top.leaflet-right {{
+        top: 10px;
+        right: 10px;
+      }}
+
+      .toggle-btn {{
+        background: rgba(255,255,255,0.18);
+        border: none;
+        color: white;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+      }}
     </style>
 
-    <div id="mobile-dashboard" style="
-        position: fixed; top: 10px; left: 10px; max-width: 320px; z-index: 9999;
-        background: rgba(15, 23, 42, 0.92); color: white; padding: 12px 14px;
-        border-radius: 12px; font-family: -apple-system, sans-serif;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.12); font-size: 12px; line-height: 1.5;
-    ">
+    <div id="responsive-dashboard">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <div style="font-weight: bold; font-size: 14px; color: #f8fafc;">
-          <span class="purple-dot"></span>🦬 水牛向量與古道對齊預判
+        <div style="font-weight: bold; font-size: 13px; color: #f8fafc; display: flex; align-items: center;">
+          <span class="purple-dot"></span>🦬 水牛戰情與未來預判
         </div>
-        <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 10px;">
-          <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
-        <div>
-          <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
-          <div style="font-weight: bold; font-size: 15px; color: #f87171;">{BUFFALO_COUNT} <span style="font-size: 10px;">頭</span></div>
-        </div>
-        <div>
-          <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
-          <div style="font-weight: bold; font-size: 15px; color: #c084fc;">{HISTORICAL_COS_SIM}%</div>
-        </div>
-      </div>
-
-      <div style="background: rgba(168, 85, 247, 0.15); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
-        <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 步道沿線向量：{VECTOR_BEARING} ({VECTOR_SPEED})</div>
-        <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
-          🎯 <b>預測目標地點：</b>{dest_name}
-          <br><span style="color: #38bdf8; font-size: 10px;">途經：{via_name} ({via_eta})</span>
-        </div>
-      </div>
-
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
-        <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險時序：</b></div>
-        <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
-          <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">{T1_TIME} (+1h)</div>
-            <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 8px;">
+            <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
           </div>
-          <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">{T2_TIME} (+2h)</div>
-            <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+          <button class="toggle-btn" onclick="toggleDashboard()">收合</button>
+        </div>
+      </div>
+
+      <div id="dashboard-content">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.06); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
+          <div>
+            <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
+            <div style="font-weight: bold; font-size: 15px; color: #f87171;">{BUFFALO_COUNT} <span style="font-size: 10px;">頭</span></div>
           </div>
-          <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">{T3_TIME} (+3h)</div>
-            <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
+          <div>
+            <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
+            <div style="font-weight: bold; font-size: 15px; color: #c084fc;">{HISTORICAL_COS_SIM}%</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(168, 85, 247, 0.18); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
+          <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 向量：{VECTOR_BEARING} ({VECTOR_SPEED})</div>
+          <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
+            🎯 <b>預測目標：</b>{dest_name}
+            <br><span style="color: #38bdf8; font-size: 10px;">途經：{via_name} ({via_eta})</span>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 5px;">
+          <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險時序：</b></div>
+          <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+            <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">{T1_TIME} (+1h)</div>
+              <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+            </div>
+            <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">{T2_TIME} (+2h)</div>
+              <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+            </div>
+            <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">{T3_TIME} (+3h)</div>
+              <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
+            </div>
           </div>
         </div>
       </div>
@@ -238,17 +287,31 @@ def build_map(output_html="index.html"):
       let now = new Date();
       document.getElementById('update-time').innerText = now.toTimeString().split(' ')[0];
 
+      function toggleDashboard() {{
+        let content = document.getElementById('dashboard-content');
+        let btn = document.querySelector('.toggle-btn');
+        if (content.style.display === 'none') {{
+          content.style.display = 'block';
+          btn.innerText = '收合';
+        }} else {{
+          content.style.display = 'none';
+          btn.innerText = '展開';
+        }}
+      }}
+
       setTimeout(function(){{ location.reload(); }}, 10000);
     </script>
     </body>
     """
 
   with open(output_html, "r", encoding="utf-8") as f:
-    content = f.read().replace("</body>", vector_ui)
+    content = f.read().replace("</body>", responsive_ui)
   with open(output_html, "w", encoding="utf-8") as f:
     f.write(content)
 
-  print(f"✅ [main.py] 成功產出最新的戰情地圖: {output_html}")
+  print(
+      f"✅ [main.py] 成功產出支援桌面與手機版 (RWD 雙平台自適應) 的戰情圖台: {output_html}"
+  )
 
 
 if __name__ == "__main__":
