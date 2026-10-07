@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_048a8715459fd8f8b6b5c2d0406098b9 {
+                #map_de295eb0b0a21477ae72a88293f5bcb0 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,7 +54,7 @@
 <body>
     
     
-            <div class="folium-map" id="map_048a8715459fd8f8b6b5c2d0406098b9" ></div>
+            <div class="folium-map" id="map_de295eb0b0a21477ae72a88293f5bcb0" ></div>
         
 
     <style>
@@ -67,57 +67,106 @@
         display: inline-block; width: 8px; height: 8px; background-color: #a855f7;
         border-radius: 50%; margin-right: 6px; animation: pulse-ring 1.5s infinite; vertical-align: middle;
       }
+      
+      /* 預設：桌面電腦版樣式 (寬度 >= 600px) */
+      #responsive-dashboard {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: 320px;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.92);
+        color: white;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+        font-size: 12px;
+        line-height: 1.4;
+        transition: all 0.3s ease;
+      }
+
+      /* 手機版 RWD 樣式 (寬度 < 600px 自動切換至底部) */
+      @media (max-width: 599px) {
+        #responsive-dashboard {
+          top: auto;
+          bottom: 12px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: calc(100% - 24px);
+          max-width: 420px;
+          padding: 10px 12px;
+          border-radius: 14px;
+        }
+      }
+
+      /* 控制層選單不重疊 */
+      .leaflet-top.leaflet-right {
+        top: 10px;
+        right: 10px;
+      }
+
+      .toggle-btn {
+        background: rgba(255,255,255,0.18);
+        border: none;
+        color: white;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 11px;
+        cursor: pointer;
+      }
     </style>
 
-    <div id="mobile-dashboard" style="
-        position: fixed; top: 10px; left: 10px; max-width: 320px; z-index: 9999;
-        background: rgba(15, 23, 42, 0.92); color: white; padding: 12px 14px;
-        border-radius: 12px; font-family: -apple-system, sans-serif;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.12); font-size: 12px; line-height: 1.5;
-    ">
+    <div id="responsive-dashboard">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-        <div style="font-weight: bold; font-size: 14px; color: #f8fafc;">
-          <span class="purple-dot"></span>🦬 水牛向量與古道對齊預判
+        <div style="font-weight: bold; font-size: 13px; color: #f8fafc; display: flex; align-items: center;">
+          <span class="purple-dot"></span>🦬 水牛戰情與未來預判
         </div>
-        <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 10px;">
-          <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
-        <div>
-          <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
-          <div style="font-weight: bold; font-size: 15px; color: #f87171;">7 <span style="font-size: 10px;">頭</span></div>
-        </div>
-        <div>
-          <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
-          <div style="font-weight: bold; font-size: 15px; color: #c084fc;">91.5%</div>
-        </div>
-      </div>
-
-      <div style="background: rgba(168, 85, 247, 0.15); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
-        <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 步道沿線向量：南南東 (165°) (0.8 m/s)</div>
-        <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
-          🎯 <b>預測目標地點：</b>護管所泥塘散熱區 (預測終點)
-          <br><span style="color: #38bdf8; font-size: 10px;">途經：埡口南側步道 (預測途經點) (+10 分鐘)</span>
-        </div>
-      </div>
-
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
-        <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險時序：</b></div>
-        <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
-          <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">06:38 (+1h)</div>
-            <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 8px;">
+            <span id="update-time">--:--:--</span> (<span id="refresh-count">#1</span>)
           </div>
-          <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">07:38 (+2h)</div>
-            <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+          <button class="toggle-btn" onclick="toggleDashboard()">收合</button>
+        </div>
+      </div>
+
+      <div id="dashboard-content">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: rgba(255,255,255,0.06); padding: 6px; border-radius: 8px; margin-bottom: 6px;">
+          <div>
+            <div style="color: #94a3b8; font-size: 10px;">🦬 水牛數量</div>
+            <div style="font-weight: bold; font-size: 15px; color: #f87171;">7 <span style="font-size: 10px;">頭</span></div>
           </div>
-          <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
-            <div style="color: #cbd5e1;">08:38 (+3h)</div>
-            <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
+          <div>
+            <div style="color: #94a3b8; font-size: 10px;">📊 模式相似度</div>
+            <div style="font-weight: bold; font-size: 15px; color: #c084fc;">91.5%</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(168, 85, 247, 0.18); padding: 6px 8px; border-left: 3px solid #a855f7; border-radius: 4px; margin-bottom: 6px;">
+          <div style="color: #e9d5ff; font-weight: bold; font-size: 11px;">🧭 向量：南南東 (165°) (0.8 m/s)</div>
+          <div style="color: #cbd5e1; font-size: 11px; margin-top: 2px;">
+            🎯 <b>預測目標：</b>護管所泥塘散熱區 (預測終點)
+            <br><span style="color: #38bdf8; font-size: 10px;">途經：埡口南側步道 (預測途經點) (+10 分鐘)</span>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 5px;">
+          <div style="color: #94a3b8; font-size: 10px; margin-bottom: 4px;">⏱️ <b>未來登步道/橫越風險時序：</b></div>
+          <div style="display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+            <div style="flex: 1; background: rgba(239, 68, 68, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">06:48 (+1h)</div>
+              <div style="color: #f87171; font-weight: bold;">85% (高)</div>
+            </div>
+            <div style="flex: 1; background: rgba(245, 158, 11, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">07:48 (+2h)</div>
+              <div style="color: #fbbf24; font-weight: bold;">60% (中)</div>
+            </div>
+            <div style="flex: 1; background: rgba(34, 197, 94, 0.25); margin: 0 2px; padding: 3px 0; border-radius: 4px;">
+              <div style="color: #cbd5e1;">08:48 (+3h)</div>
+              <div style="color: #4ade80; font-weight: bold;">20% (低)</div>
+            </div>
           </div>
         </div>
       </div>
@@ -131,6 +180,18 @@
       let now = new Date();
       document.getElementById('update-time').innerText = now.toTimeString().split(' ')[0];
 
+      function toggleDashboard() {
+        let content = document.getElementById('dashboard-content');
+        let btn = document.querySelector('.toggle-btn');
+        if (content.style.display === 'none') {
+          content.style.display = 'block';
+          btn.innerText = '收合';
+        } else {
+          content.style.display = 'none';
+          btn.innerText = '展開';
+        }
+      }
+
       setTimeout(function(){ location.reload(); }, 10000);
     </script>
     </body>
@@ -138,8 +199,8 @@
 <script>
     
     
-            var map_048a8715459fd8f8b6b5c2d0406098b9 = L.map(
-                "map_048a8715459fd8f8b6b5c2d0406098b9",
+            var map_de295eb0b0a21477ae72a88293f5bcb0 = L.map(
+                "map_de295eb0b0a21477ae72a88293f5bcb0",
                 {
                     center: [24.978, 121.9242],
                     crs: L.CRS.EPSG3857,
@@ -156,7 +217,7 @@
 
         
     
-            var tile_layer_309318c400bb65a9ee7edc65c7a0b8bb = L.tileLayer(
+            var tile_layer_a255a924afb79acf01446a380cd29b5f = L.tileLayer(
                 "https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -173,10 +234,10 @@
             );
         
     
-            tile_layer_309318c400bb65a9ee7edc65c7a0b8bb.addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            tile_layer_a255a924afb79acf01446a380cd29b5f.addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var tile_layer_9568450fedcfb069696890f170257246 = L.tileLayer(
+            var tile_layer_5eed934c7ec3004fa4f3bf972ee05339 = L.tileLayer(
                 "https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -193,56 +254,56 @@
             );
         
     
-            tile_layer_9568450fedcfb069696890f170257246.addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            tile_layer_5eed934c7ec3004fa4f3bf972ee05339.addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var poly_line_d352ba4451409b35218cf76bcd4aace9 = L.polyline(
+            var poly_line_87eca6b8dc9024def24652316871edcb = L.polyline(
                 [[25.0034, 121.9318], [24.996, 121.9285], [24.9886, 121.925], [24.9785, 121.924], [24.978, 121.9242], [24.9762, 121.9245], [24.9745, 121.9248], [24.9696, 121.9242], [24.9691, 121.9246]],
                 {"bubblingMouseEvents": true, "color": "#2563eb", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#2563eb", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 6}
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-        var popup_3500b284bb2a3fbef24334679a33ab33 = L.popup({
+        var popup_77ea505d8f5f9f643a263cc952f64098 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_586cffd65e1a9676cf2398fc0c4c69ab = $(`<div id="html_586cffd65e1a9676cf2398fc0c4c69ab" style="width: 100.0%; height: 100.0%;"><b>🚶‍♂️ 草嶺古道主線</b></div>`)[0];
-                popup_3500b284bb2a3fbef24334679a33ab33.setContent(html_586cffd65e1a9676cf2398fc0c4c69ab);
+                var html_9ec6f3e866246e1d55faaf949b1071d2 = $(`<div id="html_9ec6f3e866246e1d55faaf949b1071d2" style="width: 100.0%; height: 100.0%;"><b>🚶‍♂️ 草嶺古道主線</b></div>`)[0];
+                popup_77ea505d8f5f9f643a263cc952f64098.setContent(html_9ec6f3e866246e1d55faaf949b1071d2);
             
         
 
-        poly_line_d352ba4451409b35218cf76bcd4aace9.bindPopup(popup_3500b284bb2a3fbef24334679a33ab33)
+        poly_line_87eca6b8dc9024def24652316871edcb.bindPopup(popup_77ea505d8f5f9f643a263cc952f64098)
         ;
 
         
     
     
-            var poly_line_c6454daaf768ce9dc74697f1e89ebe35 = L.polyline(
+            var poly_line_cb53ec311f87b5fdb94b40658273241f = L.polyline(
                 [[24.9782, 121.924], [24.9762, 121.9245], [24.9745, 121.9248]],
                 {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": "8, 8", "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.95, "smoothFactor": 1.0, "stroke": true, "weight": 6}
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-        var popup_9a2220b6ea8bdfe61e8f704a7006032a = L.popup({
+        var popup_b540a3e72ab96bc2104b563943612090 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_7eb556a7b6254bcbf9959cb661348a54 = $(`<div id="html_7eb556a7b6254bcbf9959cb661348a54" style="width: 100.0%; height: 100.0%;"><b>🧭 未來移動向量</b><br>方向: 南南東 (165°)<br>速度: 0.8 m/s</div>`)[0];
-                popup_9a2220b6ea8bdfe61e8f704a7006032a.setContent(html_7eb556a7b6254bcbf9959cb661348a54);
+                var html_04c279784c92bb8609b71bde90eccd03 = $(`<div id="html_04c279784c92bb8609b71bde90eccd03" style="width: 100.0%; height: 100.0%;"><b>🧭 未來移動向量</b><br>方向: 南南東 (165°)<br>速度: 0.8 m/s</div>`)[0];
+                popup_b540a3e72ab96bc2104b563943612090.setContent(html_04c279784c92bb8609b71bde90eccd03);
             
         
 
-        poly_line_c6454daaf768ce9dc74697f1e89ebe35.bindPopup(popup_9a2220b6ea8bdfe61e8f704a7006032a)
+        poly_line_cb53ec311f87b5fdb94b40658273241f.bindPopup(popup_b540a3e72ab96bc2104b563943612090)
         ;
 
         
     
     
-            poly_line_c6454daaf768ce9dc74697f1e89ebe35.bindTooltip(
+            poly_line_cb53ec311f87b5fdb94b40658273241f.bindTooltip(
                 `<div>
                      🧭 沿古道預測移動：南南東 (165°) ➔ 目標：護管所泥塘散熱區 (預測終點)
                  </div>`,
@@ -252,14 +313,14 @@
             );
         
     
-            var marker_96a7250fb2f18af123ed6b86b4dc9886 = L.marker(
+            var marker_d9169b2e1fc69005fb7dbe2e9d4f86a8 = L.marker(
                 [24.9762, 121.9245],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_7a6dbe61c336882759930ea714d5b905 = L.AwesomeMarkers.icon(
+            var icon_b1dc148dd054577d0e810c9367d2e54b = L.AwesomeMarkers.icon(
                 {
   "markerColor": "cadetblue",
   "iconColor": "white",
@@ -270,24 +331,24 @@
             );
         
     
-        var popup_3d5c2a899d1899af1073c17f80ed5894 = L.popup({
+        var popup_3a5b411bd8fb1d968743d7a09504a92a = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_0529f3e30d69093668ddb4ee0d7741c2 = $(`<div id="html_0529f3e30d69093668ddb4ee0d7741c2" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：埡口南側步道 (預測途經點)</b><br>預估抵達時間：+10 分鐘<br>說明：沿草嶺古道步道順向移動</div>`)[0];
-                popup_3d5c2a899d1899af1073c17f80ed5894.setContent(html_0529f3e30d69093668ddb4ee0d7741c2);
+                var html_1c57558bfcadb482602c970b0c92338c = $(`<div id="html_1c57558bfcadb482602c970b0c92338c" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：埡口南側步道 (預測途經點)</b><br>預估抵達時間：+10 分鐘<br>說明：沿草嶺古道步道順向移動</div>`)[0];
+                popup_3a5b411bd8fb1d968743d7a09504a92a.setContent(html_1c57558bfcadb482602c970b0c92338c);
             
         
 
-        marker_96a7250fb2f18af123ed6b86b4dc9886.bindPopup(popup_3d5c2a899d1899af1073c17f80ed5894)
+        marker_d9169b2e1fc69005fb7dbe2e9d4f86a8.bindPopup(popup_3a5b411bd8fb1d968743d7a09504a92a)
         ;
 
         
     
     
-            marker_96a7250fb2f18af123ed6b86b4dc9886.bindTooltip(
+            marker_d9169b2e1fc69005fb7dbe2e9d4f86a8.bindTooltip(
                 `<div>
                      📍 步道預測地點：<b>埡口南側步道 (預測途經點)</b> (+10 分鐘)
                  </div>`,
@@ -297,17 +358,17 @@
             );
         
     
-                marker_96a7250fb2f18af123ed6b86b4dc9886.setIcon(icon_7a6dbe61c336882759930ea714d5b905);
+                marker_d9169b2e1fc69005fb7dbe2e9d4f86a8.setIcon(icon_b1dc148dd054577d0e810c9367d2e54b);
             
     
-            var marker_8c6cf482e89b4d6c97810b8ffd44e611 = L.marker(
+            var marker_6cf4423cd4aa5b730a3098a49a6b3537 = L.marker(
                 [24.9745, 121.9248],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_98b5aeecb15b74cf4611e70a22da5ba8 = L.AwesomeMarkers.icon(
+            var icon_95b09f4d8de037f1b4ad28440e6bde3e = L.AwesomeMarkers.icon(
                 {
   "markerColor": "purple",
   "iconColor": "white",
@@ -318,24 +379,24 @@
             );
         
     
-        var popup_61103255c72ca9469db9fee43e1e7c88 = L.popup({
+        var popup_1ae990732550715f7980061c2e942878 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_21c8fd2b9f2f2084b04096c7b4c2aba0 = $(`<div id="html_21c8fd2b9f2f2084b04096c7b4c2aba0" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：護管所泥塘散熱區 (預測終點)</b><br>預估抵達時間：+25 分鐘<br>說明：高溫 THI 驅動泥塘泡水目的地</div>`)[0];
-                popup_61103255c72ca9469db9fee43e1e7c88.setContent(html_21c8fd2b9f2f2084b04096c7b4c2aba0);
+                var html_95b3821015d9ef2b19801c858b0fcd71 = $(`<div id="html_95b3821015d9ef2b19801c858b0fcd71" style="width: 100.0%; height: 100.0%;"><b>🎯 預測地點：護管所泥塘散熱區 (預測終點)</b><br>預估抵達時間：+25 分鐘<br>說明：高溫 THI 驅動泥塘泡水目的地</div>`)[0];
+                popup_1ae990732550715f7980061c2e942878.setContent(html_95b3821015d9ef2b19801c858b0fcd71);
             
         
 
-        marker_8c6cf482e89b4d6c97810b8ffd44e611.bindPopup(popup_61103255c72ca9469db9fee43e1e7c88)
+        marker_6cf4423cd4aa5b730a3098a49a6b3537.bindPopup(popup_1ae990732550715f7980061c2e942878)
         ;
 
         
     
     
-            marker_8c6cf482e89b4d6c97810b8ffd44e611.bindTooltip(
+            marker_6cf4423cd4aa5b730a3098a49a6b3537.bindTooltip(
                 `<div>
                      📍 步道預測地點：<b>護管所泥塘散熱區 (預測終點)</b> (+25 分鐘)
                  </div>`,
@@ -345,16 +406,16 @@
             );
         
     
-                marker_8c6cf482e89b4d6c97810b8ffd44e611.setIcon(icon_98b5aeecb15b74cf4611e70a22da5ba8);
+                marker_6cf4423cd4aa5b730a3098a49a6b3537.setIcon(icon_95b09f4d8de037f1b4ad28440e6bde3e);
             
     
-            var circle_647d939f5289f99787199c52ab098b8b = L.circle(
+            var circle_9f45cde17e15357f0d7a3448d07a9eae = L.circle(
                 [24.9782, 121.924],
                 {"bubblingMouseEvents": true, "color": "#ef4444", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            circle_647d939f5289f99787199c52ab098b8b.bindTooltip(
+            circle_9f45cde17e15357f0d7a3448d07a9eae.bindTooltip(
                 `<div>
                      🔴 10m 硬防線 | 水牛數量：7 頭
                  </div>`,
@@ -364,14 +425,14 @@
             );
         
     
-            var marker_97b0f90117f86a863d5faa68a5f7c7c2 = L.marker(
+            var marker_95d1c7cfd96883e9d5e8943425e47284 = L.marker(
                 [24.9782, 121.924],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_88b9268ab3627e5eecf04faf696c9248 = L.AwesomeMarkers.icon(
+            var icon_e4b2ba74312f028f4ee28ab958171c24 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "red",
   "iconColor": "white",
@@ -382,24 +443,24 @@
             );
         
     
-        var popup_5ca55b8890fb6756dc7ba5fbcf093ac9 = L.popup({
+        var popup_743e4873136e1e933552d9d02d195eeb = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_1daab487be68c70d486a2798349ef07f = $(`<div id="html_1daab487be68c70d486a2798349ef07f" style="width: 100.0%; height: 100.0%;">🦬 <b>水牛即時點位資訊</b><br>• 即時數量：7 頭<br>• 移動向量：南南東 (165°) (0.8 m/s)<br>• 預測地點：護管所泥塘散熱區 (預測終點)<br>• 預估抵達：25 分鐘內</div>`)[0];
-                popup_5ca55b8890fb6756dc7ba5fbcf093ac9.setContent(html_1daab487be68c70d486a2798349ef07f);
+                var html_d3cd581860df2d02d416b5357eb55da8 = $(`<div id="html_d3cd581860df2d02d416b5357eb55da8" style="width: 100.0%; height: 100.0%;">🦬 <b>水牛即時點位資訊</b><br>• 即時數量：7 頭<br>• 移動向量：南南東 (165°) (0.8 m/s)<br>• 預測地點：護管所泥塘散熱區 (預測終點)<br>• 預估抵達：25 分鐘內</div>`)[0];
+                popup_743e4873136e1e933552d9d02d195eeb.setContent(html_d3cd581860df2d02d416b5357eb55da8);
             
         
 
-        marker_97b0f90117f86a863d5faa68a5f7c7c2.bindPopup(popup_5ca55b8890fb6756dc7ba5fbcf093ac9)
+        marker_95d1c7cfd96883e9d5e8943425e47284.bindPopup(popup_743e4873136e1e933552d9d02d195eeb)
         ;
 
         
     
     
-            marker_97b0f90117f86a863d5faa68a5f7c7c2.bindTooltip(
+            marker_95d1c7cfd96883e9d5e8943425e47284.bindTooltip(
                 `<div>
                      🦬 <b>水牛數量：7 頭</b><br>向量方向：南南東 (165°)
                  </div>`,
@@ -409,17 +470,17 @@
             );
         
     
-                marker_97b0f90117f86a863d5faa68a5f7c7c2.setIcon(icon_88b9268ab3627e5eecf04faf696c9248);
+                marker_95d1c7cfd96883e9d5e8943425e47284.setIcon(icon_e4b2ba74312f028f4ee28ab958171c24);
             
     
-            var marker_f0809aeafead80a607c5f6781f13d21a = L.marker(
+            var marker_96dd892f646166b1e38f9f63f3a3d993 = L.marker(
                 [25.0034, 121.9318],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_de79cfd5ae0739a0d97f2d218f91ee1b = L.AwesomeMarkers.icon(
+            var icon_2b4f26c163b3a046b2ff5580faba7415 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -430,24 +491,24 @@
             );
         
     
-        var popup_d725ceeee82bd21065f646f9f59c11d4 = L.popup({
+        var popup_24d00e03773b710cbe415cb7ca88f313 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_9e8649d76ac47041a2f915da8781680c = $(`<div id="html_9e8649d76ac47041a2f915da8781680c" style="width: 100.0%; height: 100.0%;"><b>📍 遠望坑入口</b></div>`)[0];
-                popup_d725ceeee82bd21065f646f9f59c11d4.setContent(html_9e8649d76ac47041a2f915da8781680c);
+                var html_a3db8309d6f87577e3944bf4deed81f6 = $(`<div id="html_a3db8309d6f87577e3944bf4deed81f6" style="width: 100.0%; height: 100.0%;"><b>📍 遠望坑入口</b></div>`)[0];
+                popup_24d00e03773b710cbe415cb7ca88f313.setContent(html_a3db8309d6f87577e3944bf4deed81f6);
             
         
 
-        marker_f0809aeafead80a607c5f6781f13d21a.bindPopup(popup_d725ceeee82bd21065f646f9f59c11d4)
+        marker_96dd892f646166b1e38f9f63f3a3d993.bindPopup(popup_24d00e03773b710cbe415cb7ca88f313)
         ;
 
         
     
     
-            marker_f0809aeafead80a607c5f6781f13d21a.bindTooltip(
+            marker_96dd892f646166b1e38f9f63f3a3d993.bindTooltip(
                 `<div>
                      📍 遠望坑入口
                  </div>`,
@@ -457,17 +518,17 @@
             );
         
     
-                marker_f0809aeafead80a607c5f6781f13d21a.setIcon(icon_de79cfd5ae0739a0d97f2d218f91ee1b);
+                marker_96dd892f646166b1e38f9f63f3a3d993.setIcon(icon_2b4f26c163b3a046b2ff5580faba7415);
             
     
-            var marker_bc97546764b356bbcc681556d0e6eb06 = L.marker(
+            var marker_456eed7584c4ac2ad0702136c8b9a35a = L.marker(
                 [24.996, 121.9285],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_a6f5dd189acfe3fd25d1fd7d63224536 = L.AwesomeMarkers.icon(
+            var icon_8629fbeda690aa417db493372e7491ca = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -478,24 +539,24 @@
             );
         
     
-        var popup_823bf72ec4529814c0180b34a556b4f9 = L.popup({
+        var popup_1882e604d3cad1a16970df4a43c597a9 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_16a219e1cd639305fc794cae17a0b8ae = $(`<div id="html_16a219e1cd639305fc794cae17a0b8ae" style="width: 100.0%; height: 100.0%;"><b>📍 跌死馬橋</b></div>`)[0];
-                popup_823bf72ec4529814c0180b34a556b4f9.setContent(html_16a219e1cd639305fc794cae17a0b8ae);
+                var html_885fa009af49c749f0bceb7993015642 = $(`<div id="html_885fa009af49c749f0bceb7993015642" style="width: 100.0%; height: 100.0%;"><b>📍 跌死馬橋</b></div>`)[0];
+                popup_1882e604d3cad1a16970df4a43c597a9.setContent(html_885fa009af49c749f0bceb7993015642);
             
         
 
-        marker_bc97546764b356bbcc681556d0e6eb06.bindPopup(popup_823bf72ec4529814c0180b34a556b4f9)
+        marker_456eed7584c4ac2ad0702136c8b9a35a.bindPopup(popup_1882e604d3cad1a16970df4a43c597a9)
         ;
 
         
     
     
-            marker_bc97546764b356bbcc681556d0e6eb06.bindTooltip(
+            marker_456eed7584c4ac2ad0702136c8b9a35a.bindTooltip(
                 `<div>
                      📍 跌死馬橋
                  </div>`,
@@ -505,17 +566,17 @@
             );
         
     
-                marker_bc97546764b356bbcc681556d0e6eb06.setIcon(icon_a6f5dd189acfe3fd25d1fd7d63224536);
+                marker_456eed7584c4ac2ad0702136c8b9a35a.setIcon(icon_8629fbeda690aa417db493372e7491ca);
             
     
-            var marker_f9bdab47b201eed3e2cfc8877c60d3e3 = L.marker(
+            var marker_c403f58446787fe63c0d7b485737092d = L.marker(
                 [24.9886, 121.925],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_3cc1382c052312a1aae514f7e880cae7 = L.AwesomeMarkers.icon(
+            var icon_748b4d13925196ac4835f1b7dd4a311d = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -526,24 +587,24 @@
             );
         
     
-        var popup_c64ddbbe916e30cfc43eab295b755064 = L.popup({
+        var popup_4a57601428cce6367075da5839b9e601 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_b50a8c8ae716d31f5e030915e9b1abfb = $(`<div id="html_b50a8c8ae716d31f5e030915e9b1abfb" style="width: 100.0%; height: 100.0%;"><b>📍 雄鎮蠻煙碑</b></div>`)[0];
-                popup_c64ddbbe916e30cfc43eab295b755064.setContent(html_b50a8c8ae716d31f5e030915e9b1abfb);
+                var html_af08d5c016ad428c41db853b6c444cc2 = $(`<div id="html_af08d5c016ad428c41db853b6c444cc2" style="width: 100.0%; height: 100.0%;"><b>📍 雄鎮蠻煙碑</b></div>`)[0];
+                popup_4a57601428cce6367075da5839b9e601.setContent(html_af08d5c016ad428c41db853b6c444cc2);
             
         
 
-        marker_f9bdab47b201eed3e2cfc8877c60d3e3.bindPopup(popup_c64ddbbe916e30cfc43eab295b755064)
+        marker_c403f58446787fe63c0d7b485737092d.bindPopup(popup_4a57601428cce6367075da5839b9e601)
         ;
 
         
     
     
-            marker_f9bdab47b201eed3e2cfc8877c60d3e3.bindTooltip(
+            marker_c403f58446787fe63c0d7b485737092d.bindTooltip(
                 `<div>
                      📍 雄鎮蠻煙碑
                  </div>`,
@@ -553,17 +614,17 @@
             );
         
     
-                marker_f9bdab47b201eed3e2cfc8877c60d3e3.setIcon(icon_3cc1382c052312a1aae514f7e880cae7);
+                marker_c403f58446787fe63c0d7b485737092d.setIcon(icon_748b4d13925196ac4835f1b7dd4a311d);
             
     
-            var marker_afaf346451680fc6a9e31f7feb0dc50f = L.marker(
+            var marker_9b57ffee071282b73e6ec5c0cc2b9c7c = L.marker(
                 [24.9785, 121.924],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_99f089d6acd8a93d026335c625ccf315 = L.AwesomeMarkers.icon(
+            var icon_a888fff423ec31691b3b0caf0b80ec24 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -574,24 +635,24 @@
             );
         
     
-        var popup_0b969b8c114a1dded2beae2deb1029b8 = L.popup({
+        var popup_8ce8047d08a3b285bcb1ae0ca4e77986 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_4194ded48560cec2aabbe2aee0704172 = $(`<div id="html_4194ded48560cec2aabbe2aee0704172" style="width: 100.0%; height: 100.0%;"><b>📍 虎字碑</b></div>`)[0];
-                popup_0b969b8c114a1dded2beae2deb1029b8.setContent(html_4194ded48560cec2aabbe2aee0704172);
+                var html_d1a798189118aa00cc984455142a081c = $(`<div id="html_d1a798189118aa00cc984455142a081c" style="width: 100.0%; height: 100.0%;"><b>📍 虎字碑</b></div>`)[0];
+                popup_8ce8047d08a3b285bcb1ae0ca4e77986.setContent(html_d1a798189118aa00cc984455142a081c);
             
         
 
-        marker_afaf346451680fc6a9e31f7feb0dc50f.bindPopup(popup_0b969b8c114a1dded2beae2deb1029b8)
+        marker_9b57ffee071282b73e6ec5c0cc2b9c7c.bindPopup(popup_8ce8047d08a3b285bcb1ae0ca4e77986)
         ;
 
         
     
     
-            marker_afaf346451680fc6a9e31f7feb0dc50f.bindTooltip(
+            marker_9b57ffee071282b73e6ec5c0cc2b9c7c.bindTooltip(
                 `<div>
                      📍 虎字碑
                  </div>`,
@@ -601,17 +662,17 @@
             );
         
     
-                marker_afaf346451680fc6a9e31f7feb0dc50f.setIcon(icon_99f089d6acd8a93d026335c625ccf315);
+                marker_9b57ffee071282b73e6ec5c0cc2b9c7c.setIcon(icon_a888fff423ec31691b3b0caf0b80ec24);
             
     
-            var marker_aad14dee979a0f7b176fb7e7841d7346 = L.marker(
+            var marker_abb7b35196c27f7987831974d19b049c = L.marker(
                 [24.978, 121.9242],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_4b7f1e59c915aef6a2872160907164f2 = L.AwesomeMarkers.icon(
+            var icon_0fe60d15d77069c6e56b470aa7e1193c = L.AwesomeMarkers.icon(
                 {
   "markerColor": "orange",
   "iconColor": "white",
@@ -622,24 +683,24 @@
             );
         
     
-        var popup_7278c8febda243ebca1eaee1efca704d = L.popup({
+        var popup_2219c66d5506e19922748756e09af4a9 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_266d5df2dbaccce6dc7ef4f74896bb6f = $(`<div id="html_266d5df2dbaccce6dc7ef4f74896bb6f" style="width: 100.0%; height: 100.0%;"><b>📍 埡口涼亭 (鞍部核心區)</b></div>`)[0];
-                popup_7278c8febda243ebca1eaee1efca704d.setContent(html_266d5df2dbaccce6dc7ef4f74896bb6f);
+                var html_09ebfb6798cb6d77d9ad4c7dbb7c3706 = $(`<div id="html_09ebfb6798cb6d77d9ad4c7dbb7c3706" style="width: 100.0%; height: 100.0%;"><b>📍 埡口涼亭 (鞍部核心區)</b></div>`)[0];
+                popup_2219c66d5506e19922748756e09af4a9.setContent(html_09ebfb6798cb6d77d9ad4c7dbb7c3706);
             
         
 
-        marker_aad14dee979a0f7b176fb7e7841d7346.bindPopup(popup_7278c8febda243ebca1eaee1efca704d)
+        marker_abb7b35196c27f7987831974d19b049c.bindPopup(popup_2219c66d5506e19922748756e09af4a9)
         ;
 
         
     
     
-            marker_aad14dee979a0f7b176fb7e7841d7346.bindTooltip(
+            marker_abb7b35196c27f7987831974d19b049c.bindTooltip(
                 `<div>
                      📍 埡口涼亭 (鞍部核心區)
                  </div>`,
@@ -649,17 +710,17 @@
             );
         
     
-                marker_aad14dee979a0f7b176fb7e7841d7346.setIcon(icon_4b7f1e59c915aef6a2872160907164f2);
+                marker_abb7b35196c27f7987831974d19b049c.setIcon(icon_0fe60d15d77069c6e56b470aa7e1193c);
             
     
-            var marker_91b68a3637085c4d3d5217fe97f4bad1 = L.marker(
+            var marker_71dde51b8adc1777cf170f7eb576cd49 = L.marker(
                 [24.9745, 121.9248],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_6dc39f963d7db873dbc690dd239388a0 = L.AwesomeMarkers.icon(
+            var icon_0e404f7a49482de8a278307e0257ccfb = L.AwesomeMarkers.icon(
                 {
   "markerColor": "orange",
   "iconColor": "white",
@@ -670,24 +731,24 @@
             );
         
     
-        var popup_3f808881f04781a40cc6e2798cc2f31e = L.popup({
+        var popup_07781465f6387992f990de0a59faf3d7 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_9514595df126190476dbcfc51978c758 = $(`<div id="html_9514595df126190476dbcfc51978c758" style="width: 100.0%; height: 100.0%;"><b>📍 護管所 (泥塘散熱區)</b></div>`)[0];
-                popup_3f808881f04781a40cc6e2798cc2f31e.setContent(html_9514595df126190476dbcfc51978c758);
+                var html_89aae343ed8811cd3ac6b2219ffe85a1 = $(`<div id="html_89aae343ed8811cd3ac6b2219ffe85a1" style="width: 100.0%; height: 100.0%;"><b>📍 護管所 (泥塘散熱區)</b></div>`)[0];
+                popup_07781465f6387992f990de0a59faf3d7.setContent(html_89aae343ed8811cd3ac6b2219ffe85a1);
             
         
 
-        marker_91b68a3637085c4d3d5217fe97f4bad1.bindPopup(popup_3f808881f04781a40cc6e2798cc2f31e)
+        marker_71dde51b8adc1777cf170f7eb576cd49.bindPopup(popup_07781465f6387992f990de0a59faf3d7)
         ;
 
         
     
     
-            marker_91b68a3637085c4d3d5217fe97f4bad1.bindTooltip(
+            marker_71dde51b8adc1777cf170f7eb576cd49.bindTooltip(
                 `<div>
                      📍 護管所 (泥塘散熱區)
                  </div>`,
@@ -697,17 +758,17 @@
             );
         
     
-                marker_91b68a3637085c4d3d5217fe97f4bad1.setIcon(icon_6dc39f963d7db873dbc690dd239388a0);
+                marker_71dde51b8adc1777cf170f7eb576cd49.setIcon(icon_0e404f7a49482de8a278307e0257ccfb);
             
     
-            var marker_0f409e630749ec0df05d807d99aab821 = L.marker(
+            var marker_6a9a0f42f2c60a7ee84667d0d4c2f518 = L.marker(
                 [24.9696, 121.9242],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_42ae94e8653ddbf2fd29c46c2ca66661 = L.AwesomeMarkers.icon(
+            var icon_7031b2fbcfde8808786dba6a4ffa117e = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -718,24 +779,24 @@
             );
         
     
-        var popup_43278c2d4dc4ccc04e6965d7d46a87bf = L.popup({
+        var popup_d57515a0c6d25009913f1378aa7e2fbd = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_07d819b02cad3e53182eceeda392e17f = $(`<div id="html_07d819b02cad3e53182eceeda392e17f" style="width: 100.0%; height: 100.0%;"><b>📍 大里天公廟</b></div>`)[0];
-                popup_43278c2d4dc4ccc04e6965d7d46a87bf.setContent(html_07d819b02cad3e53182eceeda392e17f);
+                var html_55f4f2db7c35f1a41d452f77f0a1a8db = $(`<div id="html_55f4f2db7c35f1a41d452f77f0a1a8db" style="width: 100.0%; height: 100.0%;"><b>📍 大里天公廟</b></div>`)[0];
+                popup_d57515a0c6d25009913f1378aa7e2fbd.setContent(html_55f4f2db7c35f1a41d452f77f0a1a8db);
             
         
 
-        marker_0f409e630749ec0df05d807d99aab821.bindPopup(popup_43278c2d4dc4ccc04e6965d7d46a87bf)
+        marker_6a9a0f42f2c60a7ee84667d0d4c2f518.bindPopup(popup_d57515a0c6d25009913f1378aa7e2fbd)
         ;
 
         
     
     
-            marker_0f409e630749ec0df05d807d99aab821.bindTooltip(
+            marker_6a9a0f42f2c60a7ee84667d0d4c2f518.bindTooltip(
                 `<div>
                      📍 大里天公廟
                  </div>`,
@@ -745,17 +806,17 @@
             );
         
     
-                marker_0f409e630749ec0df05d807d99aab821.setIcon(icon_42ae94e8653ddbf2fd29c46c2ca66661);
+                marker_6a9a0f42f2c60a7ee84667d0d4c2f518.setIcon(icon_7031b2fbcfde8808786dba6a4ffa117e);
             
     
-            var marker_95af707450ccbd91a9449413c4524834 = L.marker(
+            var marker_a92ae35ad11da95b6694212ee1d16559 = L.marker(
                 [24.9691, 121.9246],
                 {
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
         
     
-            var icon_25c6ee46d8c73440028be5fedb08f200 = L.AwesomeMarkers.icon(
+            var icon_e5dd9628973dcf5de8f40b9f050102c5 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -766,24 +827,24 @@
             );
         
     
-        var popup_b53d6bb0e42c3672fe9b7908130b4640 = L.popup({
+        var popup_09c675c2f69868618cf5a5a684ca7830 = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_3d8340b811dfb21a08ed3fe350bc613e = $(`<div id="html_3d8340b811dfb21a08ed3fe350bc613e" style="width: 100.0%; height: 100.0%;"><b>📍 大里遊客中心</b></div>`)[0];
-                popup_b53d6bb0e42c3672fe9b7908130b4640.setContent(html_3d8340b811dfb21a08ed3fe350bc613e);
+                var html_5ae92be01edead38a8dc8cdf0f7a03b3 = $(`<div id="html_5ae92be01edead38a8dc8cdf0f7a03b3" style="width: 100.0%; height: 100.0%;"><b>📍 大里遊客中心</b></div>`)[0];
+                popup_09c675c2f69868618cf5a5a684ca7830.setContent(html_5ae92be01edead38a8dc8cdf0f7a03b3);
             
         
 
-        marker_95af707450ccbd91a9449413c4524834.bindPopup(popup_b53d6bb0e42c3672fe9b7908130b4640)
+        marker_a92ae35ad11da95b6694212ee1d16559.bindPopup(popup_09c675c2f69868618cf5a5a684ca7830)
         ;
 
         
     
     
-            marker_95af707450ccbd91a9449413c4524834.bindTooltip(
+            marker_a92ae35ad11da95b6694212ee1d16559.bindTooltip(
                 `<div>
                      📍 大里遊客中心
                  </div>`,
@@ -793,26 +854,26 @@
             );
         
     
-                marker_95af707450ccbd91a9449413c4524834.setIcon(icon_25c6ee46d8c73440028be5fedb08f200);
+                marker_a92ae35ad11da95b6694212ee1d16559.setIcon(icon_e5dd9628973dcf5de8f40b9f050102c5);
             
     
-            var layer_control_fbce7b592d3d303098ade1051c842a40_layers = {
+            var layer_control_b0cc6e13e59c53bd01337121214023a5_layers = {
                 base_layers : {
-                    "\ud83d\uddfa\ufe0f \u570b\u571f\u901a\u7528\u96fb\u5b50\u5730\u5716" : tile_layer_309318c400bb65a9ee7edc65c7a0b8bb,
-                    "\ud83d\udef0\ufe0f \u570b\u571f\u885b\u661f\u822a\u7167\u5716" : tile_layer_9568450fedcfb069696890f170257246,
+                    "\ud83d\uddfa\ufe0f \u570b\u571f\u901a\u7528\u96fb\u5b50\u5730\u5716" : tile_layer_a255a924afb79acf01446a380cd29b5f,
+                    "\ud83d\udef0\ufe0f \u570b\u571f\u885b\u661f\u822a\u7167\u5716" : tile_layer_5eed934c7ec3004fa4f3bf972ee05339,
                 },
                 overlays :  {
                 },
             };
-            let layer_control_fbce7b592d3d303098ade1051c842a40 = L.control.layers(
-                layer_control_fbce7b592d3d303098ade1051c842a40_layers.base_layers,
-                layer_control_fbce7b592d3d303098ade1051c842a40_layers.overlays,
+            let layer_control_b0cc6e13e59c53bd01337121214023a5 = L.control.layers(
+                layer_control_b0cc6e13e59c53bd01337121214023a5_layers.base_layers,
+                layer_control_b0cc6e13e59c53bd01337121214023a5_layers.overlays,
                 {
   "position": "topright",
-  "collapsed": false,
+  "collapsed": true,
   "autoZIndex": true,
 }
-            ).addTo(map_048a8715459fd8f8b6b5c2d0406098b9);
+            ).addTo(map_de295eb0b0a21477ae72a88293f5bcb0);
 
         
 </script>
