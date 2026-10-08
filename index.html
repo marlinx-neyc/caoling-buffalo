@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GEM Engine v27.0 | 水牛動態棲地預判與 EKF/HMM/Neural-UCB 全域戰情台</title>
+    <title>GEM Engine v27.0 | 水牛動態棲地預判與 EKF/HMM 全域戰情台</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -96,18 +96,19 @@
             50% { box-shadow: 0 0 25px rgba(255, 42, 95, 0.9); }
         }
 
+        /* 雙模態自動切換規則 */
         body.mode-mobile #desktop-root { display: none !important; }
         body.mode-mobile #mobile-root { display: flex !important; }
         body.mode-desktop #desktop-root { display: grid !important; }
         body.mode-desktop #mobile-root { display: none !important; }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar for dashboard panels */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
     </style>
 </head>
-<body class="mode-desktop h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden">
+<body class="h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden">
 
     <!-- 頂部戰情旗艦導航列 -->
     <header class="h-[52px] border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-50">
@@ -118,31 +119,64 @@
             <div>
                 <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1.5">
                     GEM<span class="text-neonCyan">ENGINE</span> 
-                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0 EKF-HMM MASTER</span>
+                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0 MASTER</span>
                 </h1>
-                <div class="hidden sm:flex items-center gap-1.5 text-[9px] text-slate-400 font-mono">
-                    <span class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                    <span>2D-EKF 連續濾波 × 15/30/60m HMM 時空外推 × Neural-UCB 20D 導流</span>
+                <!-- 即時日期、時間與心跳資訊更新燈號 -->
+                <div class="flex items-center gap-2 text-[9px] text-slate-300 font-mono">
+                    <span class="flex items-center gap-1 text-neonCyan font-bold">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="live-datetime-display">2026-10-08 20:04:28 CST</span>
+                    </span>
+                    <span class="hidden md:inline text-slate-500">|</span>
+                    <!-- 心跳更新燈號與更新累計次數 -->
+                    <span class="flex items-center gap-1 text-slate-300">
+                        <span id="heartbeat-indicator" class="w-2 h-2 rounded-full bg-neonGreen animate-ping"></span>
+                        <span class="text-[8.5px] text-neonGreen font-bold">LIVE SYNC</span>
+                        <span class="text-slate-400 font-mono">(第 <b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,482</b> 次)</span>
+                    </span>
                 </div>
+            </div>
+        </div>
+
+        <!-- 頂部中心：全日人流累積總量與即時過載率 -->
+        <div class="hidden lg:flex items-center gap-3 bg-cyberDark/90 px-3 py-1 rounded-lg border border-cyberBorder text-xs font-mono">
+            <div class="flex items-center gap-1.5 border-r border-cyberBorder/80 pr-2.5">
+                <i class="fa-solid fa-person-walking text-neonCyan"></i>
+                <span class="text-slate-400 text-[10px]">今日全線人流:</span>
+                <span id="top-daily-total-crowd" class="font-orbitron font-bold text-sm text-neonGreen">3,850</span>
+                <span class="text-[9px] text-slate-400">人次</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie text-neonAmber"></i>
+                <span class="text-slate-400 text-[10px]">即時承載率:</span>
+                <span id="top-crowd-capacity-percent" class="font-orbitron font-bold text-xs text-neonAmber">77.0%</span>
+                <span id="top-crowd-capacity-bar" class="w-14 h-1.5 rounded-full bg-slate-800 overflow-hidden inline-flex border border-cyberBorder">
+                    <span class="bg-gradient-to-r from-emerald-400 via-amber-400 to-neonRed h-full w-[77%]"></span>
+                </span>
             </div>
         </div>
 
         <!-- 頂部功能樞紐區 -->
         <div class="flex items-center gap-2 text-xs font-mono">
+            <!-- 載具自適應狀態提示標籤 -->
+            <span id="device-mode-badge" class="hidden sm:inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-cyan-950/90 text-neonCyan border border-cyan-500/40">
+                <i class="fa-solid fa-microchip"></i> 偵測中...
+            </span>
+
             <!-- 底圖圖層選擇器 -->
             <div class="flex items-center bg-cyberDark/90 p-0.5 rounded border border-cyberBorder text-[10px]">
-                <span class="text-slate-400 px-1 hidden md:inline"><i class="fa-solid fa-layer-group text-neonCyan"></i> 戰情底圖:</span>
+                <span class="text-slate-400 px-1 hidden md:inline"><i class="fa-solid fa-layer-group text-neonCyan"></i> 底圖:</span>
                 <select id="select-tile-layer" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 outline-none cursor-pointer">
-                    <option value="none" selected>🌌 純向量拓樸戰情 (純黑底・無 403 阻擋)</option>
-                    <option value="googleHybrid">🛰️ Google Maps 高清衛星混合</option>
-                    <option value="googleTerrain">⛰️ Google Maps 立體地形山勢</option>
-                    <option value="esriSat">🌐 Esri 全球權威衛星航照</option>
+                    <option value="none" selected>🌌 純向量拓樸戰情 (純黑底・無阻擋)</option>
+                    <option value="googleHybrid">🛰️ Google 高清衛星航照</option>
+                    <option value="googleTerrain">⛰️ Google 地形山勢圖</option>
+                    <option value="esriSat">🌐 Esri 全球衛星航照</option>
                 </select>
             </div>
 
             <!-- Edge AI 姿態快捷切換 (模擬檢驗) -->
             <div class="hidden xl:flex items-center bg-cyberDark/90 p-0.5 rounded border border-cyberBorder text-[10px]">
-                <span class="text-slate-400 px-1"><i class="fa-solid fa-camera text-neonAmber"></i> Edge AI 姿態:</span>
+                <span class="text-slate-400 px-1"><i class="fa-solid fa-camera text-neonAmber"></i> 姿態:</span>
                 <select id="select-edge-posture" class="bg-cyberCard text-amber-300 border border-cyberBorder rounded px-1.5 py-0.5 outline-none cursor-pointer">
                     <option value="DEFENSIVE_HEAD_LOW" selected>⚠️ 低頭抵角對峙 (1.8x)</option>
                     <option value="CHARGING">🚨 啟動防禦衝撞 (3.5x)</option>
@@ -151,8 +185,9 @@
                 </select>
             </div>
 
+            <!-- 載具手動覆蓋切換按鈕 -->
             <button id="btn-toggle-view" class="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700 transition rounded flex items-center gap-1 text-[11px]">
-                <i class="fa-solid fa-mobile-screen"></i> 載具切換
+                <i class="fa-solid fa-mobile-screen"></i> <span id="btn-toggle-view-text">載具切換</span>
             </button>
 
             <button id="btn-open-audit-modal" class="px-2.5 py-1 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-900 transition flex items-center gap-1 text-[11px] font-bold">
@@ -161,7 +196,7 @@
         </div>
     </header>
 
-    <!-- 桌面版介面 ROOT (左 8 欄地圖與時空拓樸，右 4 欄 EKF/HMM/神經運算矩陣) -->
+    <!-- 桌面版介面 ROOT (左 8 欄地圖與時空拓樸，右 4 欄 EKF/HMM/各據點人流數據) -->
     <div id="desktop-root" class="h-[calc(100vh-52px)] w-full grid grid-cols-12 gap-2 p-2 overflow-hidden">
         
         <!-- 左側 8 欄：GIS 地圖與多層覆疊 -->
@@ -179,6 +214,9 @@
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-900 border border-cyberBorder text-slate-300">
+                            全日累計人流: <b id="desk-footfall-summary" class="text-neonCyan font-orbitron">3,850</b> 人次
+                        </span>
                         <span id="layer-status-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">
                             純向量拓樸模式 (無阻擋)
                         </span>
@@ -212,8 +250,8 @@
                             <span class="text-neonAmber">TTC: <b id="hud-ttc-sec" class="font-orbitron font-bold text-neonRed">2.9s</b></span>
                         </div>
                         <div id="hud-pred-detail" class="text-[9px] text-slate-300 bg-cyberCard/80 p-1.5 rounded border border-cyberBorder leading-relaxed">
-                            🎯 <b>[HMM 15m 外推]</b> 埡口主群受迫對峙，預估往護管所泥塘下切機率 65%。<br>
-                            ⚠️ <b>[TTC 碰撞倒數 2.9s]</b> 人牛相對速度 $v_{rel}=1.45\text{ m/s}$，立即啟動廣播管制。
+                            ⚠️ <b>[TTC 碰撞倒數 2.9s]</b> 人牛相對速度 $v_{rel}=1.45\text{ m/s}$，水牛進入【DEFENSIVE_HEAD_LOW】防禦姿態。<br>
+                            🎯 <b>[HMM 15m 外推]</b> 埡口主群受迫對峙，預估往護管所泥塘下切機率 65%，強制啟動 E-Bike 導流。
                         </div>
                     </div>
 
@@ -275,7 +313,7 @@
             </div>
         </section>
 
-        <!-- 右側 4 欄：人牛交織分析、HMM 前瞻推演與神經強化學習日誌 -->
+        <!-- 右側 4 欄：人牛交織分析、各據點人流統計與強化學習日誌 -->
         <section class="col-span-4 flex flex-col gap-2 h-full min-h-0 overflow-y-auto pr-0.5">
             
             <!-- 人牛動態交織矩陣 Canvas (時・位・險 整合可視化) -->
@@ -286,7 +324,7 @@
                     </span>
                     <span id="desk-matrix-active-info" class="text-[9px] font-mono text-neonRed font-bold">12:00 @ 埡口鞍部 [R=13.05 極高]</span>
                 </div>
-                <div class="relative w-full h-[130px]">
+                <div class="relative w-full h-[120px]">
                     <canvas id="kinematicsCanvasDesk" class="w-full h-full bg-cyberDark/90 rounded border border-cyberBorder/80 cursor-crosshair"></canvas>
                 </div>
                 <!-- 時空與風險整合圖例及下標標記 -->
@@ -304,12 +342,21 @@
                         <span class="text-neonGreen">聚集:</span> <span id="matrix-legend-count" class="font-bold text-neonGreen font-orbitron">14頭</span>
                     </div>
                 </div>
-                <div class="flex items-center justify-between mt-1 text-[8px] font-mono text-slate-400 px-1">
-                    <span class="flex items-center gap-1"><span class="w-2 h-1.5 bg-cyan-500/30 inline-block"></span>人流壓力 <i>v</i><sub>6</sub></span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-purple-400 inline-block"></span>速度 (m/s)</span>
-                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>低險(&lt;3)</span>
-                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>中險(3-6)</span>
-                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span>極高(&gt;6)</span>
+            </div>
+
+            <!-- 【新增亮點：草嶺古道各重要據點即時人流統計表】 -->
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket shrink-0 font-mono text-[10px]">
+                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
+                    <span class="font-bold text-xs text-neonCyan font-orbitron flex items-center gap-1.5">
+                        <i class="fa-solid fa-users-viewfinder text-neonCyan"></i> 草嶺古道各重要據點人流即時統計
+                    </span>
+                    <span class="text-[8.5px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                        當前時段: <b id="stations-active-time" class="text-white">12:00</b>
+                    </span>
+                </div>
+                <!-- 據點人流分佈網格 -->
+                <div id="desk-stations-crowd-container" class="grid grid-cols-2 gap-1.5">
+                    <!-- 由 JavaScript 動態繪製 6 大站點即時人數與負載長條 -->
                 </div>
             </div>
 
@@ -350,14 +397,14 @@
             </div>
 
             <!-- Neural-UCB 20維特徵張量與 SVD 自癒日誌 -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket flex flex-col flex-1 min-h-[120px]">
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket flex flex-col flex-1 min-h-[110px]">
                 <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1">
                     <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
                         <i class="fa-solid fa-brain text-neonCyan"></i> Neural-UCB & SVD 自癒運算日誌
                     </span>
                     <span id="svd-cond-badge" class="text-[9px] font-mono text-neonGreen">Cond: 9.36 (優)</span>
                 </div>
-                <div id="learning-log-container" class="space-y-1 max-h-[120px] overflow-y-auto text-[9px] font-mono text-slate-300 pr-1">
+                <div id="learning-log-container" class="space-y-1 max-h-[110px] overflow-y-auto text-[9px] font-mono text-slate-300 pr-1">
                     <div class="p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between">
                         <span class="text-neonCyan">[12:00 EKF融合]</span> 座標 (334250, 2762100) 誤差半徑 1.35m
                         <span class="text-neonGreen">狀態收斂</span>
@@ -374,43 +421,196 @@
             </div>
         </section>
     </div>
-
-    <!-- 手機版介面 ROOT (55% 地圖 + 45% 儀表板上下分割) -->
+    <!-- 手機版介面 ROOT (上 45% 地圖 + 下 55% 滾動式完整表格資訊清單) -->
     <div id="mobile-root" class="h-[calc(100vh-52px)] w-full flex-col hidden relative overflow-hidden bg-cyberDark">
-        <div class="relative w-full h-[55%] min-h-0 bg-cyberDark">
+        <!-- 上半部：GIS 地圖與浮動狀態 (佔 45%) -->
+        <div class="relative w-full h-[45%] min-h-0 bg-cyberDark shrink-0">
             <div id="leafletMapMobile"></div>
+            
+            <!-- Mobile HUD 浮動精簡指標 -->
+            <div class="absolute top-2 left-2 right-2 bg-cyberDark/90 backdrop-blur-md p-2 rounded-lg border border-neonPurple/50 z-30 pointer-events-none text-xs font-mono flex items-center justify-between shadow-lg">
+                <div>
+                    <span class="text-neonCyan font-bold">14頭水牛 @埡口</span>
+                    <div class="text-[9px] text-slate-300">TTC: <b id="mob-hud-ttc" class="text-neonRed font-orbitron">2.9s</b> | 姿態: <b id="mob-hud-posture" class="text-neonAmber">低頭抵角</b></div>
+                </div>
+                <div class="text-right">
+                    <span id="mob-hud-risk-badge" class="px-2 py-0.5 rounded bg-rose-950 text-rose-200 border border-neonRed text-[9px] font-bold">R=13.05 極高</span>
+                    <div class="text-[8.5px] text-slate-400 mt-0.5">總人流: <b id="mob-hud-daily-crowd" class="text-neonGreen">3,850</b> 人</div>
+                </div>
+            </div>
+
             <!-- Mobile Timeline Floating Scrubber -->
             <div class="absolute bottom-2 left-2 right-2 bg-cyberDark/90 backdrop-blur-md p-1.5 rounded border border-cyberBorder z-30 flex items-center gap-2 text-xs font-mono">
+                <button id="mob-btn-play-timeline" class="w-6 h-6 rounded bg-neonCyan/20 text-neonCyan border border-neonCyan/50 flex items-center justify-center">
+                    <i class="fa-solid fa-play text-[10px]"></i>
+                </button>
                 <input id="slider-timeline-mob" type="range" min="0" max="11" value="4" step="1" class="flex-1 accent-cyan-400">
                 <span id="label-time-mob" class="font-bold text-neonCyan w-12 text-center font-orbitron">12:00</span>
             </div>
         </div>
-        <div class="w-full h-[45%] bg-cyberPanel border-t border-cyberBorder p-2 overflow-y-auto text-xs font-mono space-y-2">
-            <div class="grid grid-cols-4 gap-1 text-center text-[10px]">
+
+        <!-- 下半部：滾動式完整表格資訊清單 (佔 55%) -->
+        <div class="w-full flex-1 min-h-0 bg-cyberPanel border-t border-cyberBorder p-2.5 overflow-y-auto text-xs font-mono space-y-3">
+            
+            <!-- 1. 核心數值儀表 5 格 (含每日人流總數與心跳燈狀態) -->
+            <div class="grid grid-cols-5 gap-1 text-center text-[10px]">
                 <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[8px]">THI 熱應力</div>
+                    <div class="text-slate-400 text-[7.5px] truncate">全日人流總數</div>
+                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-xs font-orbitron">3,850</div>
+                    <div class="text-[7px] text-slate-400">今日累計</div>
+                </div>
+                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
+                    <div class="text-slate-400 text-[7.5px] truncate">THI 熱應力</div>
                     <div id="mob-val-thi" class="text-neonRed font-bold text-xs font-orbitron">83.6</div>
+                    <div class="text-[7px] text-rose-400">強制泥浴</div>
                 </div>
                 <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[8px]">衝突風險 R</div>
+                    <div class="text-slate-400 text-[7.5px] truncate">衝突風險 R</div>
                     <div id="mob-val-risk" class="text-neonRed font-bold text-xs font-orbitron">13.05</div>
+                    <div class="text-[7px] text-rose-400">極度危險</div>
                 </div>
                 <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[8px]">TTC 碰撞</div>
+                    <div class="text-slate-400 text-[7.5px] truncate">碰撞預估</div>
                     <div id="mob-val-ttc" class="text-neonAmber font-bold text-xs font-orbitron">2.9s</div>
+                    <div class="text-[7px] text-amber-400">緊急避讓</div>
                 </div>
                 <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[8px]">水牛總頭數</div>
+                    <div class="text-slate-400 text-[7.5px] truncate">水牛頭數</div>
                     <div id="mob-val-count" class="text-neonCyan font-bold text-xs font-orbitron">14頭</div>
+                    <div class="text-[7px] text-cyan-400">3個聚落</div>
                 </div>
             </div>
-            <div class="bg-cyberDark p-1.5 rounded border border-cyberBorder">
-                <div class="text-[10px] text-neonGreen font-bold mb-1 flex justify-between">
-                    <span>人牛動態交織 (時・位・險)</span>
-                    <span class="text-slate-400">08:00~18:30</span>
+
+            <!-- 2. 【新增：手機版草嶺古道各重要據點人流即時統計表格】 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-cyan-500/40 space-y-1.5">
+                <div class="text-neonCyan font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-users-viewfinder text-neonCyan"></i> 草嶺古道各重要據點人流即時統計</span>
+                    <span class="text-slate-400 text-[8.5px]">全線承載率: <b id="mob-stations-capacity" class="text-neonAmber">77.0%</b></span>
                 </div>
-                <canvas id="kinematicsCanvasMob" class="w-full h-[95px] bg-[#080e1c] rounded"></canvas>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[9px]">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-cyberBorder">
+                                <th class="py-1 px-1">據點名稱</th>
+                                <th class="py-1 px-1">即時人流</th>
+                                <th class="py-1 px-1">負載程度</th>
+                                <th class="py-1 px-1">分流導引建議</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mob-stations-table-body" class="divide-y divide-cyberBorder/60">
+                            <!-- 由 JS 動態填充 6 大據點 -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <!-- 3. 人牛動態交織折線 Canvas 圖 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder">
+                <div class="text-[10px] text-neonGreen font-bold mb-1 flex justify-between items-center">
+                    <span><i class="fa-solid fa-chart-line"></i> 人牛動態交織矩陣 (時・位・險整合)</span>
+                    <span id="mob-matrix-active-info" class="text-[9px] text-neonRed font-bold">12:00 @ 埡口鞍部</span>
+                </div>
+                <canvas id="kinematicsCanvasMob" class="w-full h-[100px] bg-[#080e1c] rounded"></canvas>
+            </div>
+
+            <!-- 4. 2D-EKF 定位與即時動態指標結構表格 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-neonPurple/50 space-y-1.5">
+                <div class="text-purple-300 font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-crosshairs text-neonPurple"></i> 2D-EKF 連續濾波與即時狀態表</span>
+                    <span class="text-neonGreen text-[9px]">14頭牛監測中</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-[9px]">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-cyberBorder">
+                                <th class="py-1 px-1">指標項目</th>
+                                <th class="py-1 px-1">即時觀測數值</th>
+                                <th class="py-1 px-1">狀態意義</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-cyberBorder/60">
+                            <tr>
+                                <td class="py-1 px-1 text-slate-300">核心空間座標</td>
+                                <td class="py-1 px-1 font-mono text-neonCyan">[121.9264, 24.9756]</td>
+                                <td class="py-1 px-1 text-slate-400">埡口觀景亭隘口</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-1 text-slate-300">當前移動向量</td>
+                                <td class="py-1 px-1 font-mono text-neonPurple">南南東 165° @ 0.8 m/s</td>
+                                <td class="py-1 px-1 text-slate-400">朝護管所谷線移動</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-1 text-slate-300">Edge AI 姿態</td>
+                                <td class="py-1 px-1 font-bold text-amber-300">DEFENSIVE_HEAD_LOW</td>
+                                <td class="py-1 px-1 text-rose-400">低頭抵角 (權重 1.8x)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-1 text-slate-300">人牛最短間距</td>
+                                <td class="py-1 px-1 font-mono text-neonRed font-bold">4.2 m</td>
+                                <td class="py-1 px-1 text-rose-400">🚨 侵入 10m Flight Zone</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-1 text-slate-300">相對速度 / TTC</td>
+                                <td class="py-1 px-1 font-mono text-purple-300">v_rel=1.45 m/s</td>
+                                <td class="py-1 px-1 font-bold text-neonRed">TTC: 2.9 秒 (倒數)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. HMM 隱馬爾可夫前瞻軌跡推演表格 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder space-y-1.5">
+                <div class="text-neonAmber font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-neonAmber"></i> HMM 隱馬爾可夫前瞻軌跡推演表</span>
+                    <span class="text-slate-400 text-[9px]">Markov Extrapolation</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-center">
+                    <div class="bg-cyberCard p-1.5 rounded border border-amber-500/40">
+                        <div class="text-[8px] text-slate-400">+15 分鐘前瞻</div>
+                        <div id="mob-hmm-15m" class="text-neonAmber font-bold font-orbitron text-[11px] mt-0.5 truncate">護管所泥塘</div>
+                        <div class="text-[7.5px] text-slate-400">誤差: ±6.8m (65%)</div>
+                        <div class="text-[7.5px] text-amber-300 mt-0.5">下切泥塘避暑</div>
+                    </div>
+                    <div class="bg-cyberCard p-1.5 rounded border border-rose-500/40">
+                        <div class="text-[8px] text-slate-400">+30 分鐘前瞻</div>
+                        <div id="mob-hmm-30m" class="text-neonRed font-bold font-orbitron text-[11px] mt-0.5 truncate">沼澤核心浸泡</div>
+                        <div class="text-[7.5px] text-slate-400">誤差: ±14.2m (85%)</div>
+                        <div class="text-[7.5px] text-rose-300 mt-0.5">體表散熱降溫</div>
+                    </div>
+                    <div class="bg-cyberCard p-1.5 rounded border border-emerald-500/40">
+                        <div class="text-[8px] text-slate-400">+60 分鐘前瞻</div>
+                        <div id="mob-hmm-60m" class="text-neonGreen font-bold font-orbitron text-[11px] mt-0.5 truncate">次要林緣避暑</div>
+                        <div class="text-[7.5px] text-slate-400">誤差: ±28.5m (90%)</div>
+                        <div class="text-[7.5px] text-emerald-300 mt-0.5">樹蔭臥伏反芻</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 14 頭牛群時空泡泡分佈清冊表格 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-neonCyan/40 space-y-1.5">
+                <div class="text-neonCyan font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-list-check text-neonCyan"></i> 14頭牛群時空泡泡分佈清冊</span>
+                    <span id="mob-bubble-time-badge" class="text-neonAmber text-[9px] font-bold">12:00 即時點位與風險</span>
+                </div>
+                <div id="mob-herds-inventory-container" class="space-y-1">
+                    <!-- 動態由 JavaScript 生成 (與桌面版完全對齊) -->
+                </div>
+            </div>
+
+            <!-- 7. 歷史採礦交織條件與自癒安全規範 -->
+            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder space-y-1 text-[9px] text-slate-300">
+                <div class="text-purple-300 font-bold text-[10px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
+                    <span>⚡ 歷史採礦交織條件 (Pattern Mined)</span>
+                    <span class="text-neonGreen">規則已鎖定</span>
+                </div>
+                <div class="space-y-1 pt-0.5">
+                    <div>1. <b>10m 驚嚇硬防線侵入</b>: <i>D</i><sub>human</sub> &le; 10.0m &rarr; 啟動雙曲非線性懲罰放大 <i>R</i><sub>conflict</sub>，觸發賁卦離根扣分。</div>
+                    <div>2. <b>極低速極致風險規律</b>: 於路寬 <i>W</i> &lt; 1.8m 隘口 (&Omega;<sub>topo</sub> = 1.5)，水牛受迫防禦對峙（移動速度 1 ~ 3 m/h，風險指標高達 11.22）。</div>
+                    <div>3. <b>人流湧入加速度效應</b>: 當 &Delta;<i>v</i><sub>6</sub> / &Delta;<i>t</i> &gt; 0.15 /min 時，代表遊客快速集結，系統自動將預警推播提前 15 ~ 20 分鐘發布。</div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -430,7 +630,6 @@
             </div>
         </div>
     </div>
-
     <script>
         /* ==========================================================================
            1. 草嶺古道真實路徑幾何 (乾淨高精度向量路線，不亂連 POI 直線)
@@ -471,14 +670,24 @@
             { name: "石觀音寺 (天然海蝕洞)", lat: 24.964382, lng: 121.903414, color: "#ffaa00", desc: "天然海蝕洞景觀據點" }
         ];
 
-        /* ==========================================================================
-           3. 14 頭牛之時序演繹資料庫 (08:00 ~ 18:30) - 整合 EKF、HMM、TTC 與姿態
-           ========================================================================== */
+        /* 3. 各重要據點人流數據定義與最大承載限額 */
+        const STATIONS_METADATA = [
+            { id: "STA_YWK", name: "遠望坑親水公園", maxCap: 500, ratio: 0.38, role: "北端入口 (管制閘口)" },
+            { id: "STA_XZM", name: "雄鎮蠻煙碑", maxCap: 250, ratio: 0.18, role: "中段古蹟步道 (TMI採樣)" },
+            { id: "STA_HZI", name: "虎字碑", maxCap: 300, ratio: 0.22, role: "前哨監測區 (10m防線)" },
+            { id: "STA_YKO", name: "埡口觀景亭", maxCap: 450, ratio: 0.35, role: "核心隘口 (W<1.8m 極限)" },
+            { id: "STA_KZH", name: "客棧遺址", maxCap: 280, ratio: 0.20, role: "南向下切緩衝坡" },
+            { id: "STA_DLI", name: "大里天公廟", maxCap: 450, ratio: 0.28, role: "南端出口 (E-Bike轉乘)" }
+        ];
+
+        /* 4. 每小時全域時序數據庫 (含各據點人流分佈、總量、THI 與 14 頭牛狀態) */
         const HOURLY_DATA = [
             { 
-                time: "08:00", crowd: 45, thi: 74.2, risk: 1.20, totalCount: 5, speed: 0.4, vectorDeg: 45, 
+                time: "08:00", crowd: 77, thi: 74.2, risk: 1.20, totalCount: 5, speed: 0.4, vectorDeg: 45, 
                 primaryLoc: "灣坑頭山稜線", gridId: "GRID_RIDGE_201", riskDesc: "安全綠燈",
                 ttc: 32.5, posture: "STANDING", vRel: 0.6,
+                dailyCumulative: 420, capacityRate: 15.4,
+                stations: { STA_YWK: 45, STA_XZM: 12, STA_HZI: 8, STA_YKO: 12, STA_KZH: 6, STA_DLI: 20 },
                 herds: [
                     { name: "灣坑頭山主群", lat: 24.975597, lng: 121.910740, count: 3, role: "採食草坡", isDanger: false },
                     { name: "客棧遺址緩坡", lat: 24.974000, lng: 121.926000, count: 1, role: "晨間休憩", isDanger: false },
@@ -486,9 +695,11 @@
                 ] 
             },
             { 
-                time: "09:00", crowd: 110, thi: 76.5, risk: 2.10, totalCount: 8, speed: 0.4, vectorDeg: 60, 
+                time: "09:00", crowd: 223, thi: 76.5, risk: 2.10, totalCount: 8, speed: 0.4, vectorDeg: 60, 
                 primaryLoc: "草嶺線稜線", gridId: "GRID_RIDGE_205", riskDesc: "低度警戒",
                 ttc: 21.0, posture: "STANDING", vRel: 0.7,
+                dailyCumulative: 860, capacityRate: 35.8,
+                stations: { STA_YWK: 110, STA_XZM: 35, STA_HZI: 25, STA_YKO: 48, STA_KZH: 18, STA_DLI: 65 },
                 herds: [
                     { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 4, role: "稜線採食", isDanger: false },
                     { name: "埡口觀景亭側", lat: 24.975621, lng: 121.926413, count: 2, role: "鞍部緩行", isDanger: false },
@@ -496,9 +707,11 @@
                 ] 
             },
             { 
-                time: "10:00", crowd: 240, thi: 78.8, risk: 4.80, totalCount: 10, speed: 0.6, vectorDeg: 120, 
+                time: "10:00", crowd: 510, thi: 78.8, risk: 4.80, totalCount: 10, speed: 0.6, vectorDeg: 120, 
                 primaryLoc: "客棧遺址隘口", gridId: "GRID_PASS_3189", riskDesc: "中度交織",
                 ttc: 12.5, posture: "STANDING", vRel: 0.9,
+                dailyCumulative: 1650, capacityRate: 58.2,
+                stations: { STA_YWK: 240, STA_XZM: 95, STA_HZI: 80, STA_YKO: 130, STA_KZH: 65, STA_DLI: 140 },
                 herds: [
                     { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 5, role: "接近步道 (18m)", isDanger: false },
                     { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "開始試探泥沼", isDanger: false },
@@ -506,9 +719,11 @@
                 ] 
             },
             { 
-                time: "11:00", crowd: 380, thi: 81.3, risk: 7.90, totalCount: 12, speed: 0.8, vectorDeg: 160, 
+                time: "11:00", crowd: 850, thi: 81.3, risk: 7.90, totalCount: 12, speed: 0.8, vectorDeg: 160, 
                 primaryLoc: "埡口觀景亭隘口", gridId: "GRID_YA_KOU_108", riskDesc: "高度警戒 (Flight Zone逼近)",
                 ttc: 6.2, posture: "DEFENSIVE_HEAD_LOW", vRel: 1.25,
+                dailyCumulative: 2580, capacityRate: 72.5,
+                stations: { STA_YWK: 380, STA_XZM: 175, STA_HZI: 155, STA_YKO: 260, STA_KZH: 130, STA_DLI: 210 },
                 herds: [
                     { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 6, role: "隘口集結 (逼近10m)", isDanger: true },
                     { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "泥浴散熱中", isDanger: false },
@@ -516,9 +731,11 @@
                 ] 
             },
             { 
-                time: "12:00", crowd: 420, thi: 83.6, risk: 13.05, totalCount: 14, speed: 0.8, vectorDeg: 165, 
+                time: "12:00", crowd: 1095, thi: 83.6, risk: 13.05, totalCount: 14, speed: 0.8, vectorDeg: 165, 
                 primaryLoc: "埡口鞍部核心隘口", gridId: "GRID_YA_KOU_108", riskDesc: "極致警戒 (侵入10m/防禦對峙)",
                 ttc: 2.9, posture: "DEFENSIVE_HEAD_LOW", vRel: 1.45,
+                dailyCumulative: 3850, capacityRate: 85.6,
+                stations: { STA_YWK: 420, STA_XZM: 210, STA_HZI: 235, STA_YKO: 385, STA_KZH: 195, STA_DLI: 290 },
                 herds: [
                     { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 7, role: "防禦對峙 (D=4.2m)", isDanger: true },
                     { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "THI>78 強制泥浴", isDanger: false },
@@ -526,9 +743,11 @@
                 ] 
             },
             { 
-                time: "13:00", crowd: 460, thi: 84.1, risk: 14.20, totalCount: 14, speed: 0.85, vectorDeg: 165, 
+                time: "13:00", crowd: 1210, thi: 84.1, risk: 14.20, totalCount: 14, speed: 0.85, vectorDeg: 165, 
                 primaryLoc: "埡口至護管所下切段", gridId: "GRID_PASS_3190", riskDesc: "極限過載 (老陽Z=+2.4)",
                 ttc: 2.5, posture: "CHARGING", vRel: 1.60,
+                dailyCumulative: 4720, capacityRate: 91.2,
+                stations: { STA_YWK: 460, STA_XZM: 230, STA_HZI: 260, STA_YKO: 410, STA_KZH: 220, STA_DLI: 340 },
                 herds: [
                     { name: "埡口下切主群", lat: 24.977200, lng: 121.926350, count: 7, role: "跨越步道下切中", isDanger: true },
                     { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "泥沼浸泡降溫", isDanger: false },
@@ -536,9 +755,11 @@
                 ] 
             },
             { 
-                time: "14:00", crowd: 390, thi: 82.5, risk: 8.20, totalCount: 12, speed: 0.75, vectorDeg: 170, 
+                time: "14:00", crowd: 1140, thi: 82.5, risk: 8.20, totalCount: 12, speed: 0.75, vectorDeg: 170, 
                 primaryLoc: "護管所泥塘沼澤", gridId: "GRID_MUD_POOL_502", riskDesc: "高熱散熱期",
                 ttc: 8.5, posture: "LYING", vRel: 0.8,
+                dailyCumulative: 5460, capacityRate: 82.2,
+                stations: { STA_YWK: 390, STA_XZM: 205, STA_HZI: 220, STA_YKO: 370, STA_KZH: 215, STA_DLI: 380 },
                 herds: [
                     { name: "護管所泥沼大群", lat: 24.979661, lng: 121.926351, count: 5, role: "原位泥浴散熱", isDanger: false },
                     { name: "埡口周邊群", lat: 24.975621, lng: 121.926413, count: 5, role: "步道旁樹蔭反芻", isDanger: true },
@@ -546,9 +767,11 @@
                 ] 
             },
             { 
-                time: "15:00", crowd: 280, thi: 80.0, risk: 5.60, totalCount: 10, speed: 0.5, vectorDeg: 140, 
+                time: "15:00", crowd: 880, thi: 80.0, risk: 5.60, totalCount: 10, speed: 0.5, vectorDeg: 140, 
                 primaryLoc: "護管所周邊林緣", gridId: "GRID_SLOPE_104", riskDesc: "中度緩和",
                 ttc: 15.0, posture: "STANDING", vRel: 0.7,
+                dailyCumulative: 6020, capacityRate: 64.5,
+                stations: { STA_YWK: 280, STA_XZM: 160, STA_HZI: 170, STA_YKO: 290, STA_KZH: 180, STA_DLI: 310 },
                 herds: [
                     { name: "護管所泥浴群", lat: 24.979661, lng: 121.926351, count: 4, role: "離塘慢步", isDanger: false },
                     { name: "埡口林下群", lat: 24.975621, lng: 121.926413, count: 4, role: "退回林緣", isDanger: false },
@@ -556,9 +779,11 @@
                 ] 
             },
             { 
-                time: "16:00", crowd: 160, thi: 77.8, risk: 3.40, totalCount: 8, speed: 0.3, vectorDeg: 90, 
+                time: "16:00", crowd: 600, thi: 77.8, risk: 3.40, totalCount: 8, speed: 0.3, vectorDeg: 90, 
                 primaryLoc: "虎字碑後方緩坡", gridId: "GRID_HU_ZI_02", riskDesc: "常態回穩",
                 ttc: 24.0, posture: "STANDING", vRel: 0.5,
+                dailyCumulative: 6380, capacityRate: 40.0,
+                stations: { STA_YWK: 160, STA_XZM: 110, STA_HZI: 120, STA_YKO: 180, STA_KZH: 130, STA_DLI: 260 },
                 herds: [
                     { name: "虎字碑西側群", lat: 24.976389, lng: 121.924465, count: 3, role: "傍晚採食", isDanger: false },
                     { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "原處整理體表", isDanger: false },
@@ -566,9 +791,11 @@
                 ] 
             },
             { 
-                time: "17:00", crowd: 80, thi: 75.6, risk: 2.00, totalCount: 6, speed: 0.2, vectorDeg: 80, 
+                time: "17:00", crowd: 345, thi: 75.6, risk: 2.00, totalCount: 6, speed: 0.2, vectorDeg: 80, 
                 primaryLoc: "客棧遺址上方林緣", gridId: "GRID_FOREST_01", riskDesc: "低度安全",
                 ttc: 45.0, posture: "STANDING", vRel: 0.3,
+                dailyCumulative: 6590, capacityRate: 23.0,
+                stations: { STA_YWK: 80, STA_XZM: 55, STA_HZI: 65, STA_YKO: 95, STA_KZH: 75, STA_DLI: 170 },
                 herds: [
                     { name: "客棧上方林緣群", lat: 24.974000, lng: 121.926000, count: 2, role: "入林避風", isDanger: false },
                     { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 2, role: "靜止反芻", isDanger: false },
@@ -576,9 +803,11 @@
                 ] 
             },
             { 
-                time: "18:00", crowd: 30, thi: 74.0, risk: 1.10, totalCount: 5, speed: 0.3, vectorDeg: 45, 
+                time: "18:00", crowd: 160, thi: 74.0, risk: 1.10, totalCount: 5, speed: 0.3, vectorDeg: 45, 
                 primaryLoc: "灣坑頭山背風坡", gridId: "GRID_RIDGE_201", riskDesc: "步道閉園/安全",
                 ttc: 90.0, posture: "LYING", vRel: 0.2,
+                dailyCumulative: 6680, capacityRate: 10.6,
+                stations: { STA_YWK: 30, STA_XZM: 20, STA_HZI: 25, STA_YKO: 40, STA_KZH: 35, STA_DLI: 90 },
                 herds: [
                     { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "夜間集結", isDanger: false },
                     { name: "護管所避風群", lat: 24.979661, lng: 121.926351, count: 1, role: "泥塘林下休息", isDanger: false },
@@ -586,9 +815,11 @@
                 ] 
             },
             { 
-                time: "18:30", crowd: 10, thi: 73.5, risk: 0.80, totalCount: 4, speed: 0.1, vectorDeg: 30, 
+                time: "18:30", crowd: 70, thi: 73.5, risk: 0.80, totalCount: 4, speed: 0.1, vectorDeg: 30, 
                 primaryLoc: "次要林緣休養區", gridId: "GRID_FOREST_01", riskDesc: "夜間平穩休眠",
                 ttc: 120.0, posture: "LYING", vRel: 0.1,
+                dailyCumulative: 6720, capacityRate: 4.8,
+                stations: { STA_YWK: 10, STA_XZM: 8, STA_HZI: 10, STA_YKO: 15, STA_KZH: 12, STA_DLI: 45 },
                 herds: [
                     { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "深度休養", isDanger: false },
                     { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 1, role: "臥伏反芻", isDanger: false },
@@ -597,15 +828,17 @@
             }
         ];
 
-        /* 全域地圖與圖層變數 */
+        /* 全域變數 */
         let currentTimeIndex = 4; // 預設 12:00
         let mapDesk = null, mapMob = null;
         let activeTileDesk = null, activeTileMob = null;
         let deskBuffaloLayer = null, mobBuffaloLayer = null;
         let deskFutureLayer = null, mobFutureLayer = null;
         let deskEkfLayer = null, mobEkfLayer = null;
+        let userManualOverride = false;
+        let heartbeatTicks = 1482; // 心跳更新累計次數
 
-        /* 圖磚 URL 快取字典 (杜絕 403 與浮水印) */
+        /* 圖磚 URL 快取字典 */
         const TILE_URLS = {
             none: null,
             googleHybrid: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
@@ -613,11 +846,69 @@
             esriSat: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
         };
     </script>
-
     <script>
+        /* 啟動實時時鐘與心跳計數器 */
+        function initRealtimeClockAndHeartbeat() {
+            function updateClock() {
+                const now = new Date();
+                const pad = (n) => String(n).padStart(2, '0');
+                const yr = now.getFullYear();
+                const mo = pad(now.getMonth() + 1);
+                const da = pad(now.getDate());
+                const hr = pad(now.getHours());
+                const mi = pad(now.getMinutes());
+                const se = pad(now.getSeconds());
+                
+                const str = `${yr}-${mo}-${da} ${hr}:${mi}:${se} CST`;
+                const clockEl = document.getElementById('live-datetime-display');
+                if (clockEl) clockEl.innerText = str;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // 每 2.5 秒模擬一次心跳同步封包，累計次數 +1
+            setInterval(() => {
+                heartbeatTicks += 1;
+                const tickEl = document.getElementById('heartbeat-tick-count');
+                if (tickEl) tickEl.innerText = heartbeatTicks.toLocaleString();
+                
+                const heartEl = document.getElementById('heartbeat-indicator');
+                if (heartEl) {
+                    heartEl.classList.remove('animate-ping');
+                    void heartEl.offsetWidth; // 觸發重繪
+                    heartEl.classList.add('animate-ping');
+                }
+            }, 2500);
+        }
+
+        function checkAndApplyDeviceMode() {
+            if (userManualOverride) return;
+
+            const isMobileViewport = window.matchMedia('(max-width: 1023px)').matches;
+            const badge = document.getElementById('device-mode-badge');
+            const toggleBtnText = document.getElementById('btn-toggle-view-text');
+
+            if (isMobileViewport) {
+                document.body.className = 'mode-mobile flex flex-col h-screen w-screen overflow-hidden bg-cyberDark text-slate-100 font-rajdhani';
+                if (badge) badge.innerHTML = '<i class="fa-solid fa-mobile-screen text-neonAmber"></i> 手機版模式 (自適應)';
+                if (toggleBtnText) toggleBtnText.innerText = '切換桌面版';
+            } else {
+                document.body.className = 'mode-desktop flex flex-col h-screen w-screen overflow-hidden bg-cyberDark text-slate-100 font-rajdhani';
+                if (badge) badge.innerHTML = '<i class="fa-solid fa-desktop text-neonCyan"></i> 桌面版模式 (自適應)';
+                if (toggleBtnText) toggleBtnText.innerText = '切換手機版';
+            }
+
+            setTimeout(() => {
+                if (mapDesk) mapDesk.invalidateSize();
+                if (mapMob) mapMob.invalidateSize();
+                drawKinematics('kinematicsCanvasDesk');
+                drawKinematics('kinematicsCanvasMob');
+            }, 100);
+        }
+
         function createTileLayer(key) {
             const url = TILE_URLS[key];
-            if (!url) return null; // 純向量模式，不載入第三方圖磚
+            if (!url) return null;
             return L.tileLayer(url, {
                 maxZoom: 20,
                 attribution: '&copy; GEM Engine GIS'
@@ -628,24 +919,22 @@
             const mapContainer = document.getElementById(elementId);
             if (!mapContainer) return null;
 
-            // 初始化 Leaflet，中心於埡口鞍部 (24.9756, 121.9264)
             const map = L.map(elementId, {
                 zoomControl: isDesktop,
                 attributionControl: false
             }).setView([24.975621, 121.926413], 15);
 
-            // 預設純向量拓樸戰情模式 (純黑底，杜絕被擋)
             let tileLayer = createTileLayer('none');
             if (tileLayer) tileLayer.addTo(map);
 
-            // 1. 繪製草嶺古道真實路網 (青色發光線條，不跨海)
+            // 1. 繪製草嶺古道真實路網
             L.polyline(VERIFIED_TRAIL_COORDINATES, {
                 color: '#00f0ff',
                 weight: 4.5,
                 opacity: 0.85
             }).bindPopup("<b style='color:#00f0ff;'>草嶺古道 (主線路網)</b><br>遠望坑親水公園 ➔ 埡口 ➔ 大里天公廟").addTo(map);
 
-            // 2. 繪製桃源谷草嶺線稜線步道 (紫色虛線)
+            // 2. 繪製桃源谷草嶺線稜線步道
             L.polyline(RIDGE_TRAIL_COORDINATES, {
                 color: '#b026ff',
                 weight: 3.5,
@@ -673,7 +962,6 @@
                 marker.addTo(map);
             });
 
-            // 4. 水牛動態泡泡圖層、HMM未來外推圖層、EKF不確定性橢圓圖層
             const buffaloLayer = L.layerGroup().addTo(map);
             const futureLayer = L.layerGroup().addTo(map);
             const ekfLayer = L.layerGroup().addTo(map);
@@ -691,7 +979,6 @@
                 const bubbleColor = isCrit ? "#ff2a5f" : (herd.count >= 4 ? "#b026ff" : "#00ff88");
                 const radiusMeters = 20 + herd.count * 4.5;
 
-                // 外部動態呼吸光暈
                 const aura = L.circle([herd.lat, herd.lng], {
                     radius: radiusMeters,
                     color: bubbleColor,
@@ -700,7 +987,6 @@
                     weight: isCrit ? 2 : 1
                 });
 
-                // 核心實心定位圓
                 const marker = L.circleMarker([herd.lat, herd.lng], {
                     radius: 7.5,
                     fillColor: bubbleColor,
@@ -710,7 +996,6 @@
                     fillOpacity: 1
                 });
 
-                // 泡泡上的牛隻數量標籤
                 const label = L.marker([herd.lat, herd.lng], {
                     icon: L.divIcon({
                         className: 'herd-bubble-label',
@@ -744,7 +1029,6 @@
             const centerLat = 24.975621;
             const centerLng = 121.926413;
 
-            // EKF 1.35m 誤差圓 (紅色半透明)
             const ekfCircle = L.circle([centerLat, centerLng], {
                 radius: 1.35,
                 color: '#ff2a5f',
@@ -754,7 +1038,6 @@
                 dashArray: '2, 2'
             }).bindPopup("<b>2D-EKF 連續濾波</b><br>估測協方差半徑: ±1.35m");
 
-            // 速度向量方向指示線
             const rad = (curData.vectorDeg || 165) * Math.PI / 180;
             const len = 0.00045 * (curData.speed || 0.8);
             const targetLat = centerLat - len * Math.cos(rad);
@@ -779,7 +1062,6 @@
             futureGroup.clearLayers();
 
             if (curData.thi > 78.0) {
-                // 主趨勢：下切護管所沼澤 (ETA +15m / +30m)
                 const mudCorridor = L.polygon([
                     [24.975621, 121.926413],
                     [24.978000, 121.925500],
@@ -793,7 +1075,6 @@
                     dashArray: '4, 4'
                 });
 
-                // HMM 15m 投射節點
                 const node15m = L.circle([24.977500, 121.926300], {
                     radius: 6.8,
                     color: '#ffaa00',
@@ -802,7 +1083,6 @@
                     weight: 1.5
                 }).bindPopup("<b>HMM +15m 投射點</b><br>埡口鞍部下切隘口 (誤差 ±6.8m)");
 
-                // HMM 30m 投射節點
                 const node30m = L.circle([24.979661, 121.926351], {
                     radius: 14.2,
                     color: '#ff2a5f',
@@ -826,7 +1106,6 @@
                 futureGroup.addLayer(node30m);
                 futureGroup.addLayer(mainVectorLine);
             } else {
-                // 次趨勢：沿桃源谷草嶺稜線採食 (ETA +25m)
                 const ridgeVectorLine = L.polyline([
                     [24.975621, 121.926413],
                     [24.976500, 121.918000],
@@ -841,18 +1120,109 @@
             }
         }
     </script>
-
     <script>
-        /* 升級版：人牛動態交織矩陣 (時・位・險 整合呈現) */
+        /* 渲染草嶺古道各重要據點即時人流統計表 (桌面版與手機版同步渲染) */
+        function renderStationsFootfall(curData) {
+            const timeLabel = document.getElementById('stations-active-time');
+            if (timeLabel) timeLabel.innerText = curData.time;
+
+            // 1. 桌面版卡片渲染
+            const containerDesk = document.getElementById('desk-stations-crowd-container');
+            if (containerDesk) {
+                containerDesk.innerHTML = '';
+                STATIONS_METADATA.forEach(sta => {
+                    const count = curData.stations[sta.id] || 0;
+                    const pct = Math.min(100, Math.round((count / sta.maxCap) * 100));
+                    
+                    let statusColor = "text-neonGreen";
+                    let barGrad = "from-emerald-500 to-teal-400";
+                    let badge = "常態";
+                    if (pct >= 85) {
+                        statusColor = "text-neonRed";
+                        barGrad = "from-rose-600 to-neonRed";
+                        badge = "過載";
+                    } else if (pct >= 60) {
+                        statusColor = "text-neonAmber";
+                        barGrad = "from-amber-500 to-yellow-400";
+                        badge = "擁擠";
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = "bg-cyberCard/90 p-1.5 rounded border border-cyberBorder flex flex-col justify-between";
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between text-[9px]">
+                            <span class="font-bold text-slate-200 truncate">${sta.name}</span>
+                            <span class="font-orbitron font-bold ${statusColor}">${count} <span class="text-[7.5px] font-normal text-slate-400">/ ${sta.maxCap}人</span></span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden my-1 border border-cyberBorder/60">
+                            <div class="bg-gradient-to-r ${barGrad} h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-[7.5px] text-slate-400">
+                            <span>${sta.role}</span>
+                            <span class="font-mono ${statusColor}">${pct}% (${badge})</span>
+                        </div>
+                    `;
+                    containerDesk.appendChild(card);
+                });
+            }
+
+            // 2. 手機版表格行渲染
+            const tbodyMob = document.getElementById('mob-stations-table-body');
+            const capRateEl = document.getElementById('mob-stations-capacity');
+            if (capRateEl) capRateEl.innerText = `${curData.capacityRate}%`;
+
+            if (tbodyMob) {
+                tbodyMob.innerHTML = '';
+                STATIONS_METADATA.forEach(sta => {
+                    const count = curData.stations[sta.id] || 0;
+                    const pct = Math.min(100, Math.round((count / sta.maxCap) * 100));
+
+                    let badgeColor = "text-neonGreen bg-emerald-950 border-emerald-500/40";
+                    let badgeText = "舒適 (綠燈)";
+                    let advice = "開放自由通暢步行";
+                    if (pct >= 85) {
+                        badgeColor = "text-neonRed bg-rose-950 border-neonRed";
+                        badgeText = "極度擁擠";
+                        advice = "啟動 E-Bike 低碳導流管制";
+                    } else if (pct >= 60) {
+                        badgeColor = "text-neonAmber bg-amber-950 border-neonAmber";
+                        badgeText = "偏高注意";
+                        advice = "建議放慢步調或分段暫停";
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="py-1 px-1 font-bold text-slate-200">
+                            ${sta.name}
+                            <div class="text-[7.5px] text-slate-400 font-normal">${sta.role}</div>
+                        </td>
+                        <td class="py-1 px-1 font-mono font-bold text-neonCyan">
+                            ${count} <span class="text-[7.5px] text-slate-400 font-normal">/ ${sta.maxCap}</span>
+                        </td>
+                        <td class="py-1 px-1">
+                            <span class="px-1 py-0.2 rounded border text-[7.5px] font-bold ${badgeColor}">
+                                ${pct}% ${badgeText}
+                            </span>
+                        </td>
+                        <td class="py-1 px-1 text-[8px] text-slate-300">
+                            ${advice}
+                        </td>
+                    `;
+                    tbodyMob.appendChild(tr);
+                });
+            }
+        }
+
+        /* 人牛動態交織矩陣 Canvas 繪製 */
         function drawKinematics(canvasId) {
             const cvs = document.getElementById(canvasId);
             if (!cvs) return;
             const ctx = cvs.getContext('2d');
             const w = cvs.width = cvs.offsetWidth || 340;
-            const h = cvs.height = cvs.offsetHeight || 130;
+            const h = cvs.height = cvs.offsetHeight || 120;
             ctx.clearRect(0, 0, w, h);
 
-            const padX = 30, padTop = 20, padBottom = 24;
+            const padX = 26, padTop = 18, padBottom = 22;
             const plotW = w - padX * 2, plotH = h - padTop - padBottom;
             const n = HOURLY_DATA.length;
             const stepX = plotW / (n - 1);
@@ -868,11 +1238,11 @@
                 ctx.stroke();
             }
 
-            // 2. 人流壓力面積圖 (代表人流擠壓背景 v6)
+            // 2. 人流壓力面積圖
             ctx.beginPath();
             ctx.moveTo(padX, padTop + plotH);
             HOURLY_DATA.forEach((d, i) => {
-                const py = (padTop + plotH) - (d.crowd / 500) * plotH;
+                const py = (padTop + plotH) - (d.crowd / 1300) * plotH;
                 ctx.lineTo(padX + i * stepX, py);
             });
             ctx.lineTo(padX + plotW, padTop + plotH);
@@ -883,7 +1253,7 @@
             ctx.fillStyle = grad;
             ctx.fill();
 
-            // 3. 遷移速度折線 (紫色線條)
+            // 3. 遷移速度折線
             ctx.beginPath();
             HOURLY_DATA.forEach((d, i) => {
                 const py = (padTop + plotH) - (d.speed / 1.0) * plotH;
@@ -893,13 +1263,12 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // 4. 時・位・險 節點氣泡 (隨聚集頭數與風險等級漸變)
+            // 4. 時・位・險 節點氣泡
             HOURLY_DATA.forEach((d, i) => {
                 const px = padX + i * stepX;
                 const py = (padTop + plotH) - (d.speed / 1.0) * plotH;
-                const radius = 3.0 + d.totalCount * 0.55;
+                const radius = 3.0 + d.totalCount * 0.5;
 
-                // 風險等級配色
                 let nodeColor = "#00ff88";
                 let auraColor = "rgba(0, 255, 136, 0.3)";
                 if (d.risk >= 6.0) {
@@ -910,13 +1279,11 @@
                     auraColor = "rgba(255, 170, 0, 0.35)";
                 }
 
-                // 光暈
                 ctx.beginPath();
                 ctx.arc(px, py, radius + 2.5, 0, Math.PI * 2);
                 ctx.fillStyle = auraColor;
                 ctx.fill();
 
-                // 核心實心圓點
                 ctx.beginPath();
                 ctx.arc(px, py, radius, 0, Math.PI * 2);
                 ctx.fillStyle = nodeColor;
@@ -925,7 +1292,6 @@
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
 
-                // 極高風險標籤
                 if (d.risk >= 6.0) {
                     ctx.font = "8px 'Orbitron', sans-serif";
                     ctx.fillStyle = "#ff2a5f";
@@ -934,13 +1300,13 @@
                 }
             });
 
-            // 5. 底部時間標籤 (X軸刻度)
+            // 5. 底部時間標籤
             ctx.fillStyle = "#94a3b8";
             ctx.font = "8px 'JetBrains Mono', monospace";
             ctx.textAlign = "center";
             [0, 2, 4, 6, 8, 10, 11].forEach(idx => {
                 const px = padX + idx * stepX;
-                ctx.fillText(HOURLY_DATA[idx].time, px, h - 6);
+                ctx.fillText(HOURLY_DATA[idx].time, px, h - 5);
             });
 
             // 6. 當前時間垂直游標
@@ -958,64 +1324,69 @@
             ctx.setLineDash([]);
 
             ctx.beginPath();
-            ctx.arc(curX, curY, 7.5 + cur.totalCount * 0.55, 0, Math.PI * 2);
+            ctx.arc(curX, curY, 7.0 + cur.totalCount * 0.5, 0, Math.PI * 2);
             ctx.strokeStyle = "#00f0ff";
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // 頂部地點與風險浮動提示卡
+            // 頂部浮動標記
             const badgeText = `${cur.time} [${cur.primaryLoc}] 🦬${cur.totalCount}頭 R=${cur.risk.toFixed(2)}`;
             ctx.font = "bold 8.5px 'Rajdhani', sans-serif";
-            const tw = ctx.measureText(badgeText).width + 12;
+            const tw = ctx.measureText(badgeText).width + 10;
             const badgeX = Math.min(Math.max(curX, padX + tw / 2), w - padX - tw / 2);
-            const badgeY = 12;
+            const badgeY = 11;
 
             ctx.fillStyle = "rgba(4, 7, 17, 0.95)";
             ctx.strokeStyle = cur.risk >= 6.0 ? "#ff2a5f" : (cur.risk >= 3.0 ? "#ffaa00" : "#00f0ff");
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.roundRect(badgeX - tw / 2, badgeY - 10, tw, 15, 3);
+            ctx.roundRect(badgeX - tw / 2, badgeY - 9, tw, 14, 3);
             ctx.fill();
             ctx.stroke();
 
             ctx.fillStyle = cur.risk >= 6.0 ? "#ff8ba7" : (cur.risk >= 3.0 ? "#ffd166" : "#e2e8f0");
-            ctx.fillText(badgeText, badgeX, badgeY + 1);
+            ctx.fillText(badgeText, badgeX, badgeY + 1.5);
         }
 
         /* 渲染 14 頭牛群時空泡泡分佈清冊 */
         function renderHerdsInventory(curData) {
-            const container = document.getElementById('herds-inventory-container');
-            const timeBadge = document.getElementById('bubble-list-time-badge');
-            if (timeBadge) {
-                timeBadge.innerText = `${curData.time} 即時點位與風險 (${curData.riskDesc})`;
-                timeBadge.className = `text-[9px] font-bold ${curData.risk >= 6.0 ? 'text-neonRed' : (curData.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
-            }
+            const containerDesk = document.getElementById('herds-inventory-container');
+            const containerMob = document.getElementById('mob-herds-inventory-container');
+            const timeBadgeDesk = document.getElementById('bubble-list-time-badge');
+            const timeBadgeMob = document.getElementById('mob-bubble-time-badge');
 
-            if (!container) return;
-            container.innerHTML = '';
+            const badgeText = `${curData.time} 即時點位與風險 (${curData.riskDesc})`;
+            const badgeCls = `text-[9px] font-bold ${curData.risk >= 6.0 ? 'text-neonRed' : (curData.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
 
-            curData.herds.forEach((herd, idx) => {
-                const card = document.createElement('div');
-                const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
-                const borderCls = isCrit ? 'border-neonRed/50 bg-rose-950/40 text-rose-200' : (herd.count >= 4 ? 'border-neonPurple/50 bg-purple-950/40 text-purple-200' : 'border-neonCyan/40 bg-cyan-950/30 text-cyan-200');
-                const labelCls = isCrit ? 'text-neonRed' : (herd.count >= 4 ? 'text-purple-300' : 'text-neonCyan');
+            if (timeBadgeDesk) { timeBadgeDesk.innerText = badgeText; timeBadgeDesk.className = badgeCls; }
+            if (timeBadgeMob) { timeBadgeMob.innerText = badgeText; timeBadgeMob.className = badgeCls; }
 
-                card.className = `flex items-center justify-between p-1.5 rounded border ${borderCls} transition-all duration-200`;
-                card.innerHTML = `
-                    <div class="truncate pr-1">
-                        <span class="font-bold ${labelCls}">[聚落 ${String.fromCharCode(65 + idx)}] ${herd.name}</span>
-                        <div class="text-[8px] text-slate-400">坐標: [${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}] • ${herd.role}</div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <span class="font-orbitron font-bold text-xs ${labelCls}">🦬 ${herd.count} 頭</span>
-                        <div class="text-[7.5px] ${isCrit ? 'text-rose-400 font-bold' : 'text-slate-400'}">${isCrit ? '🔴 侵入硬防線' : '常態監控'}</div>
-                    </div>
-                `;
-                container.appendChild(card);
+            [containerDesk, containerMob].forEach(container => {
+                if (!container) return;
+                container.innerHTML = '';
+
+                curData.herds.forEach((herd, idx) => {
+                    const card = document.createElement('div');
+                    const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
+                    const borderCls = isCrit ? 'border-neonRed/50 bg-rose-950/40 text-rose-200' : (herd.count >= 4 ? 'border-neonPurple/50 bg-purple-950/40 text-purple-200' : 'border-neonCyan/40 bg-cyan-950/30 text-cyan-200');
+                    const labelCls = isCrit ? 'text-neonRed' : (herd.count >= 4 ? 'text-purple-300' : 'text-neonCyan');
+
+                    card.className = `flex items-center justify-between p-1.5 rounded border ${borderCls} transition-all duration-200`;
+                    card.innerHTML = `
+                        <div class="truncate pr-1">
+                            <span class="font-bold ${labelCls}">[聚落 ${String.fromCharCode(65 + idx)}] ${herd.name}</span>
+                            <div class="text-[8px] text-slate-400">坐標: [${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}] • ${herd.role}</div>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="font-orbitron font-bold text-xs ${labelCls}">🦬 ${herd.count} 頭</span>
+                            <div class="text-[7.5px] ${isCrit ? 'text-rose-400 font-bold' : 'text-slate-400'}">${isCrit ? '🔴 侵入硬防線' : '常態監控'}</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
             });
         }
     </script>
-
     <script>
         function applyTimeState(idx) {
             currentTimeIndex = Math.max(0, Math.min(HOURLY_DATA.length - 1, idx));
@@ -1035,6 +1406,19 @@
             if (valTtc) valTtc.innerText = cur.ttc.toFixed(1);
             const valCount = document.getElementById('val-count');
             if (valCount) valCount.innerText = cur.totalCount;
+
+            // 頂部全日累積人流與即時承載率更新
+            const topDailyCrowd = document.getElementById('top-daily-total-crowd');
+            if (topDailyCrowd) topDailyCrowd.innerText = cur.dailyCumulative.toLocaleString();
+            const deskFootfallSum = document.getElementById('desk-footfall-summary');
+            if (deskFootfallSum) deskFootfallSum.innerText = cur.dailyCumulative.toLocaleString();
+
+            const topCapacityPercent = document.getElementById('top-crowd-capacity-percent');
+            if (topCapacityPercent) topCapacityPercent.innerText = `${cur.capacityRate}%`;
+            const topCapacityBar = document.getElementById('top-crowd-capacity-bar');
+            if (topCapacityBar) {
+                topCapacityBar.innerHTML = `<span class="bg-gradient-to-r from-emerald-400 via-amber-400 to-neonRed h-full transition-all duration-300" style="width: ${cur.capacityRate}%"></span>`;
+            }
 
             // 矩陣資訊列更新 (時・位・險 核心連動)
             const matrixActiveInfo = document.getElementById('desk-matrix-active-info');
@@ -1090,7 +1474,7 @@
                 }
             }
 
-            // 手機版同步
+            // 手機版同步更新
             const mobSlider = document.getElementById('slider-timeline-mob');
             if (mobSlider) mobSlider.value = idx;
             const mobTime = document.getElementById('label-time-mob');
@@ -1104,6 +1488,28 @@
             const mobCount = document.getElementById('mob-val-count');
             if (mobCount) mobCount.innerText = `${cur.totalCount}頭`;
 
+            // 手機版每日人流總量更新
+            const mobDailyTotal = document.getElementById('mob-val-daily-total');
+            if (mobDailyTotal) mobDailyTotal.innerText = cur.dailyCumulative.toLocaleString();
+            const mobHudDailyCrowd = document.getElementById('mob-hud-daily-crowd');
+            if (mobHudDailyCrowd) mobHudDailyCrowd.innerText = cur.dailyCumulative.toLocaleString();
+
+            const mobHudTtc = document.getElementById('mob-hud-ttc');
+            if (mobHudTtc) mobHudTtc.innerText = `${cur.ttc}s`;
+            const mobHudPosture = document.getElementById('mob-hud-posture');
+            if (mobHudPosture) mobHudPosture.innerText = cur.posture;
+            const mobHudRiskBadge = document.getElementById('mob-hud-risk-badge');
+            if (mobHudRiskBadge) {
+                mobHudRiskBadge.innerText = `R=${cur.risk.toFixed(2)} ${cur.risk >= 6.0 ? '極高' : (cur.risk >= 3.0 ? '中度' : '安全')}`;
+                mobHudRiskBadge.className = `px-2 py-0.5 rounded text-[9px] font-bold ${cur.risk >= 6.0 ? 'bg-rose-950 text-rose-200 border border-neonRed' : (cur.risk >= 3.0 ? 'bg-amber-950 text-amber-200 border border-neonAmber' : 'bg-emerald-950 text-emerald-200 border border-neonGreen')}`;
+            }
+
+            const mobMatrixActiveInfo = document.getElementById('mob-matrix-active-info');
+            if (mobMatrixActiveInfo) {
+                mobMatrixActiveInfo.innerText = `${cur.time} @ ${cur.primaryLoc}`;
+                mobMatrixActiveInfo.className = `text-[9px] font-bold ${cur.risk >= 6.0 ? 'text-neonRed' : (cur.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
+            }
+
             // 更新地圖水牛泡泡、EKF 誤差範圍與 HMM 走廊
             renderBuffaloBubbles(deskBuffaloLayer, cur);
             renderBuffaloBubbles(mobBuffaloLayer, cur);
@@ -1112,7 +1518,8 @@
             renderFuturePrediction(deskFutureLayer, cur);
             renderFuturePrediction(mobFutureLayer, cur);
 
-            // 更新清冊與 Canvas
+            // 更新各據點人流統計、清冊與 Canvas
+            renderStationsFootfall(cur);
             renderHerdsInventory(cur);
             drawKinematics('kinematicsCanvasDesk');
             drawKinematics('kinematicsCanvasMob');
@@ -1120,6 +1527,10 @@
 
         /* 視窗載入與事件註冊 */
         window.onload = function() {
+            // 1. 初始化實時時鐘與心跳同步器
+            initRealtimeClockAndHeartbeat();
+
+            // 2. 初始化桌面與手機 GIS 地圖
             const deskSys = initGISMap('leafletMap', true);
             const mobSys = initGISMap('leafletMapMobile', false);
 
@@ -1139,7 +1550,17 @@
                 mobEkfLayer = mobSys.ekfLayer;
             }
 
-            // 圖層切換 (純淨無浮水印圖資，支援純黑底向量拓樸模式)
+            // 3. 執行載具自動辨識 (桌面 vs 手機)
+            checkAndApplyDeviceMode();
+            window.addEventListener('resize', () => {
+                checkAndApplyDeviceMode();
+                if (mapDesk) mapDesk.invalidateSize();
+                if (mapMob) mapMob.invalidateSize();
+                drawKinematics('kinematicsCanvasDesk');
+                drawKinematics('kinematicsCanvasMob');
+            });
+
+            // 4. 圖層切換監聽
             const tileSelector = document.getElementById('select-tile-layer');
             if (tileSelector) {
                 tileSelector.addEventListener('change', (e) => {
@@ -1173,7 +1594,7 @@
                 });
             }
 
-            // Edge AI 姿態切換檢測
+            // 5. Edge AI 姿態切換檢測
             const postureSelector = document.getElementById('select-edge-posture');
             if (postureSelector) {
                 postureSelector.addEventListener('change', (e) => {
@@ -1196,7 +1617,7 @@
                 });
             }
 
-            // 時間軸 Slider 監聽
+            // 6. 時間軸 Slider 監聽 (桌面與手機同步)
             const sliderDesk = document.getElementById('slider-timeline');
             if (sliderDesk) {
                 sliderDesk.addEventListener('input', (e) => applyTimeState(parseInt(e.target.value, 10)));
@@ -1206,26 +1627,50 @@
                 sliderMob.addEventListener('input', (e) => applyTimeState(parseInt(e.target.value, 10)));
             }
 
-            // 支援點擊 Canvas 快速跳轉時程
+            // 7. 點擊 Canvas 快速跳轉時程
             const deskCanvas = document.getElementById('kinematicsCanvasDesk');
             if (deskCanvas) {
                 deskCanvas.addEventListener('click', (e) => {
                     const rect = deskCanvas.getBoundingClientRect();
                     const clickX = e.clientX - rect.left;
-                    const padX = 30;
+                    const padX = 26;
                     const plotW = deskCanvas.width - padX * 2;
                     const ratio = Math.max(0, Math.min(1, (clickX - padX) / plotW));
                     const targetIdx = Math.round(ratio * (HOURLY_DATA.length - 1));
                     applyTimeState(targetIdx);
                 });
             }
+            const mobCanvas = document.getElementById('kinematicsCanvasMob');
+            if (mobCanvas) {
+                mobCanvas.addEventListener('click', (e) => {
+                    const rect = mobCanvas.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const padX = 26;
+                    const plotW = mobCanvas.width - padX * 2;
+                    const ratio = Math.max(0, Math.min(1, (clickX - padX) / plotW));
+                    const targetIdx = Math.round(ratio * (HOURLY_DATA.length - 1));
+                    applyTimeState(targetIdx);
+                });
+            }
 
-            // 雙載具模式切換 (桌面 <-> 手機)
+            // 8. 載具切換按鈕 (手動覆蓋自動偵測)
             const btnToggleView = document.getElementById('btn-toggle-view');
             if (btnToggleView) {
                 btnToggleView.addEventListener('click', () => {
+                    userManualOverride = true;
                     const isDesk = document.body.classList.contains('mode-desktop');
-                    document.body.className = isDesk ? 'mode-mobile flex flex-col' : 'mode-desktop flex flex-col';
+                    const toggleBtnText = document.getElementById('btn-toggle-view-text');
+                    const badge = document.getElementById('device-mode-badge');
+
+                    if (isDesk) {
+                        document.body.className = 'mode-mobile flex flex-col h-screen w-screen overflow-hidden bg-cyberDark text-slate-100 font-rajdhani';
+                        if (toggleBtnText) toggleBtnText.innerText = '切換桌面版';
+                        if (badge) badge.innerHTML = '<i class="fa-solid fa-mobile-screen text-neonAmber"></i> 手機版模式 (手動)';
+                    } else {
+                        document.body.className = 'mode-desktop flex flex-col h-screen w-screen overflow-hidden bg-cyberDark text-slate-100 font-rajdhani';
+                        if (toggleBtnText) toggleBtnText.innerText = '切換手機版';
+                        if (badge) badge.innerHTML = '<i class="fa-solid fa-desktop text-neonCyan"></i> 桌面版模式 (手動)';
+                    }
                     setTimeout(() => {
                         if (mapDesk) mapDesk.invalidateSize();
                         if (mapMob) mapMob.invalidateSize();
@@ -1235,26 +1680,32 @@
                 });
             }
 
-            // 播放/暫停時間軸模擬
+            // 9. 播放/暫停時間軸模擬
             let isPlaying = false;
             let playInterval = null;
-            const btnPlay = document.getElementById('btn-play-timeline');
-            if (btnPlay) {
-                btnPlay.addEventListener('click', () => {
-                    isPlaying = !isPlaying;
-                    btnPlay.innerHTML = isPlaying ? '<i class="fa-solid fa-pause text-[10px]"></i>' : '<i class="fa-solid fa-play text-[10px]"></i>';
-                    if (isPlaying) {
-                        playInterval = setInterval(() => {
-                            let nextIdx = (currentTimeIndex + 1) % HOURLY_DATA.length;
-                            applyTimeState(nextIdx);
-                        }, 1800);
-                    } else {
-                        clearInterval(playInterval);
-                    }
-                });
-            }
+            const togglePlayTimeline = () => {
+                isPlaying = !isPlaying;
+                const iconHtml = isPlaying ? '<i class="fa-solid fa-pause text-[10px]"></i>' : '<i class="fa-solid fa-play text-[10px]"></i>';
+                const btnDesk = document.getElementById('btn-play-timeline');
+                const btnMob = document.getElementById('mob-btn-play-timeline');
+                if (btnDesk) btnDesk.innerHTML = iconHtml;
+                if (btnMob) btnMob.innerHTML = iconHtml;
 
-            // Notion DB 數位存根彈窗
+                if (isPlaying) {
+                    playInterval = setInterval(() => {
+                        let nextIdx = (currentTimeIndex + 1) % HOURLY_DATA.length;
+                        applyTimeState(nextIdx);
+                    }, 1800);
+                } else {
+                    clearInterval(playInterval);
+                }
+            };
+            const btnPlayDesk = document.getElementById('btn-play-timeline');
+            if (btnPlayDesk) btnPlayDesk.addEventListener('click', togglePlayTimeline);
+            const btnPlayMob = document.getElementById('mob-btn-play-timeline');
+            if (btnPlayMob) btnPlayMob.addEventListener('click', togglePlayTimeline);
+
+            // 10. Notion DB 數位存根彈窗
             const modal = document.getElementById('audit-modal');
             const btnOpenAudit = document.getElementById('btn-open-audit-modal');
             const btnCloseAudit = document.getElementById('btn-close-audit');
@@ -1264,6 +1715,10 @@
                     document.getElementById('audit-json-content').innerText = JSON.stringify({
                         "engine_version": "GEM Engine v27.0 Master Production Edition",
                         "timestamp": new Date().toISOString(),
+                        "local_datetime": document.getElementById('live-datetime-display')?.innerText || "",
+                        "heartbeat_sync_count": heartbeatTicks,
+                        "daily_cumulative_crowd": cur.dailyCumulative,
+                        "stations_footfall": cur.stations,
                         "ekf_positioning": {
                             "coords_m": [334250.0, 2762100.0],
                             "uncertainty_radius_m": 1.35
@@ -1286,21 +1741,11 @@
                 btnCloseAudit.addEventListener('click', () => modal.classList.add('hidden'));
             }
 
-            // 確保容器佈局完成後刷新視圖
+            // 初始化應用 12:00 資料
             setTimeout(() => {
-                if (mapDesk) mapDesk.invalidateSize();
-                if (mapMob) mapMob.invalidateSize();
-                applyTimeState(4); // 套用 12:00 初始資料
+                applyTimeState(4);
             }, 100);
         };
-
-        // 監聽視窗縮放
-        window.addEventListener('resize', () => {
-            if (mapDesk) mapDesk.invalidateSize();
-            if (mapMob) mapMob.invalidateSize();
-            drawKinematics('kinematicsCanvasDesk');
-            drawKinematics('kinematicsCanvasMob');
-        });
     </script>
 </body>
 </html>
