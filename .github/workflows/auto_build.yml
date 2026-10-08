@@ -24,7 +24,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install folium numpy requests httpx pydantic
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install folium numpy requests httpx pydantic fastapi uvicorn
 
       - name: Run main.py to generate index.html
         run: |
