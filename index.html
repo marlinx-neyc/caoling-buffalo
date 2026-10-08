@@ -106,6 +106,21 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
+
+        /* 手機版表格專屬強化樣式 */
+        .mobile-table th {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 8px 6px;
+            background: rgba(13, 23, 44, 0.95);
+            color: #94a3b8;
+        }
+        .mobile-table td {
+            font-size: 12px;
+            padding: 8px 6px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden">
@@ -452,163 +467,209 @@
         <!-- 下半部：滾動式完整表格資訊清單 (佔 55%) -->
         <div class="w-full flex-1 min-h-0 bg-cyberPanel border-t border-cyberBorder p-2.5 overflow-y-auto text-xs font-mono space-y-3">
             
-            <!-- 1. 核心數值儀表 5 格 (含每日人流總數與心跳燈狀態) -->
-            <div class="grid grid-cols-5 gap-1 text-center text-[10px]">
-                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[7.5px] truncate">全日人流總數</div>
-                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-xs font-orbitron">3,850</div>
-                    <div class="text-[7px] text-slate-400">今日累計</div>
+            <!-- 1. 核心數值儀表 5 格 (字體放大，關鍵字與燈號標註) -->
+            <div class="grid grid-cols-5 gap-1.5 text-center">
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[9px] font-bold">全日人流</div>
+                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-sm font-orbitron my-0.5">3,850</div>
+                    <div class="text-[8.5px] text-emerald-400 flex items-center justify-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neonGreen"></span> 累計人次
+                    </div>
                 </div>
-                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[7.5px] truncate">THI 熱應力</div>
-                    <div id="mob-val-thi" class="text-neonRed font-bold text-xs font-orbitron">83.6</div>
-                    <div class="text-[7px] text-rose-400">強制泥浴</div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[9px] font-bold">THI 熱指數</div>
+                    <div id="mob-val-thi" class="text-neonRed font-bold text-sm font-orbitron my-0.5">83.6</div>
+                    <div class="text-[8.5px] text-rose-400 flex items-center justify-center gap-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neonRed animate-ping"></span> 強制泥浴
+                    </div>
                 </div>
-                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[7.5px] truncate">衝突風險 R</div>
-                    <div id="mob-val-risk" class="text-neonRed font-bold text-xs font-orbitron">13.05</div>
-                    <div class="text-[7px] text-rose-400">極度危險</div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[9px] font-bold">衝突風險 R</div>
+                    <div id="mob-val-risk" class="text-neonRed font-bold text-sm font-orbitron my-0.5">13.05</div>
+                    <div class="text-[8.5px] text-rose-300 font-bold bg-rose-950/80 rounded px-1">
+                        🔴 極度危險
+                    </div>
                 </div>
-                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[7.5px] truncate">碰撞預估</div>
-                    <div id="mob-val-ttc" class="text-neonAmber font-bold text-xs font-orbitron">2.9s</div>
-                    <div class="text-[7px] text-amber-400">緊急避讓</div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[9px] font-bold">碰撞預估</div>
+                    <div id="mob-val-ttc" class="text-neonAmber font-bold text-sm font-orbitron my-0.5">2.9s</div>
+                    <div class="text-[8.5px] text-amber-300 font-bold bg-amber-950/80 rounded px-1">
+                        ⚠️ 緊急避讓
+                    </div>
                 </div>
-                <div class="bg-cyberDark p-1 rounded border border-cyberBorder">
-                    <div class="text-slate-400 text-[7.5px] truncate">水牛頭數</div>
-                    <div id="mob-val-count" class="text-neonCyan font-bold text-xs font-orbitron">14頭</div>
-                    <div class="text-[7px] text-cyan-400">3個聚落</div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[9px] font-bold">水牛總數</div>
+                    <div id="mob-val-count" class="text-neonCyan font-bold text-sm font-orbitron my-0.5">14頭</div>
+                    <div class="text-[8.5px] text-cyan-300 flex items-center justify-center gap-0.5">
+                        🦬 3大聚落
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. 【新增：手機版草嶺古道各重要據點人流即時統計表格】 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-cyan-500/40 space-y-1.5">
-                <div class="text-neonCyan font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-users-viewfinder text-neonCyan"></i> 草嶺古道各重要據點人流即時統計</span>
-                    <span class="text-slate-400 text-[8.5px]">全線承載率: <b id="mob-stations-capacity" class="text-neonAmber">77.0%</b></span>
+            <!-- 2. 【手機版：草嶺古道 6 大重要據點人流即時統計表格】 -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyan-500/50 space-y-1.5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-cyberBorder pb-1.5">
+                    <span class="font-bold text-xs text-neonCyan font-orbitron flex items-center gap-1.5">
+                        <i class="fa-solid fa-users-viewfinder"></i> 據點人流即時統計
+                    </span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
+                        全線承載率: <b id="mob-stations-capacity" class="text-neonAmber font-orbitron">85.6%</b>
+                    </span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[9px]">
+                    <table class="w-full text-left border-collapse mobile-table">
                         <thead>
-                            <tr class="text-slate-400 border-b border-cyberBorder">
-                                <th class="py-1 px-1">據點名稱</th>
-                                <th class="py-1 px-1">即時人流</th>
-                                <th class="py-1 px-1">負載程度</th>
-                                <th class="py-1 px-1">分流導引建議</th>
+                            <tr class="border-b border-cyberBorder/80">
+                                <th class="w-[28%]">據點名稱</th>
+                                <th class="w-[24%]">即時人流</th>
+                                <th class="w-[24%] text-center">負載程度</th>
+                                <th class="w-[24%]">處置對策</th>
                             </tr>
                         </thead>
-                        <tbody id="mob-stations-table-body" class="divide-y divide-cyberBorder/60">
-                            <!-- 由 JS 動態填充 6 大據點 -->
+                        <tbody id="mob-stations-table-body" class="divide-y divide-cyberBorder/50">
+                            <!-- 由 JavaScript 動態繪製大字階、燈號表格 -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 3. 人牛動態交織折線 Canvas 圖 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder">
-                <div class="text-[10px] text-neonGreen font-bold mb-1 flex justify-between items-center">
-                    <span><i class="fa-solid fa-chart-line"></i> 人牛動態交織矩陣 (時・位・險整合)</span>
-                    <span id="mob-matrix-active-info" class="text-[9px] text-neonRed font-bold">12:00 @ 埡口鞍部</span>
-                </div>
-                <canvas id="kinematicsCanvasMob" class="w-full h-[100px] bg-[#080e1c] rounded"></canvas>
-            </div>
-
-            <!-- 4. 2D-EKF 定位與即時動態指標結構表格 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-neonPurple/50 space-y-1.5">
-                <div class="text-purple-300 font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-crosshairs text-neonPurple"></i> 2D-EKF 連續濾波與即時狀態表</span>
-                    <span class="text-neonGreen text-[9px]">14頭牛監測中</span>
+            <!-- 3. 【手機版：14 頭水牛時空泡泡分佈清冊表格】 (取代原先過小卡片) -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-neonPurple/50 space-y-1.5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-cyberBorder pb-1.5 font-orbitron">
+                    <span class="font-bold text-xs text-purple-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check text-neonPurple"></i> 14頭牛群聚落清冊
+                    </span>
+                    <span id="mob-bubble-time-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-200 border border-neonRed">
+                        🔴 12:00 極致警戒
+                    </span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-[9px]">
+                    <table class="w-full text-left border-collapse mobile-table">
                         <thead>
-                            <tr class="text-slate-400 border-b border-cyberBorder">
-                                <th class="py-1 px-1">指標項目</th>
-                                <th class="py-1 px-1">即時觀測數值</th>
-                                <th class="py-1 px-1">狀態意義</th>
+                            <tr class="border-b border-cyberBorder/80">
+                                <th class="w-[30%]">聚落與坐標</th>
+                                <th class="w-[20%] text-center">頭數</th>
+                                <th class="w-[26%]">行為狀態</th>
+                                <th class="w-[24%] text-center">防線警戒</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-cyberBorder/60">
-                            <tr>
-                                <td class="py-1 px-1 text-slate-300">核心空間座標</td>
-                                <td class="py-1 px-1 font-mono text-neonCyan">[121.9264, 24.9756]</td>
-                                <td class="py-1 px-1 text-slate-400">埡口觀景亭隘口</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1 px-1 text-slate-300">當前移動向量</td>
-                                <td class="py-1 px-1 font-mono text-neonPurple">南南東 165° @ 0.8 m/s</td>
-                                <td class="py-1 px-1 text-slate-400">朝護管所谷線移動</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1 px-1 text-slate-300">Edge AI 姿態</td>
-                                <td class="py-1 px-1 font-bold text-amber-300">DEFENSIVE_HEAD_LOW</td>
-                                <td class="py-1 px-1 text-rose-400">低頭抵角 (權重 1.8x)</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1 px-1 text-slate-300">人牛最短間距</td>
-                                <td class="py-1 px-1 font-mono text-neonRed font-bold">4.2 m</td>
-                                <td class="py-1 px-1 text-rose-400">🚨 侵入 10m Flight Zone</td>
-                            </tr>
-                            <tr>
-                                <td class="py-1 px-1 text-slate-300">相對速度 / TTC</td>
-                                <td class="py-1 px-1 font-mono text-purple-300">v_rel=1.45 m/s</td>
-                                <td class="py-1 px-1 font-bold text-neonRed">TTC: 2.9 秒 (倒數)</td>
-                            </tr>
+                        <tbody id="mob-herds-table-body" class="divide-y divide-cyberBorder/50">
+                            <!-- 由 JS 動態生成結構化表格 -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- 5. HMM 隱馬爾可夫前瞻軌跡推演表格 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder space-y-1.5">
-                <div class="text-neonAmber font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-neonAmber"></i> HMM 隱馬爾可夫前瞻軌跡推演表</span>
-                    <span class="text-slate-400 text-[9px]">Markov Extrapolation</span>
+            <!-- 4. 人牛動態交織折線 Canvas 圖 (時・位・險整合) -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder">
+                <div class="text-[11px] text-neonGreen font-bold mb-1 flex justify-between items-center">
+                    <span><i class="fa-solid fa-chart-line"></i> 人牛交織矩陣 (時・位・險整合)</span>
+                    <span id="mob-matrix-active-info" class="text-[10px] text-neonRed font-bold bg-rose-950/80 px-1.5 py-0.5 rounded border border-neonRed/50">
+                        12:00 @ 埡口鞍部
+                    </span>
                 </div>
-                <div class="grid grid-cols-3 gap-1.5 text-center">
-                    <div class="bg-cyberCard p-1.5 rounded border border-amber-500/40">
-                        <div class="text-[8px] text-slate-400">+15 分鐘前瞻</div>
-                        <div id="mob-hmm-15m" class="text-neonAmber font-bold font-orbitron text-[11px] mt-0.5 truncate">護管所泥塘</div>
-                        <div class="text-[7.5px] text-slate-400">誤差: ±6.8m (65%)</div>
-                        <div class="text-[7.5px] text-amber-300 mt-0.5">下切泥塘避暑</div>
-                    </div>
-                    <div class="bg-cyberCard p-1.5 rounded border border-rose-500/40">
-                        <div class="text-[8px] text-slate-400">+30 分鐘前瞻</div>
-                        <div id="mob-hmm-30m" class="text-neonRed font-bold font-orbitron text-[11px] mt-0.5 truncate">沼澤核心浸泡</div>
-                        <div class="text-[7.5px] text-slate-400">誤差: ±14.2m (85%)</div>
-                        <div class="text-[7.5px] text-rose-300 mt-0.5">體表散熱降溫</div>
-                    </div>
-                    <div class="bg-cyberCard p-1.5 rounded border border-emerald-500/40">
-                        <div class="text-[8px] text-slate-400">+60 分鐘前瞻</div>
-                        <div id="mob-hmm-60m" class="text-neonGreen font-bold font-orbitron text-[11px] mt-0.5 truncate">次要林緣避暑</div>
-                        <div class="text-[7.5px] text-slate-400">誤差: ±28.5m (90%)</div>
-                        <div class="text-[7.5px] text-emerald-300 mt-0.5">樹蔭臥伏反芻</div>
-                    </div>
-                </div>
+                <canvas id="kinematicsCanvasMob" class="w-full h-[105px] bg-[#080e1c] rounded"></canvas>
             </div>
 
-            <!-- 6. 14 頭牛群時空泡泡分佈清冊表格 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-neonCyan/40 space-y-1.5">
-                <div class="text-neonCyan font-bold text-[11px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-list-check text-neonCyan"></i> 14頭牛群時空泡泡分佈清冊</span>
-                    <span id="mob-bubble-time-badge" class="text-neonAmber text-[9px] font-bold">12:00 即時點位與風險</span>
+            <!-- 5. 2D-EKF 定位與即時動態指標結構表格 (大字體 + 燈號) -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5">
+                <div class="text-purple-300 font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-crosshairs text-neonPurple"></i> 2D-EKF 連續濾波與即時狀態</span>
+                    <span class="text-neonCyan text-[10px] font-bold">±1.35m 精度</span>
                 </div>
-                <div id="mob-herds-inventory-container" class="space-y-1">
-                    <!-- 動態由 JavaScript 生成 (與桌面版完全對齊) -->
-                </div>
+                <table class="w-full text-left border-collapse mobile-table">
+                    <tbody class="divide-y divide-cyberBorder/50">
+                        <tr>
+                            <td class="text-slate-400 font-bold w-[32%]">核心坐標</td>
+                            <td class="font-mono text-neonCyan font-bold text-[12px]">[121.9264, 24.9756]</td>
+                            <td class="text-right text-slate-300 text-[11px]">埡口鞍部隘口</td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold">移動向量</td>
+                            <td class="font-mono text-neonPurple font-bold text-[12px]">165° @ 0.8 m/s</td>
+                            <td class="text-right text-purple-300 text-[11px]">🧭 南南東 (下切泥塘)</td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold">Edge AI 姿態</td>
+                            <td class="font-bold text-amber-300 text-[12px]">DEFENSIVE_HEAD_LOW</td>
+                            <td class="text-right"><span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/40">⚠️ 低頭抵角 1.8x</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold">人牛最短間距</td>
+                            <td class="font-mono text-neonRed font-bold text-[13px]">4.2 m</td>
+                            <td class="text-right"><span class="px-1.5 py-0.5 rounded bg-rose-950 text-neonRed text-[10px] font-bold border border-neonRed">🔴 侵入 10m 硬防線</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold">相對速度 / TTC</td>
+                            <td class="font-mono text-slate-200 text-[12px]">v_rel=1.45 m/s</td>
+                            <td class="text-right"><span class="px-2 py-0.5 rounded bg-rose-950 text-neonRed font-orbitron font-bold text-[11px] border border-neonRed">⏱️ TTC: 2.9s 倒數</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <!-- 7. 歷史採礦交織條件與自癒安全規範 -->
-            <div class="bg-cyberDark p-2 rounded-lg border border-cyberBorder space-y-1 text-[9px] text-slate-300">
-                <div class="text-purple-300 font-bold text-[10px] flex items-center justify-between border-b border-cyberBorder/70 pb-1 font-orbitron">
-                    <span>⚡ 歷史採礦交織條件 (Pattern Mined)</span>
-                    <span class="text-neonGreen">規則已鎖定</span>
+            <!-- 6. HMM 隱馬爾可夫前瞻軌跡推演表格 -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5">
+                <div class="text-neonAmber font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left"></i> HMM 前瞻推演表</span>
+                    <span class="text-slate-400 text-[10px]">Markov Extrapolation</span>
                 </div>
-                <div class="space-y-1 pt-0.5">
-                    <div>1. <b>10m 驚嚇硬防線侵入</b>: <i>D</i><sub>human</sub> &le; 10.0m &rarr; 啟動雙曲非線性懲罰放大 <i>R</i><sub>conflict</sub>，觸發賁卦離根扣分。</div>
-                    <div>2. <b>極低速極致風險規律</b>: 於路寬 <i>W</i> &lt; 1.8m 隘口 (&Omega;<sub>topo</sub> = 1.5)，水牛受迫防禦對峙（移動速度 1 ~ 3 m/h，風險指標高達 11.22）。</div>
-                    <div>3. <b>人流湧入加速度效應</b>: 當 &Delta;<i>v</i><sub>6</sub> / &Delta;<i>t</i> &gt; 0.15 /min 時，代表遊客快速集結，系統自動將預警推播提前 15 ~ 20 分鐘發布。</div>
+                <table class="w-full text-left border-collapse mobile-table">
+                    <thead>
+                        <tr class="border-b border-cyberBorder/80">
+                            <th class="w-[28%]">推演時間</th>
+                            <th class="w-[38%]">前瞻推估位點</th>
+                            <th class="w-[34%] text-right">誤差半徑 / 機率</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-cyberBorder/50">
+                        <tr>
+                            <td class="font-bold text-neonAmber text-[11px]">+15 分鐘</td>
+                            <td class="font-bold text-white text-[12px]">護管所泥塘 <span class="text-[10px] text-amber-300 block font-normal">下切泥塘避暑</span></td>
+                            <td class="text-right font-mono text-neonAmber text-[11px]">±6.8m (65%)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-neonRed text-[11px]">+30 分鐘</td>
+                            <td class="font-bold text-white text-[12px]">沼澤核心浸泡 <span class="text-[10px] text-rose-300 block font-normal">體表散熱降溫</span></td>
+                            <td class="text-right font-mono text-neonRed text-[11px]">±14.2m (85%)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-neonGreen text-[11px]">+60 分鐘</td>
+                            <td class="font-bold text-white text-[12px]">次要林緣避暑 <span class="text-[10px] text-emerald-300 block font-normal">樹蔭臥伏反芻</span></td>
+                            <td class="text-right font-mono text-neonGreen text-[11px]">±28.5m (90%)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 7. 歷史採礦交織條件與自癒安全規範 (符號化表格) -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5 text-slate-300">
+                <div class="text-purple-300 font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
+                    <span>⚡ 歷史採礦交織規則 (Mined Pattern)</span>
+                    <span class="text-neonGreen text-[10px] font-bold">🟢 規則已鎖定</span>
                 </div>
+                <table class="w-full text-left border-collapse mobile-table text-[11px]">
+                    <tbody class="divide-y divide-cyberBorder/50">
+                        <tr>
+                            <td class="font-bold text-neonRed w-[30%]">1. 10m 硬防線</td>
+                            <td class="text-slate-200">
+                                <i>D</i><sub>human</sub> &le; 10.0m &rarr; 觸發雙曲非線性懲罰放大 <i>R</i><sub>conflict</sub>，扣除 <i>P</i><sub>rootless</sub> 離根分。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-neonAmber">2. 隘口受迫停滯</td>
+                            <td class="text-slate-200">
+                                路寬 <i>W</i> &lt; 1.8m 隘口 (&Omega;<sub>topo</sub> = 1.5)，水牛受迫防禦對峙（極低速 1 ~ 3 m/h，風險指標 11.22）。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-neonCyan">3. 人流加速度</td>
+                            <td class="text-slate-200">
+                                當 &Delta;<i>v</i><sub>6</sub> / &Delta;<i>t</i> &gt; 0.15 /min 時，代表遊客快速集結湧入，預警提前 15 ~ 20 分鐘推播。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
         </div>
@@ -1166,7 +1227,7 @@
                 });
             }
 
-            // 2. 手機版表格行渲染
+            // 2. 手機版大字級階＋符號燈號表格行渲染
             const tbodyMob = document.getElementById('mob-stations-table-body');
             const capRateEl = document.getElementById('mob-stations-capacity');
             if (capRateEl) capRateEl.innerText = `${curData.capacityRate}%`;
@@ -1177,34 +1238,38 @@
                     const count = curData.stations[sta.id] || 0;
                     const pct = Math.min(100, Math.round((count / sta.maxCap) * 100));
 
-                    let badgeColor = "text-neonGreen bg-emerald-950 border-emerald-500/40";
-                    let badgeText = "舒適 (綠燈)";
-                    let advice = "開放自由通暢步行";
+                    let badgeSymbol = "🟢";
+                    let badgeColor = "text-emerald-300 bg-emerald-950/80 border-emerald-500/40";
+                    let badgeText = "常態";
+                    let advice = "自由通暢步行";
                     if (pct >= 85) {
-                        badgeColor = "text-neonRed bg-rose-950 border-neonRed";
-                        badgeText = "極度擁擠";
-                        advice = "啟動 E-Bike 低碳導流管制";
+                        badgeSymbol = "🔴";
+                        badgeColor = "text-rose-200 bg-rose-950 border-neonRed";
+                        badgeText = "過載";
+                        advice = "啟動 E-Bike 導流";
                     } else if (pct >= 60) {
-                        badgeColor = "text-neonAmber bg-amber-950 border-neonAmber";
-                        badgeText = "偏高注意";
-                        advice = "建議放慢步調或分段暫停";
+                        badgeSymbol = "🟡";
+                        badgeColor = "text-amber-200 bg-amber-950 border-neonAmber";
+                        badgeText = "偏高";
+                        advice = "放慢步調暫停";
                     }
 
                     const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/40 transition";
                     tr.innerHTML = `
-                        <td class="py-1 px-1 font-bold text-slate-200">
+                        <td class="font-bold text-slate-100 text-[13px]">
                             ${sta.name}
-                            <div class="text-[7.5px] text-slate-400 font-normal">${sta.role}</div>
+                            <span class="text-[10px] text-slate-400 block font-normal">${sta.role}</span>
                         </td>
-                        <td class="py-1 px-1 font-mono font-bold text-neonCyan">
-                            ${count} <span class="text-[7.5px] text-slate-400 font-normal">/ ${sta.maxCap}</span>
+                        <td class="font-mono font-bold text-neonCyan text-[13px]">
+                            ${count} <span class="text-[10px] text-slate-400 font-normal">/ ${sta.maxCap}</span>
                         </td>
-                        <td class="py-1 px-1">
-                            <span class="px-1 py-0.2 rounded border text-[7.5px] font-bold ${badgeColor}">
-                                ${pct}% ${badgeText}
+                        <td class="text-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[11px] font-bold ${badgeColor}">
+                                ${badgeSymbol} ${pct}% (${badgeText})
                             </span>
                         </td>
-                        <td class="py-1 px-1 text-[8px] text-slate-300">
+                        <td class="text-[11px] text-slate-200 font-medium">
                             ${advice}
                         </td>
                     `;
@@ -1348,23 +1413,24 @@
             ctx.fillText(badgeText, badgeX, badgeY + 1.5);
         }
 
-        /* 渲染 14 頭牛群時空泡泡分佈清冊 */
+        /* 渲染 14 頭牛群時空泡泡分佈清冊 (桌面版卡片與手機版結構化表格同步) */
         function renderHerdsInventory(curData) {
             const containerDesk = document.getElementById('herds-inventory-container');
-            const containerMob = document.getElementById('mob-herds-inventory-container');
+            const tbodyMob = document.getElementById('mob-herds-table-body');
             const timeBadgeDesk = document.getElementById('bubble-list-time-badge');
             const timeBadgeMob = document.getElementById('mob-bubble-time-badge');
 
-            const badgeText = `${curData.time} 即時點位與風險 (${curData.riskDesc})`;
-            const badgeCls = `text-[9px] font-bold ${curData.risk >= 6.0 ? 'text-neonRed' : (curData.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
+            const isHighRisk = curData.risk >= 6.0;
+            const badgeSymbol = isHighRisk ? "🔴" : (curData.risk >= 3.0 ? "🟡" : "🟢");
+            const badgeText = `${badgeSymbol} ${curData.time} ${curData.riskDesc}`;
+            const badgeCls = `text-[10px] font-bold px-2 py-0.5 rounded border ${isHighRisk ? 'bg-rose-950 text-rose-200 border-neonRed' : (curData.risk >= 3.0 ? 'bg-amber-950 text-amber-200 border-neonAmber' : 'bg-emerald-950 text-emerald-200 border-neonGreen')}`;
 
-            if (timeBadgeDesk) { timeBadgeDesk.innerText = badgeText; timeBadgeDesk.className = badgeCls; }
+            if (timeBadgeDesk) { timeBadgeDesk.innerText = `${curData.time} 即時點位與風險 (${curData.riskDesc})`; timeBadgeDesk.className = isHighRisk ? 'text-[9px] text-neonRed font-bold' : 'text-[9px] text-neonGreen font-bold'; }
             if (timeBadgeMob) { timeBadgeMob.innerText = badgeText; timeBadgeMob.className = badgeCls; }
 
-            [containerDesk, containerMob].forEach(container => {
-                if (!container) return;
-                container.innerHTML = '';
-
+            // 1. 桌面版卡片更新
+            if (containerDesk) {
+                containerDesk.innerHTML = '';
                 curData.herds.forEach((herd, idx) => {
                     const card = document.createElement('div');
                     const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
@@ -1382,9 +1448,41 @@
                             <div class="text-[7.5px] ${isCrit ? 'text-rose-400 font-bold' : 'text-slate-400'}">${isCrit ? '🔴 侵入硬防線' : '常態監控'}</div>
                         </div>
                     `;
-                    container.appendChild(card);
+                    containerDesk.appendChild(card);
                 });
-            });
+            }
+
+            // 2. 手機版大字級階＋符號燈號表格行更新
+            if (tbodyMob) {
+                tbodyMob.innerHTML = '';
+                curData.herds.forEach((herd, idx) => {
+                    const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
+                    const symbol = isCrit ? "🔴" : (herd.count >= 4 ? "🟣" : "🟢");
+                    const labelColor = isCrit ? "text-neonRed" : (herd.count >= 4 ? "text-purple-300" : "text-neonCyan");
+                    const statusBadge = isCrit 
+                        ? `<span class="px-2 py-0.5 rounded bg-rose-950 text-rose-200 border border-neonRed text-[11px] font-bold">🔴 侵入硬防線</span>`
+                        : `<span class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold">🟢 常態監控</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/40 transition";
+                    tr.innerHTML = `
+                        <td class="font-bold ${labelColor} text-[13px]">
+                            [聚落 ${String.fromCharCode(65 + idx)}] ${herd.name}
+                            <span class="text-[10px] text-slate-400 block font-mono font-normal">[${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}]</span>
+                        </td>
+                        <td class="text-center font-orbitron font-bold text-neonCyan text-[14px]">
+                            🦬 ${herd.count}頭
+                        </td>
+                        <td class="text-[12px] text-slate-200 font-medium">
+                            ${herd.role}
+                        </td>
+                        <td class="text-center">
+                            ${statusBadge}
+                        </td>
+                    `;
+                    tbodyMob.appendChild(tr);
+                });
+            }
         }
     </script>
     <script>
