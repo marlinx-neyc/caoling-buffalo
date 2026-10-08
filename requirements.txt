@@ -1,1 +1,7 @@
+folium
+numpy
+requests
 httpx
+pydantic
+fastapi
+uvicorn
