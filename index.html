@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>GEM Engine v27.0 | 水牛動態棲地預判與 EKF/HMM 全域戰情台</title>
     
+    <!-- PWA & Shortcut Icon: 🐮 Buffalo Head with Cyber Glow -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23030712'/><rect x='3' y='3' width='94' height='94' rx='20' fill='none' stroke='%2300f0ff' stroke-width='3'/><text x='50%' y='55%' font-size='56' dominant-baseline='central' text-anchor='middle'>🐮</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23030712'/><rect x='3' y='3' width='94' height='94' rx='20' fill='none' stroke='%2300f0ff' stroke-width='3'/><text x='50%' y='55%' font-size='56' dominant-baseline='central' text-anchor='middle'>🐮</text></svg>">
+    <meta name="theme-color" content="#030712">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GEM v27 🐮">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -31,7 +39,7 @@
                     colors: {
                         cyberDark: '#030712',
                         cyberPanel: 'rgba(8, 14, 28, 0.96)',
-                        cyberCard: 'rgba(13, 23, 44, 0.92)',
+                        cyberCard: 'rgba(13, 23, 44, 0.94)',
                         cyberBorder: '#162b4d',
                         neonCyan: '#00f0ff',
                         neonPurple: '#b026ff',
@@ -74,8 +82,23 @@
             background: #080e1c !important;
         }
 
-        .poi-popup { font-size: 12px; line-height: 1.4; color: #0f172a; }
-        .poi-popup b { color: #0284c7; font-size: 13px; font-weight: bold; }
+        /* 游標懸停客製化戰情浮動資訊卡 */
+        .leaflet-popup-content-wrapper {
+            background: rgba(6, 11, 24, 0.96) !important;
+            border: 1px solid rgba(0, 240, 255, 0.6) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35) !important;
+            padding: 2px !important;
+            color: #f1f5f9 !important;
+        }
+        .leaflet-popup-tip {
+            background: rgba(6, 11, 24, 0.96) !important;
+            border: 1px solid rgba(0, 240, 255, 0.6) !important;
+        }
+        .leaflet-popup-content {
+            margin: 8px 10px !important;
+            line-height: 1.45 !important;
+        }
 
         .herd-bubble-label {
             background: transparent !important;
@@ -83,9 +106,10 @@
             box-shadow: none !important;
             color: #ffffff !important;
             font-family: 'Orbitron', sans-serif !important;
-            font-size: 10px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
             text-shadow: 0 0 4px #000, 0 0 8px #ff2a5f;
+            pointer-events: none;
         }
 
         .posture-badge-pulse {
@@ -102,12 +126,32 @@
         body.mode-desktop #desktop-root { display: grid !important; }
         body.mode-desktop #mobile-root { display: none !important; }
 
-        /* Custom Scrollbar for dashboard panels */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #030712; }
-        ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 3px; }
 
-        /* 手機版表格專屬強化樣式 */
+        /* 高對比表格樣式 */
+        .tactical-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .tactical-table th {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 6px 8px;
+            background: rgba(13, 23, 44, 0.95);
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(22, 43, 77, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .tactical-table td {
+            font-size: 11.5px;
+            padding: 6px 8px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(22, 43, 77, 0.5);
+        }
+
         .mobile-table th {
             font-size: 11px;
             font-weight: 700;
@@ -128,26 +172,26 @@
     <!-- 頂部戰情旗艦導航列 -->
     <header class="h-[52px] border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-50">
         <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_18px_rgba(0,240,255,0.4)] text-white text-xs">
-                <i class="fa-solid fa-radar fa-spin"></i>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_18px_rgba(0,240,255,0.4)] text-white text-base">
+                🐮
             </div>
             <div>
                 <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1.5">
                     GEM<span class="text-neonCyan">ENGINE</span> 
-                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0 MASTER</span>
+                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0 MASTER 🐮</span>
                 </h1>
                 <!-- 即時日期、時間與心跳資訊更新燈號 -->
-                <div class="flex items-center gap-2 text-[9px] text-slate-300 font-mono">
+                <div class="flex items-center gap-2 text-[9.5px] text-slate-300 font-mono">
                     <span class="flex items-center gap-1 text-neonCyan font-bold">
                         <i class="fa-regular fa-clock"></i>
-                        <span id="live-datetime-display">2026-10-08 20:04:28 CST</span>
+                        <span id="live-datetime-display">2026-10-09 08:58:14 CST</span>
                     </span>
                     <span class="hidden md:inline text-slate-500">|</span>
                     <!-- 心跳更新燈號與更新累計次數 -->
                     <span class="flex items-center gap-1 text-slate-300">
                         <span id="heartbeat-indicator" class="w-2 h-2 rounded-full bg-neonGreen animate-ping"></span>
                         <span class="text-[8.5px] text-neonGreen font-bold">LIVE SYNC</span>
-                        <span class="text-slate-400 font-mono">(第 <b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,482</b> 次)</span>
+                        <span class="text-slate-400 font-mono">(第 <b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,525</b> 次)</span>
                     </span>
                 </div>
             </div>
@@ -211,7 +255,7 @@
         </div>
     </header>
 
-    <!-- 桌面版介面 ROOT (左 8 欄地圖與時空拓樸，右 4 欄 EKF/HMM/各據點人流數據) -->
+    <!-- 桌面版介面 ROOT (左 8 欄地圖與時空拓樸，右 4 欄人牛矩陣、當日變化量與據點統計) -->
     <div id="desktop-root" class="h-[calc(100vh-52px)] w-full grid grid-cols-12 gap-2 p-2 overflow-hidden">
         
         <!-- 左側 8 欄：GIS 地圖與多層覆疊 -->
@@ -226,6 +270,9 @@
                         </span>
                         <span id="ekf-accuracy-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-neonCyan border border-cyan-500/40">
                             EKF 誤差半徑: ±1.35m
+                        </span>
+                        <span class="text-[9px] text-amber-300 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-500/30">
+                            <i class="fa-solid fa-hand-pointer"></i> 游標移至點位可檢視數值與未來趨勢
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
@@ -246,7 +293,7 @@
                     <div class="absolute top-2 left-2 bg-cyberDark/90 backdrop-blur-md border border-neonPurple/50 rounded-lg p-2.5 pointer-events-none text-xs font-mono space-y-1 z-30 shadow-[0_0_20px_rgba(176,38,255,0.3)] max-w-[340px]">
                         <div class="text-purple-300 font-bold text-[10px] flex items-center justify-between border-b border-cyberBorder/60 pb-1">
                             <span>🧭 2D-EKF 定位與 HMM 軌跡預判</span>
-                            <span class="text-neonCyan font-bold">14頭水牛監測</span>
+                            <span class="text-neonCyan font-bold">14頭水牛動態監測</span>
                         </div>
                         <div class="text-slate-200 text-[10px]">
                             核心座標：<span id="hud-ekf-coords" class="text-neonGreen font-bold">[121.9264, 24.9756]</span> 
@@ -265,14 +312,14 @@
                             <span class="text-neonAmber">TTC: <b id="hud-ttc-sec" class="font-orbitron font-bold text-neonRed">2.9s</b></span>
                         </div>
                         <div id="hud-pred-detail" class="text-[9px] text-slate-300 bg-cyberCard/80 p-1.5 rounded border border-cyberBorder leading-relaxed">
-                            ⚠️ <b>[TTC 碰撞倒數 2.9s]</b> 人牛相對速度 $v_{rel}=1.45\text{ m/s}$，水牛進入【DEFENSIVE_HEAD_LOW】防禦姿態。<br>
-                            🎯 <b>[HMM 15m 外推]</b> 埡口主群受迫對峙，預估往護管所泥塘下切機率 65%，強制啟動 E-Bike 導流。
+                            ⚠️ <b>[TTC 碰撞倒數 2.9s]</b> 人牛相對速度 v_rel=1.45 m/s，水牛進入【低頭抵角】防禦姿態。<br>
+                            🎯 <b>[HMM 15m 外推]</b> 埡口主群受迫對峙，預估往護管所泥塘下切機率 65%，啟動 E-Bike 導流。
                         </div>
                     </div>
 
                     <!-- 警告橫幅 -->
                     <div id="desk-alert-banner" class="absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 z-30 bg-rose-950/95 border-neonRed text-rose-200 shadow-[0_0_25px_rgba(255,42,95,0.65)] whitespace-nowrap posture-badge-pulse">
-                        🔴 RED_ALERT: TTC 2.9s！水牛 7 頭低頭抵角 @埡口 (觸發 Flight Zone 離根懲罰，啟動 E-Bike 導流)
+                        🔴 RED_ALERT: TTC 2.9s！水牛 7 頭低頭抵角 @埡口 (侵入 10m 硬防線，啟動 E-Bike 導流)
                     </div>
 
                     <!-- 易卦與相變 Badge -->
@@ -328,22 +375,22 @@
             </div>
         </section>
 
-        <!-- 右側 4 欄：人牛交織分析、各據點人流統計與強化學習日誌 -->
-        <section class="col-span-4 flex flex-col gap-2 h-full min-h-0 overflow-y-auto pr-0.5">
+        <!-- 右側 4 欄：人牛交織分析、全日動態變化量、據點統計與 14 頭牛清冊 (全面支援捲動無遮蔽) -->
+        <section class="col-span-4 flex flex-col gap-2 h-full min-h-0 overflow-y-auto pr-1">
             
             <!-- 人牛動態交織矩陣 Canvas (時・位・險 整合可視化) -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket flex flex-col shrink-0">
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket flex flex-col shrink-0 shadow-lg">
                 <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1">
                     <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
                         <i class="fa-solid fa-chart-line text-neonGreen"></i> 人牛動態交織矩陣 (時・位・險整合)
                     </span>
-                    <span id="desk-matrix-active-info" class="text-[9px] font-mono text-neonRed font-bold">12:00 @ 埡口鞍部 [R=13.05 極高]</span>
+                    <span id="desk-matrix-active-info" class="text-[9px] font-mono text-neonRed font-bold">12:00 @ 埡口鞍部 [R=13.05]</span>
                 </div>
-                <div class="relative w-full h-[120px]">
+                <div class="relative w-full h-[135px]">
                     <canvas id="kinematicsCanvasDesk" class="w-full h-full bg-cyberDark/90 rounded border border-cyberBorder/80 cursor-crosshair"></canvas>
                 </div>
                 <!-- 時空與風險整合圖例及下標標記 -->
-                <div class="grid grid-cols-4 gap-1 text-[8px] font-mono text-center mt-1 pt-1 border-t border-cyberBorder/60 text-slate-300">
+                <div class="grid grid-cols-4 gap-1 text-[8.5px] font-mono text-center mt-1 pt-1 border-t border-cyberBorder/60 text-slate-300">
                     <div class="bg-cyberCard/90 p-0.5 rounded border border-cyberBorder truncate">
                         <span class="text-neonCyan">時段:</span> <span id="matrix-legend-time" class="font-bold text-white">12:00</span>
                     </div>
@@ -359,19 +406,56 @@
                 </div>
             </div>
 
-            <!-- 【新增亮點：草嶺古道各重要據點即時人流統計表】 -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket shrink-0 font-mono text-[10px]">
+            <!-- 【水牛當日各時段出沒變化量動態表】 (明確呈現全日出沒規律與變動量) -->
+            <div class="bg-cyberPanel rounded-xl border border-neonPurple/50 p-2 hud-bracket shrink-0 font-mono text-[10px] shadow-lg">
+                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1">
+                    <span class="font-bold text-xs text-purple-300 font-orbitron flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-neonPurple"></i> 水牛當日各時段活動與聚落變化量
+                    </span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-500/40">
+                        全日動態演繹
+                    </span>
+                </div>
+                <div class="max-h-[145px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse tactical-table">
+                        <thead>
+                            <tr>
+                                <th class="w-[18%]">時段</th>
+                                <th class="w-[24%] text-center">總頭數 (變動)</th>
+                                <th class="w-[34%]">主要分佈位點</th>
+                                <th class="w-[24%] text-center">狀態燈號</th>
+                            </tr>
+                        </thead>
+                        <tbody id="desk-buffalo-hourly-variation-body">
+                            <!-- 由 JS 動態生成 08:00~18:30 牛隻各時段變化行 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 【草嶺古道 6 大重要據點人流即時統計與事件表】 -->
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket shrink-0 font-mono text-[10px] shadow-lg">
                 <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1.5">
                     <span class="font-bold text-xs text-neonCyan font-orbitron flex items-center gap-1.5">
                         <i class="fa-solid fa-users-viewfinder text-neonCyan"></i> 草嶺古道各重要據點人流即時統計
                     </span>
                     <span class="text-[8.5px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
-                        當前時段: <b id="stations-active-time" class="text-white">12:00</b>
+                        時段: <b id="stations-active-time" class="text-white">12:00</b>
                     </span>
                 </div>
-                <!-- 據點人流分佈網格 -->
                 <div id="desk-stations-crowd-container" class="grid grid-cols-2 gap-1.5">
                     <!-- 由 JavaScript 動態繪製 6 大站點即時人數與負載長條 -->
+                </div>
+            </div>
+
+            <!-- 14頭水牛當前點位泡泡明細清冊 -->
+            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket shrink-0 font-mono text-[10px] shadow-lg">
+                <div class="text-neonCyan font-bold flex items-center justify-between mb-1 pb-1 border-b border-cyberBorder/60 font-orbitron">
+                    <span>📍 14頭牛群時空泡泡分佈清冊</span>
+                    <span id="bubble-list-time-badge" class="text-[9px] text-neonAmber">12:00 即時點位與風險狀態</span>
+                </div>
+                <div id="herds-inventory-container" class="space-y-1">
+                    <!-- 動態由 JavaScript 生成 -->
                 </div>
             </div>
 
@@ -400,42 +484,9 @@
                 </div>
             </div>
 
-            <!-- 14頭水牛分佈明細 (Bubble Details - 依時・位・險動態連動) -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket shrink-0 font-mono text-[10px]">
-                <div class="text-neonCyan font-bold flex items-center justify-between mb-1 pb-1 border-b border-cyberBorder/60 font-orbitron">
-                    <span>📍 14頭牛群時空泡泡分佈清冊</span>
-                    <span id="bubble-list-time-badge" class="text-[9px] text-neonAmber">12:00 即時點位與風險狀態</span>
-                </div>
-                <div id="herds-inventory-container" class="space-y-1">
-                    <!-- 動態由 JavaScript 生成 -->
-                </div>
-            </div>
-
-            <!-- Neural-UCB 20維特徵張量與 SVD 自癒日誌 -->
-            <div class="bg-cyberPanel rounded-xl border border-cyberBorder p-2 hud-bracket flex flex-col flex-1 min-h-[110px]">
-                <div class="flex items-center justify-between pb-1 border-b border-cyberBorder/80 mb-1">
-                    <span class="font-bold text-xs text-slate-200 font-orbitron flex items-center gap-1.5">
-                        <i class="fa-solid fa-brain text-neonCyan"></i> Neural-UCB & SVD 自癒運算日誌
-                    </span>
-                    <span id="svd-cond-badge" class="text-[9px] font-mono text-neonGreen">Cond: 9.36 (優)</span>
-                </div>
-                <div id="learning-log-container" class="space-y-1 max-h-[110px] overflow-y-auto text-[9px] font-mono text-slate-300 pr-1">
-                    <div class="p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between">
-                        <span class="text-neonCyan">[12:00 EKF融合]</span> 座標 (334250, 2762100) 誤差半徑 1.35m
-                        <span class="text-neonGreen">狀態收斂</span>
-                    </div>
-                    <div class="p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between">
-                        <span class="text-neonAmber">[12:00 Edge-AI]</span> 姿態檢出 DEFENSIVE_HEAD_LOW (權重 1.8x)
-                        <span class="text-neonRed">TTC=2.9s</span>
-                    </div>
-                    <div class="p-1 rounded bg-cyberDark border border-cyberBorder flex justify-between">
-                        <span class="text-purple-300">[12:00 Sherman-Morrison]</span> γ=0.92 老陽過載在線更新完成
-                        <span class="text-neonCyan">Cond: 9.36</span>
-                    </div>
-                </div>
-            </div>
         </section>
     </div>
+
     <!-- 手機版介面 ROOT (上 45% 地圖 + 下 55% 滾動式完整表格資訊清單) -->
     <div id="mobile-root" class="h-[calc(100vh-52px)] w-full flex-col hidden relative overflow-hidden bg-cyberDark">
         <!-- 上半部：GIS 地圖與浮動狀態 (佔 45%) -->
@@ -445,8 +496,8 @@
             <!-- Mobile HUD 浮動精簡指標 -->
             <div class="absolute top-2 left-2 right-2 bg-cyberDark/90 backdrop-blur-md p-2 rounded-lg border border-neonPurple/50 z-30 pointer-events-none text-xs font-mono flex items-center justify-between shadow-lg">
                 <div>
-                    <span class="text-neonCyan font-bold">14頭水牛 @埡口</span>
-                    <div class="text-[9px] text-slate-300">TTC: <b id="mob-hud-ttc" class="text-neonRed font-orbitron">2.9s</b> | 姿態: <b id="mob-hud-posture" class="text-neonAmber">低頭抵角</b></div>
+                    <span class="text-neonCyan font-bold">🦬 14頭水牛 @埡口鞍部</span>
+                    <div class="text-[9.5px] text-slate-300">TTC: <b id="mob-hud-ttc" class="text-neonRed font-orbitron">2.9s</b> | 姿態: <b id="mob-hud-posture" class="text-neonAmber">低頭抵角</b></div>
                 </div>
                 <div class="text-right">
                     <span id="mob-hud-risk-badge" class="px-2 py-0.5 rounded bg-rose-950 text-rose-200 border border-neonRed text-[9px] font-bold">R=13.05 極高</span>
@@ -467,57 +518,182 @@
         <!-- 下半部：滾動式完整表格資訊清單 (佔 55%) -->
         <div class="w-full flex-1 min-h-0 bg-cyberPanel border-t border-cyberBorder p-2.5 overflow-y-auto text-xs font-mono space-y-3">
             
-            <!-- 1. 核心數值儀表 5 格 (字體放大，關鍵字與燈號標註) -->
-            <div class="grid grid-cols-5 gap-1.5 text-center">
-                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                    <div class="text-slate-400 text-[9px] font-bold">全日人流</div>
-                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-sm font-orbitron my-0.5">3,850</div>
-                    <div class="text-[8.5px] text-emerald-400 flex items-center justify-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neonGreen"></span> 累計人次
-                    </div>
+            <!-- 1. 【手機版第一優先：極簡即時動態感知卡 (直觀表格化・易知易從)】 -->
+            <div class="bg-cyberDark p-2.5 rounded-xl border border-neonPurple/60 shadow-[0_0_18px_rgba(176,38,255,0.25)] space-y-2">
+                <div class="flex items-center justify-between border-b border-cyberBorder/80 pb-1.5 font-orbitron">
+                    <span class="font-bold text-xs text-purple-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-crosshairs text-neonCyan"></i> 現場即時感知與牛隻狀態 🐮
+                    </span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-neonRed font-bold flex items-center gap-1 animate-pulse">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neonRed"></span> 🔴 警戒對峙中
+                    </span>
                 </div>
-                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                    <div class="text-slate-400 text-[9px] font-bold">THI 熱指數</div>
-                    <div id="mob-val-thi" class="text-neonRed font-bold text-sm font-orbitron my-0.5">83.6</div>
-                    <div class="text-[8.5px] text-rose-400 flex items-center justify-center gap-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neonRed animate-ping"></span> 強制泥浴
-                    </div>
-                </div>
-                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                    <div class="text-slate-400 text-[9px] font-bold">衝突風險 R</div>
-                    <div id="mob-val-risk" class="text-neonRed font-bold text-sm font-orbitron my-0.5">13.05</div>
-                    <div class="text-[8.5px] text-rose-300 font-bold bg-rose-950/80 rounded px-1">
-                        🔴 極度危險
-                    </div>
-                </div>
-                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                    <div class="text-slate-400 text-[9px] font-bold">碰撞預估</div>
-                    <div id="mob-val-ttc" class="text-neonAmber font-bold text-sm font-orbitron my-0.5">2.9s</div>
-                    <div class="text-[8.5px] text-amber-300 font-bold bg-amber-950/80 rounded px-1">
-                        ⚠️ 緊急避讓
-                    </div>
-                </div>
-                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
-                    <div class="text-slate-400 text-[9px] font-bold">水牛總數</div>
-                    <div id="mob-val-count" class="text-neonCyan font-bold text-sm font-orbitron my-0.5">14頭</div>
-                    <div class="text-[8.5px] text-cyan-300 flex items-center justify-center gap-0.5">
-                        🦬 3大聚落
-                    </div>
+                
+                <table class="w-full text-left border-collapse mobile-table">
+                    <tbody class="divide-y divide-cyberBorder/60 text-[12.5px]">
+                        <tr>
+                            <td class="text-slate-400 font-bold w-[28%] py-1.5">📍 核心位置</td>
+                            <td class="font-mono text-neonCyan font-bold text-[13px] py-1.5">埡口鞍部隘口</td>
+                            <td class="text-right text-slate-400 text-[11px] font-mono py-1.5">[121.9264, 24.9756]</td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold py-1.5">🐮 牛隻姿態</td>
+                            <td id="mob-live-posture-text" class="font-bold text-amber-300 text-[13px] py-1.5">低頭抵角防禦</td>
+                            <td class="text-right py-1.5">
+                                <span id="mob-live-posture-badge" class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[11px] font-bold border border-amber-500/40">
+                                    ⚠️ 警戒中 (1.8x)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold py-1.5">📏 人牛間距</td>
+                            <td class="font-mono text-neonRed font-bold text-[14px] py-1.5">4.2 公尺</td>
+                            <td class="text-right py-1.5">
+                                <span class="px-2 py-0.5 rounded bg-rose-950 text-neonRed text-[11px] font-bold border border-neonRed">
+                                    🔴 破 10m 硬防線
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold py-1.5">⏱️ 避讓倒數</td>
+                            <td class="font-mono text-purple-200 text-[13px] py-1.5">TTC 碰撞倒數</td>
+                            <td class="text-right py-1.5">
+                                <span class="px-2 py-0.5 rounded bg-rose-950 text-neonRed font-orbitron font-bold text-[12px] border border-neonRed">
+                                    🔴 2.9 秒 (即刻避讓)
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-slate-400 font-bold py-1.5">🧭 行進趨勢</td>
+                            <td class="font-bold text-neonAmber text-[12.5px] py-1.5">下切護管所泥塘</td>
+                            <td class="text-right text-neonAmber text-[11px] font-bold py-1.5">機率 65% (南南東)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="text-[11px] text-amber-200 bg-amber-950/40 p-2 rounded-lg border border-amber-500/40 flex items-center justify-between">
+                    <span>⚡ <b>處置指令：</b> 觸發 10m 防禦，請勿靠近拍照，導流 E-Bike</span>
+                    <span class="text-[10px] text-neonCyan font-bold">已推播 LBS 🐮</span>
                 </div>
             </div>
 
-            <!-- 2. 【手機版：草嶺古道 6 大重要據點人流即時統計表格】 -->
+            <!-- 2. 核心數值儀表 5 格 -->
+            <div class="grid grid-cols-5 gap-1.5 text-center">
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">全日人流</div>
+                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-sm font-orbitron my-0.5">3,850</div>
+                    <div class="text-[9px] text-emerald-400 font-bold">🟢 累計人次</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">THI 熱指數</div>
+                    <div id="mob-val-thi" class="text-neonRed font-bold text-sm font-orbitron my-0.5">83.6</div>
+                    <div class="text-[9px] text-rose-400 font-bold">🟣 強制泥浴</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">衝突風險 R</div>
+                    <div id="mob-val-risk" class="text-neonRed font-bold text-sm font-orbitron my-0.5">13.05</div>
+                    <div class="text-[9px] text-rose-300 font-bold bg-rose-950/80 rounded px-0.5">🔴 極度危險</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">碰撞預估</div>
+                    <div id="mob-val-ttc" class="text-neonAmber font-bold text-sm font-orbitron my-0.5">2.9s</div>
+                    <div class="text-[9px] text-amber-300 font-bold bg-amber-950/80 rounded px-0.5">⚠️ 緊急避讓</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">水牛總數</div>
+                    <div id="mob-val-count" class="text-neonCyan font-bold text-sm font-orbitron my-0.5">14頭</div>
+                    <div class="text-[9px] text-cyan-300 font-bold">🐮 3大聚落</div>
+                </div>
+            </div>
+
+            <!-- 2. 核心數值儀表 5 格 -->
+            <div class="grid grid-cols-5 gap-1.5 text-center">
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">全日人流</div>
+                    <div id="mob-val-daily-total" class="text-neonGreen font-bold text-sm font-orbitron my-0.5">3,850</div>
+                    <div class="text-[9px] text-emerald-400 font-bold">🟢 累計人次</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">THI 熱指數</div>
+                    <div id="mob-val-thi" class="text-neonRed font-bold text-sm font-orbitron my-0.5">83.6</div>
+                    <div class="text-[9px] text-rose-400 font-bold">🟣 強制泥浴</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">衝突風險 R</div>
+                    <div id="mob-val-risk" class="text-neonRed font-bold text-sm font-orbitron my-0.5">13.05</div>
+                    <div class="text-[9px] text-rose-300 font-bold bg-rose-950/80 rounded px-0.5">🔴 極度危險</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">碰撞預估</div>
+                    <div id="mob-val-ttc" class="text-neonAmber font-bold text-sm font-orbitron my-0.5">2.9s</div>
+                    <div class="text-[9px] text-amber-300 font-bold bg-amber-950/80 rounded px-0.5">⚠️ 緊急避讓</div>
+                </div>
+                <div class="bg-cyberDark p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <div class="text-slate-400 text-[10px] font-bold">水牛總數</div>
+                    <div id="mob-val-count" class="text-neonCyan font-bold text-sm font-orbitron my-0.5">14頭</div>
+                    <div class="text-[9px] text-cyan-300 font-bold">🦬 3大聚落</div>
+                </div>
+            </div>
+
+            <!-- 3. 【手機版 Canvas 戰情雷達儀表】 -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs text-neonGreen font-orbitron flex items-center gap-1">
+                        <i class="fa-solid fa-crosshairs"></i> 手機即時雷達感知與人牛間距儀表 (Canvas)
+                    </span>
+                    <span id="mob-canvas-status-tag" class="text-[10px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-neonRed font-bold">
+                        🔴 TTC 2.9s 倒數
+                    </span>
+                </div>
+                <div class="relative w-full h-[110px]">
+                    <canvas id="mobileRadarCanvas" class="w-full h-full bg-[#060a14] rounded-lg border border-cyberBorder/80"></canvas>
+                </div>
+                <div class="flex justify-between items-center text-[10.5px] text-slate-300 px-1">
+                    <span>中心：<b class="text-white">埡口鞍部</b></span>
+                    <span>間距：<b class="text-neonRed">4.2m (破防線)</b></span>
+                    <span>相對速度：<b class="text-purple-300">1.45 m/s</b></span>
+                </div>
+            </div>
+
+            <!-- 4. 【水牛當日各時段活動與聚落變化量表】 -->
+            <div class="bg-cyberDark p-2 rounded-xl border border-neonPurple/50 space-y-1.5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
+                    <span class="font-bold text-xs text-purple-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-neonPurple"></i> 水牛當日出沒動態變化表
+                    </span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-500/40">
+                        當前: <b id="mob-variation-current-time" class="text-white">12:00</b>
+                    </span>
+                </div>
+                <div class="overflow-x-auto max-h-[160px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse tactical-table">
+                        <thead>
+                            <tr class="border-b border-cyberBorder/80">
+                                <th class="w-[18%]">時段</th>
+                                <th class="w-[24%] text-center">總頭數 (變量)</th>
+                                <th class="w-[34%]">主要分佈位點</th>
+                                <th class="w-[24%] text-center">狀態燈號</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mob-buffalo-variation-tbody" class="divide-y divide-cyberBorder/50">
+                            <!-- 由 JS 動態注入 12 個時段之水牛數量增減與遷移特徵 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. 【手機版：草嶺古道 6 大重要據點人流即時統計表格】 -->
             <div class="bg-cyberDark p-2 rounded-xl border border-cyan-500/50 space-y-1.5 shadow-lg">
                 <div class="flex items-center justify-between border-b border-cyberBorder pb-1.5">
                     <span class="font-bold text-xs text-neonCyan font-orbitron flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-viewfinder"></i> 據點人流即時統計
+                        <i class="fa-solid fa-users-viewfinder"></i> 據點人流即時統計與處置對策
                     </span>
                     <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
                         全線承載率: <b id="mob-stations-capacity" class="text-neonAmber font-orbitron">85.6%</b>
                     </span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse mobile-table">
+                    <table class="w-full text-left border-collapse tactical-table">
                         <thead>
                             <tr class="border-b border-cyberBorder/80">
                                 <th class="w-[28%]">據點名稱</th>
@@ -533,22 +709,22 @@
                 </div>
             </div>
 
-            <!-- 3. 【手機版：14 頭水牛時空泡泡分佈清冊表格】 (取代原先過小卡片) -->
+            <!-- 6. 【手機版：14 頭水牛時空泡泡分佈清冊表格】 -->
             <div class="bg-cyberDark p-2 rounded-xl border border-neonPurple/50 space-y-1.5 shadow-lg">
                 <div class="flex items-center justify-between border-b border-cyberBorder pb-1.5 font-orbitron">
                     <span class="font-bold text-xs text-purple-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-check text-neonPurple"></i> 14頭牛群聚落清冊
+                        <i class="fa-solid fa-list-check text-neonPurple"></i> 🐮 14頭牛群聚落清冊
                     </span>
                     <span id="mob-bubble-time-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950 text-rose-200 border border-neonRed">
                         🔴 12:00 極致警戒
                     </span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse mobile-table">
+                    <table class="w-full text-left border-collapse tactical-table">
                         <thead>
                             <tr class="border-b border-cyberBorder/80">
-                                <th class="w-[30%]">聚落與坐標</th>
-                                <th class="w-[20%] text-center">頭數</th>
+                                <th class="w-[32%]">聚落名稱</th>
+                                <th class="w-[18%] text-center">頭數</th>
                                 <th class="w-[26%]">行為狀態</th>
                                 <th class="w-[24%] text-center">防線警戒</th>
                             </tr>
@@ -560,61 +736,13 @@
                 </div>
             </div>
 
-            <!-- 4. 人牛動態交織折線 Canvas 圖 (時・位・險整合) -->
-            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder">
-                <div class="text-[11px] text-neonGreen font-bold mb-1 flex justify-between items-center">
-                    <span><i class="fa-solid fa-chart-line"></i> 人牛交織矩陣 (時・位・險整合)</span>
-                    <span id="mob-matrix-active-info" class="text-[10px] text-neonRed font-bold bg-rose-950/80 px-1.5 py-0.5 rounded border border-neonRed/50">
-                        12:00 @ 埡口鞍部
-                    </span>
-                </div>
-                <canvas id="kinematicsCanvasMob" class="w-full h-[105px] bg-[#080e1c] rounded"></canvas>
-            </div>
-
-            <!-- 5. 2D-EKF 定位與即時動態指標結構表格 (大字體 + 燈號) -->
-            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5">
-                <div class="text-purple-300 font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-crosshairs text-neonPurple"></i> 2D-EKF 連續濾波與即時狀態</span>
-                    <span class="text-neonCyan text-[10px] font-bold">±1.35m 精度</span>
-                </div>
-                <table class="w-full text-left border-collapse mobile-table">
-                    <tbody class="divide-y divide-cyberBorder/50">
-                        <tr>
-                            <td class="text-slate-400 font-bold w-[32%]">核心坐標</td>
-                            <td class="font-mono text-neonCyan font-bold text-[12px]">[121.9264, 24.9756]</td>
-                            <td class="text-right text-slate-300 text-[11px]">埡口鞍部隘口</td>
-                        </tr>
-                        <tr>
-                            <td class="text-slate-400 font-bold">移動向量</td>
-                            <td class="font-mono text-neonPurple font-bold text-[12px]">165° @ 0.8 m/s</td>
-                            <td class="text-right text-purple-300 text-[11px]">🧭 南南東 (下切泥塘)</td>
-                        </tr>
-                        <tr>
-                            <td class="text-slate-400 font-bold">Edge AI 姿態</td>
-                            <td class="font-bold text-amber-300 text-[12px]">DEFENSIVE_HEAD_LOW</td>
-                            <td class="text-right"><span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/40">⚠️ 低頭抵角 1.8x</span></td>
-                        </tr>
-                        <tr>
-                            <td class="text-slate-400 font-bold">人牛最短間距</td>
-                            <td class="font-mono text-neonRed font-bold text-[13px]">4.2 m</td>
-                            <td class="text-right"><span class="px-1.5 py-0.5 rounded bg-rose-950 text-neonRed text-[10px] font-bold border border-neonRed">🔴 侵入 10m 硬防線</span></td>
-                        </tr>
-                        <tr>
-                            <td class="text-slate-400 font-bold">相對速度 / TTC</td>
-                            <td class="font-mono text-slate-200 text-[12px]">v_rel=1.45 m/s</td>
-                            <td class="text-right"><span class="px-2 py-0.5 rounded bg-rose-950 text-neonRed font-orbitron font-bold text-[11px] border border-neonRed">⏱️ TTC: 2.9s 倒數</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 6. HMM 隱馬爾可夫前瞻軌跡推演表格 -->
+            <!-- 7. HMM 隱馬爾可夫前瞻軌跡推演表格 -->
             <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5">
                 <div class="text-neonAmber font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
                     <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left"></i> HMM 前瞻推演表</span>
                     <span class="text-slate-400 text-[10px]">Markov Extrapolation</span>
                 </div>
-                <table class="w-full text-left border-collapse mobile-table">
+                <table class="w-full text-left border-collapse tactical-table">
                     <thead>
                         <tr class="border-b border-cyberBorder/80">
                             <th class="w-[28%]">推演時間</th>
@@ -624,48 +752,54 @@
                     </thead>
                     <tbody class="divide-y divide-cyberBorder/50">
                         <tr>
-                            <td class="font-bold text-neonAmber text-[11px]">+15 分鐘</td>
-                            <td class="font-bold text-white text-[12px]">護管所泥塘 <span class="text-[10px] text-amber-300 block font-normal">下切泥塘避暑</span></td>
+                            <td class="font-bold text-neonAmber text-[12px]">+15 分鐘</td>
+                            <td class="font-bold text-white text-[13px]">護管所泥塘 <span class="text-[10px] text-amber-300 block font-normal">下切泥塘避暑</span></td>
                             <td class="text-right font-mono text-neonAmber text-[11px]">±6.8m (65%)</td>
                         </tr>
                         <tr>
-                            <td class="font-bold text-neonRed text-[11px]">+30 分鐘</td>
-                            <td class="font-bold text-white text-[12px]">沼澤核心浸泡 <span class="text-[10px] text-rose-300 block font-normal">體表散熱降溫</span></td>
+                            <td class="font-bold text-neonRed text-[12px]">+30 分鐘</td>
+                            <td class="font-bold text-white text-[13px]">沼澤核心浸泡 <span class="text-[10px] text-rose-300 block font-normal">體表散熱降溫</span></td>
                             <td class="text-right font-mono text-neonRed text-[11px]">±14.2m (85%)</td>
                         </tr>
                         <tr>
-                            <td class="font-bold text-neonGreen text-[11px]">+60 分鐘</td>
-                            <td class="font-bold text-white text-[12px]">次要林緣避暑 <span class="text-[10px] text-emerald-300 block font-normal">樹蔭臥伏反芻</span></td>
+                            <td class="font-bold text-neonGreen text-[12px]">+60 分鐘</td>
+                            <td class="font-bold text-white text-[13px]">次要林緣避暑 <span class="text-[10px] text-emerald-300 block font-normal">樹蔭臥伏反芻</span></td>
                             <td class="text-right font-mono text-neonGreen text-[11px]">±28.5m (90%)</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 7. 歷史採礦交織條件與自癒安全規範 (符號化表格) -->
-            <div class="bg-cyberDark p-2 rounded-xl border border-cyberBorder space-y-1.5 text-slate-300">
-                <div class="text-purple-300 font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
-                    <span>⚡ 歷史採礦交織規則 (Mined Pattern)</span>
-                    <span class="text-neonGreen text-[10px] font-bold">🟢 規則已鎖定</span>
+            <!-- 8. 【現場防線管制準則 (易知易從・簡易可久・去除公式雜訊)】 -->
+            <div class="bg-cyberDark p-2.5 rounded-xl border border-neonGreen/40 space-y-1.5 text-slate-300 shadow-md">
+                <div class="text-neonGreen font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-neonGreen"></i> 現場防線管制準則 (易知易從)</span>
+                    <span class="text-neonGreen text-[10.5px] font-bold px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/40">🟢 指引已鎖定</span>
                 </div>
-                <table class="w-full text-left border-collapse mobile-table text-[11px]">
+                <table class="w-full text-left border-collapse mobile-table text-[12px]">
                     <tbody class="divide-y divide-cyberBorder/50">
                         <tr>
-                            <td class="font-bold text-neonRed w-[30%]">1. 10m 硬防線</td>
-                            <td class="text-slate-200">
-                                <i>D</i><sub>human</sub> &le; 10.0m &rarr; 觸發雙曲非線性懲罰放大 <i>R</i><sub>conflict</sub>，扣除 <i>P</i><sub>rootless</sub> 離根分。
+                            <td class="font-bold text-neonRed w-[32%] py-2">
+                                <span class="inline-block w-2 h-2 rounded-full bg-neonRed mr-1"></span>1. 10m 硬防線
+                            </td>
+                            <td class="text-slate-200 py-2 leading-relaxed">
+                                人牛距離小於 <b class="text-neonRed">10.0 公尺</b>即刻啟動紅燈警戒，強制禁止遊客靠近拍照，請即刻後撤避讓。
                             </td>
                         </tr>
                         <tr>
-                            <td class="font-bold text-neonAmber">2. 隘口受迫停滯</td>
-                            <td class="text-slate-200">
-                                路寬 <i>W</i> &lt; 1.8m 隘口 (&Omega;<sub>topo</sub> = 1.5)，水牛受迫防禦對峙（極低速 1 ~ 3 m/h，風險指標 11.22）。
+                            <td class="font-bold text-neonAmber py-2">
+                                <span class="inline-block w-2 h-2 rounded-full bg-neonAmber mr-1"></span>2. 狹窄隘口停滯
+                            </td>
+                            <td class="text-slate-200 py-2 leading-relaxed">
+                                步道路寬小於 <b class="text-neonAmber">1.8 公尺</b>狹窄區（埡口段），水牛受壓迫將駐足對峙，啟動 E-Bike 導流。
                             </td>
                         </tr>
                         <tr>
-                            <td class="font-bold text-neonCyan">3. 人流加速度</td>
-                            <td class="text-slate-200">
-                                當 &Delta;<i>v</i><sub>6</sub> / &Delta;<i>t</i> &gt; 0.15 /min 時，代表遊客快速集結湧入，預警提前 15 ~ 20 分鐘推播。
+                            <td class="font-bold text-neonCyan py-2">
+                                <span class="inline-block w-2 h-2 rounded-full bg-neonCyan mr-1"></span>3. 人流突波預警
+                            </td>
+                            <td class="text-slate-200 py-2 leading-relaxed">
+                                當每分鐘人流加速湧入超過閾值時，預警自動提前 <b class="text-neonCyan">15 ~ 20 分鐘</b> 於 LINE@ / LBS 廣播推播。
                             </td>
                         </tr>
                     </tbody>
@@ -691,6 +825,7 @@
             </div>
         </div>
     </div>
+
     <script>
         /* ==========================================================================
            1. 草嶺古道真實路徑幾何 (乾淨高精度向量路線，不亂連 POI 直線)
@@ -741,150 +876,150 @@
             { id: "STA_DLI", name: "大里天公廟", maxCap: 450, ratio: 0.28, role: "南端出口 (E-Bike轉乘)" }
         ];
 
-        /* 4. 每小時全域時序數據庫 (含各據點人流分佈、總量、THI 與 14 頭牛狀態) */
+        /* 4. 每小時全域時序數據庫 (含各據點人流分佈、總量、THI 與 14 頭牛動態變動) */
         const HOURLY_DATA = [
             { 
-                time: "08:00", crowd: 77, thi: 74.2, risk: 1.20, totalCount: 5, speed: 0.4, vectorDeg: 45, 
-                primaryLoc: "灣坑頭山稜線", gridId: "GRID_RIDGE_201", riskDesc: "安全綠燈",
+                time: "08:00", crowd: 77, thi: 74.2, risk: 1.20, totalCount: 5, deltaBuffalo: "+1頭 (清晨出林)", speed: 0.4, vectorDeg: 45, 
+                primaryLoc: "灣坑頭山稜線", gridId: "GRID_RIDGE_201", riskDesc: "常態安全",
                 ttc: 32.5, posture: "STANDING", vRel: 0.6,
                 dailyCumulative: 420, capacityRate: 15.4,
                 stations: { STA_YWK: 45, STA_XZM: 12, STA_HZI: 8, STA_YKO: 12, STA_KZH: 6, STA_DLI: 20 },
                 herds: [
-                    { name: "灣坑頭山主群", lat: 24.975597, lng: 121.910740, count: 3, role: "採食草坡", isDanger: false },
-                    { name: "客棧遺址緩坡", lat: 24.974000, lng: 121.926000, count: 1, role: "晨間休憩", isDanger: false },
-                    { name: "護管所林緣", lat: 24.979661, lng: 121.926351, count: 1, role: "水源探巡", isDanger: false }
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 3, role: "迎風面採食草坡", isDanger: false, future: "+15m 沿稜線緩慢採食 (誤差 ±5m)" },
+                    { name: "客棧遺址緩坡", lat: 24.974000, lng: 121.926000, count: 1, role: "林緣晨間休憩", isDanger: false, future: "+30m 往草坡移動 (誤差 ±8m)" },
+                    { name: "護管所林緣", lat: 24.979661, lng: 121.926351, count: 1, role: "水源周邊巡邏", isDanger: false, future: "+60m 進入深林 (誤差 ±12m)" }
                 ] 
             },
             { 
-                time: "09:00", crowd: 223, thi: 76.5, risk: 2.10, totalCount: 8, speed: 0.4, vectorDeg: 60, 
+                time: "09:00", crowd: 223, thi: 76.5, risk: 2.10, totalCount: 8, deltaBuffalo: "+3頭 (林緣匯聚)", speed: 0.4, vectorDeg: 60, 
                 primaryLoc: "草嶺線稜線", gridId: "GRID_RIDGE_205", riskDesc: "低度警戒",
                 ttc: 21.0, posture: "STANDING", vRel: 0.7,
                 dailyCumulative: 860, capacityRate: 35.8,
                 stations: { STA_YWK: 110, STA_XZM: 35, STA_HZI: 25, STA_YKO: 48, STA_KZH: 18, STA_DLI: 65 },
                 herds: [
-                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 4, role: "稜線採食", isDanger: false },
-                    { name: "埡口觀景亭側", lat: 24.975621, lng: 121.926413, count: 2, role: "鞍部緩行", isDanger: false },
-                    { name: "護管所泥塘", lat: 24.979661, lng: 121.926351, count: 2, role: "邊緣徘徊", isDanger: false }
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 4, role: "稜線芒花採食", isDanger: false, future: "+15m 向鞍部緩行 (誤差 ±6m)" },
+                    { name: "埡口觀景亭側", lat: 24.975621, lng: 121.926413, count: 2, role: "鞍部背風緩行", isDanger: false, future: "+30m 接近步道 (誤差 ±10m)" },
+                    { name: "護管所泥塘", lat: 24.979661, lng: 121.926351, count: 2, role: "沼澤邊緣徘徊", isDanger: false, future: "+60m 試探泥水 (誤差 ±15m)" }
                 ] 
             },
             { 
-                time: "10:00", crowd: 510, thi: 78.8, risk: 4.80, totalCount: 10, speed: 0.6, vectorDeg: 120, 
+                time: "10:00", crowd: 510, thi: 78.8, risk: 4.80, totalCount: 10, deltaBuffalo: "+2頭 (往步道逼近)", speed: 0.6, vectorDeg: 120, 
                 primaryLoc: "客棧遺址隘口", gridId: "GRID_PASS_3189", riskDesc: "中度交織",
                 ttc: 12.5, posture: "STANDING", vRel: 0.9,
                 dailyCumulative: 1650, capacityRate: 58.2,
                 stations: { STA_YWK: 240, STA_XZM: 95, STA_HZI: 80, STA_YKO: 130, STA_KZH: 65, STA_DLI: 140 },
                 herds: [
-                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 5, role: "接近步道 (18m)", isDanger: false },
-                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "開始試探泥沼", isDanger: false },
-                    { name: "灣坑頭山稜線", lat: 24.975597, lng: 121.910740, count: 2, role: "高嶺採食", isDanger: false }
+                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 5, role: "接近步道 (18m)", isDanger: false, future: "+15m 逼近硬防線 (機率 60%)" },
+                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "試探泥沼降溫", isDanger: false, future: "+30m 下塘浸泡 (機率 75%)" },
+                    { name: "灣坑頭山稜線", lat: 24.975597, lng: 121.910740, count: 2, role: "高嶺草地採食", isDanger: false, future: "+60m 背風避日 (機率 80%)" }
                 ] 
             },
             { 
-                time: "11:00", crowd: 850, thi: 81.3, risk: 7.90, totalCount: 12, speed: 0.8, vectorDeg: 160, 
-                primaryLoc: "埡口觀景亭隘口", gridId: "GRID_YA_KOU_108", riskDesc: "高度警戒 (Flight Zone逼近)",
+                time: "11:00", crowd: 850, thi: 81.3, risk: 7.90, totalCount: 12, deltaBuffalo: "+2頭 (隘口集結)", speed: 0.8, vectorDeg: 160, 
+                primaryLoc: "埡口觀景亭隘口", gridId: "GRID_YA_KOU_108", riskDesc: "高度警戒 (防線逼近)",
                 ttc: 6.2, posture: "DEFENSIVE_HEAD_LOW", vRel: 1.25,
                 dailyCumulative: 2580, capacityRate: 72.5,
                 stations: { STA_YWK: 380, STA_XZM: 175, STA_HZI: 155, STA_YKO: 260, STA_KZH: 130, STA_DLI: 210 },
                 herds: [
-                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 6, role: "隘口集結 (逼近10m)", isDanger: true },
-                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "泥浴散熱中", isDanger: false },
-                    { name: "灣坑頭山稜線", lat: 24.975597, lng: 121.910740, count: 3, role: "背風緩行", isDanger: false }
+                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 6, role: "隘口集結 (逼近10m)", isDanger: true, future: "+15m 觸發對峙管制 (機率 80%)" },
+                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "泥浴散熱中", isDanger: false, future: "+30m 核心泥浴 (機率 85%)" },
+                    { name: "灣坑頭山稜線", lat: 24.975597, lng: 121.910740, count: 3, role: "背風緩行採食", isDanger: false, future: "+60m 草坡暫歇 (機率 70%)" }
                 ] 
             },
             { 
-                time: "12:00", crowd: 1095, thi: 83.6, risk: 13.05, totalCount: 14, speed: 0.8, vectorDeg: 165, 
+                time: "12:00", crowd: 1095, thi: 83.6, risk: 13.05, totalCount: 14, deltaBuffalo: "+2頭 (14頭全數集結)", speed: 0.8, vectorDeg: 165, 
                 primaryLoc: "埡口鞍部核心隘口", gridId: "GRID_YA_KOU_108", riskDesc: "極致警戒 (侵入10m/防禦對峙)",
                 ttc: 2.9, posture: "DEFENSIVE_HEAD_LOW", vRel: 1.45,
                 dailyCumulative: 3850, capacityRate: 85.6,
                 stations: { STA_YWK: 420, STA_XZM: 210, STA_HZI: 235, STA_YKO: 385, STA_KZH: 195, STA_DLI: 290 },
                 herds: [
-                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 7, role: "防禦對峙 (D=4.2m)", isDanger: true },
-                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "THI>78 強制泥浴", isDanger: false },
-                    { name: "灣坑頭山稜線群", lat: 24.975597, lng: 121.910740, count: 3, role: "高嶺背風放牧", isDanger: false }
+                    { name: "埡口鞍部主群", lat: 24.975621, lng: 121.926413, count: 7, role: "低頭抵角防禦對峙 (D=4.2m)", isDanger: true, future: "+15m 預估下切護管所泥塘 (65% 機率，走廊 ±6.8m)" },
+                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "THI>78 強制泥浴降溫", isDanger: false, future: "+30m 沼澤核心浸泡散熱 (85% 機率，誤差 ±14.2m)" },
+                    { name: "灣坑頭山稜線群", lat: 24.975597, lng: 121.910740, count: 3, role: "高嶺背風芒花放牧", isDanger: false, future: "+60m 次要林緣避暑反芻 (90% 機率，誤差 ±28.5m)" }
                 ] 
             },
             { 
-                time: "13:00", crowd: 1210, thi: 84.1, risk: 14.20, totalCount: 14, speed: 0.85, vectorDeg: 165, 
-                primaryLoc: "埡口至護管所下切段", gridId: "GRID_PASS_3190", riskDesc: "極限過載 (老陽Z=+2.4)",
+                time: "13:00", crowd: 1210, thi: 84.1, risk: 14.20, totalCount: 14, deltaBuffalo: "0頭 (正午極限過載)", speed: 0.85, vectorDeg: 165, 
+                primaryLoc: "埡口至護管所下切段", gridId: "GRID_PASS_3190", riskDesc: "極限過載 (老陽相變)",
                 ttc: 2.5, posture: "CHARGING", vRel: 1.60,
                 dailyCumulative: 4720, capacityRate: 91.2,
                 stations: { STA_YWK: 460, STA_XZM: 230, STA_HZI: 260, STA_YKO: 410, STA_KZH: 220, STA_DLI: 340 },
                 herds: [
-                    { name: "埡口下切主群", lat: 24.977200, lng: 121.926350, count: 7, role: "跨越步道下切中", isDanger: true },
-                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "泥沼浸泡降溫", isDanger: false },
-                    { name: "灣坑頭山稜線群", lat: 24.975597, lng: 121.910740, count: 3, role: "草坡採食", isDanger: false }
+                    { name: "埡口下切主群", lat: 24.977200, lng: 121.926350, count: 7, role: "跨越步道下切中", isDanger: true, future: "+15m 穿過步道隘口 (機率 90%)" },
+                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 4, role: "泥沼深度浸泡", isDanger: false, future: "+30m 持續散熱反芻 (機率 95%)" },
+                    { name: "灣坑頭山稜線群", lat: 24.975597, lng: 121.910740, count: 3, role: "背陽草坡採食", isDanger: false, future: "+60m 林蔭暫避 (機率 80%)" }
                 ] 
             },
             { 
-                time: "14:00", crowd: 1140, thi: 82.5, risk: 8.20, totalCount: 12, speed: 0.75, vectorDeg: 170, 
+                time: "14:00", crowd: 1140, thi: 82.5, risk: 8.20, totalCount: 12, deltaBuffalo: "-2頭 (主群轉移入塘)", speed: 0.75, vectorDeg: 170, 
                 primaryLoc: "護管所泥塘沼澤", gridId: "GRID_MUD_POOL_502", riskDesc: "高熱散熱期",
                 ttc: 8.5, posture: "LYING", vRel: 0.8,
                 dailyCumulative: 5460, capacityRate: 82.2,
                 stations: { STA_YWK: 390, STA_XZM: 205, STA_HZI: 220, STA_YKO: 370, STA_KZH: 215, STA_DLI: 380 },
                 herds: [
-                    { name: "護管所泥沼大群", lat: 24.979661, lng: 121.926351, count: 5, role: "原位泥浴散熱", isDanger: false },
-                    { name: "埡口周邊群", lat: 24.975621, lng: 121.926413, count: 5, role: "步道旁樹蔭反芻", isDanger: true },
-                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "背風草坡採食", isDanger: false }
+                    { name: "護管所泥沼大群", lat: 24.979661, lng: 121.926351, count: 5, role: "全體泥浴散熱", isDanger: false, future: "+15m 繼續浸泡 (機率 90%)" },
+                    { name: "埡口周邊群", lat: 24.975621, lng: 121.926413, count: 5, role: "樹蔭臥伏反芻", isDanger: true, future: "+30m 往泥塘集結 (機率 70%)" },
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "草坡採食", isDanger: false, future: "+60m 沿線慢行 (機率 75%)" }
                 ] 
             },
             { 
-                time: "15:00", crowd: 880, thi: 80.0, risk: 5.60, totalCount: 10, speed: 0.5, vectorDeg: 140, 
+                time: "15:00", crowd: 880, thi: 80.0, risk: 5.60, totalCount: 10, deltaBuffalo: "-2頭 (牛群離塘緩散)", speed: 0.5, vectorDeg: 140, 
                 primaryLoc: "護管所周邊林緣", gridId: "GRID_SLOPE_104", riskDesc: "中度緩和",
                 ttc: 15.0, posture: "STANDING", vRel: 0.7,
                 dailyCumulative: 6020, capacityRate: 64.5,
                 stations: { STA_YWK: 280, STA_XZM: 160, STA_HZI: 170, STA_YKO: 290, STA_KZH: 180, STA_DLI: 310 },
                 herds: [
-                    { name: "護管所泥浴群", lat: 24.979661, lng: 121.926351, count: 4, role: "離塘慢步", isDanger: false },
-                    { name: "埡口林下群", lat: 24.975621, lng: 121.926413, count: 4, role: "退回林緣", isDanger: false },
-                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "向稜線聚集", isDanger: false }
+                    { name: "護管所泥浴群", lat: 24.979661, lng: 121.926351, count: 4, role: "離塘上岸慢步", isDanger: false, future: "+15m 進入林緣 (機率 80%)" },
+                    { name: "埡口林下群", lat: 24.975621, lng: 121.926413, count: 4, role: "退回林緣", isDanger: false, future: "+30m 避開步道 (機率 85%)" },
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "向稜線慢行", isDanger: false, future: "+60m 高嶺放牧 (機率 90%)" }
                 ] 
             },
             { 
-                time: "16:00", crowd: 600, thi: 77.8, risk: 3.40, totalCount: 8, speed: 0.3, vectorDeg: 90, 
+                time: "16:00", crowd: 600, thi: 77.8, risk: 3.40, totalCount: 8, deltaBuffalo: "-2頭 (傍晚林緣放牧)", speed: 0.3, vectorDeg: 90, 
                 primaryLoc: "虎字碑後方緩坡", gridId: "GRID_HU_ZI_02", riskDesc: "常態回穩",
                 ttc: 24.0, posture: "STANDING", vRel: 0.5,
                 dailyCumulative: 6380, capacityRate: 40.0,
                 stations: { STA_YWK: 160, STA_XZM: 110, STA_HZI: 120, STA_YKO: 180, STA_KZH: 130, STA_DLI: 260 },
                 herds: [
-                    { name: "虎字碑西側群", lat: 24.976389, lng: 121.924465, count: 3, role: "傍晚採食", isDanger: false },
-                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "原處整理體表", isDanger: false },
-                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "稜線慢行", isDanger: false }
+                    { name: "虎字碑西側群", lat: 24.976389, lng: 121.924465, count: 3, role: "傍晚草坡採食", isDanger: false, future: "+15m 往西側背風林 (誤差 ±10m)" },
+                    { name: "護管所泥塘群", lat: 24.979661, lng: 121.926351, count: 3, role: "整理體表泥殼", isDanger: false, future: "+30m 林下暫息 (誤差 ±15m)" },
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "稜線背風慢步", isDanger: false, future: "+60m 夜間棲地 (誤差 ±20m)" }
                 ] 
             },
             { 
-                time: "17:00", crowd: 345, thi: 75.6, risk: 2.00, totalCount: 6, speed: 0.2, vectorDeg: 80, 
+                time: "17:00", crowd: 345, thi: 75.6, risk: 2.00, totalCount: 6, deltaBuffalo: "-2頭 (入林避風)", speed: 0.2, vectorDeg: 80, 
                 primaryLoc: "客棧遺址上方林緣", gridId: "GRID_FOREST_01", riskDesc: "低度安全",
                 ttc: 45.0, posture: "STANDING", vRel: 0.3,
                 dailyCumulative: 6590, capacityRate: 23.0,
                 stations: { STA_YWK: 80, STA_XZM: 55, STA_HZI: 65, STA_YKO: 95, STA_KZH: 75, STA_DLI: 170 },
                 herds: [
-                    { name: "客棧上方林緣群", lat: 24.974000, lng: 121.926000, count: 2, role: "入林避風", isDanger: false },
-                    { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 2, role: "靜止反芻", isDanger: false },
-                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "草坡慢步", isDanger: false }
+                    { name: "客棧上方林緣群", lat: 24.974000, lng: 121.926000, count: 2, role: "入林避風反芻", isDanger: false, future: "+30m 樹下定點臥伏" },
+                    { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 2, role: "靜止反芻", isDanger: false, future: "+30m 棲息於樹叢" },
+                    { name: "灣坑頭山群", lat: 24.975597, lng: 121.910740, count: 2, role: "草坡慢步", isDanger: false, future: "+30m 背風凹谷集結" }
                 ] 
             },
             { 
-                time: "18:00", crowd: 160, thi: 74.0, risk: 1.10, totalCount: 5, speed: 0.3, vectorDeg: 45, 
+                time: "18:00", crowd: 160, thi: 74.0, risk: 1.10, totalCount: 5, deltaBuffalo: "-1頭 (夜間休眠)", speed: 0.3, vectorDeg: 45, 
                 primaryLoc: "灣坑頭山背風坡", gridId: "GRID_RIDGE_201", riskDesc: "步道閉園/安全",
                 ttc: 90.0, posture: "LYING", vRel: 0.2,
                 dailyCumulative: 6680, capacityRate: 10.6,
                 stations: { STA_YWK: 30, STA_XZM: 20, STA_HZI: 25, STA_YKO: 40, STA_KZH: 35, STA_DLI: 90 },
                 herds: [
-                    { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "夜間集結", isDanger: false },
-                    { name: "護管所避風群", lat: 24.979661, lng: 121.926351, count: 1, role: "泥塘林下休息", isDanger: false },
-                    { name: "埡口背風林群", lat: 24.975621, lng: 121.926413, count: 2, role: "夜間休眠", isDanger: false }
+                    { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "夜間集結休養", isDanger: false, future: "定點休眠" },
+                    { name: "護管所避風群", lat: 24.979661, lng: 121.926351, count: 1, role: "泥塘林下休息", isDanger: false, future: "定點休眠" },
+                    { name: "埡口背風林群", lat: 24.975621, lng: 121.926413, count: 2, role: "夜間休眠反芻", isDanger: false, future: "定點休眠" }
                 ] 
             },
             { 
-                time: "18:30", crowd: 70, thi: 73.5, risk: 0.80, totalCount: 4, speed: 0.1, vectorDeg: 30, 
+                time: "18:30", crowd: 70, thi: 73.5, risk: 0.80, totalCount: 4, deltaBuffalo: "-1頭 (深林定點)", speed: 0.1, vectorDeg: 30, 
                 primaryLoc: "次要林緣休養區", gridId: "GRID_FOREST_01", riskDesc: "夜間平穩休眠",
                 ttc: 120.0, posture: "LYING", vRel: 0.1,
                 dailyCumulative: 6720, capacityRate: 4.8,
                 stations: { STA_YWK: 10, STA_XZM: 8, STA_HZI: 10, STA_YKO: 15, STA_KZH: 12, STA_DLI: 45 },
                 herds: [
-                    { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "深度休養", isDanger: false },
-                    { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 1, role: "臥伏反芻", isDanger: false },
-                    { name: "埡口背風林群", lat: 24.975621, lng: 121.926413, count: 1, role: "臥伏反芻", isDanger: false }
+                    { name: "灣坑頭山宿營群", lat: 24.975597, lng: 121.910740, count: 2, role: "深度休養", isDanger: false, future: "晨間前保持靜止" },
+                    { name: "護管所林緣群", lat: 24.979661, lng: 121.926351, count: 1, role: "臥伏反芻", isDanger: false, future: "晨間前保持靜止" },
+                    { name: "埡口背風林群", lat: 24.975621, lng: 121.926413, count: 1, role: "臥伏反芻", isDanger: false, future: "晨間前保持靜止" }
                 ] 
             }
         ];
@@ -897,9 +1032,8 @@
         let deskFutureLayer = null, mobFutureLayer = null;
         let deskEkfLayer = null, mobEkfLayer = null;
         let userManualOverride = false;
-        let heartbeatTicks = 1482; // 心跳更新累計次數
+        let heartbeatTicks = 1525;
 
-        /* 圖磚 URL 快取字典 */
         const TILE_URLS = {
             none: null,
             googleHybrid: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
@@ -907,6 +1041,7 @@
             esriSat: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
         };
     </script>
+
     <script>
         /* 啟動實時時鐘與心跳計數器 */
         function initRealtimeClockAndHeartbeat() {
@@ -927,7 +1062,6 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // 每 2.5 秒模擬一次心跳同步封包，累計次數 +1
             setInterval(() => {
                 heartbeatTicks += 1;
                 const tickEl = document.getElementById('heartbeat-tick-count');
@@ -936,10 +1070,110 @@
                 const heartEl = document.getElementById('heartbeat-indicator');
                 if (heartEl) {
                     heartEl.classList.remove('animate-ping');
-                    void heartEl.offsetWidth; // 觸發重繪
+                    void heartEl.offsetWidth;
                     heartEl.classList.add('animate-ping');
                 }
             }, 2500);
+        }
+
+        /* 繪製手機專屬 Canvas 戰情雷達儀表 */
+        function drawMobileRadarCanvas() {
+            const cvs = document.getElementById('mobileRadarCanvas');
+            if (!cvs) return;
+            const ctx = cvs.getContext('2d');
+            const w = cvs.width = cvs.offsetWidth || 340;
+            const h = cvs.height = cvs.offsetHeight || 110;
+            ctx.clearRect(0, 0, w, h);
+
+            const cur = HOURLY_DATA[currentTimeIndex];
+            const centerX = w / 2;
+            const centerY = h / 2;
+
+            const r10 = 22; // 10m Flight Zone
+            const r25 = 38;
+            const r50 = 50;
+
+            // 50m
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, r50, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.25)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 25m
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, r25, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(255, 170, 0, 0.4)";
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 10m 硬防線
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, r10, 0, Math.PI * 2);
+            ctx.fillStyle = cur.risk >= 6.0 ? "rgba(255, 42, 95, 0.25)" : "rgba(0, 255, 136, 0.1)";
+            ctx.fill();
+            ctx.strokeStyle = cur.risk >= 6.0 ? "#ff2a5f" : "#00ff88";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 十字準心
+            ctx.strokeStyle = "rgba(22, 43, 77, 0.8)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX - r50 - 8, centerY);
+            ctx.lineTo(centerX + r50 + 8, centerY);
+            ctx.moveTo(centerX, centerY - r50 - 4);
+            ctx.lineTo(centerX, centerY + r50 + 4);
+            ctx.stroke();
+
+            // 水牛聚落點
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5.5, 0, Math.PI * 2);
+            ctx.fillStyle = cur.risk >= 6.0 ? "#ff2a5f" : "#00f0ff";
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 遊客位置點
+            const humanDistPx = (cur.risk >= 6.0 ? 10 : 34); 
+            const humanX = centerX - humanDistPx;
+            const humanY = centerY + 4;
+
+            ctx.beginPath();
+            ctx.arc(humanX, humanY, 4.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffaa00";
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 連線
+            ctx.beginPath();
+            ctx.moveTo(humanX, humanY);
+            ctx.lineTo(centerX, centerY);
+            ctx.strokeStyle = cur.risk >= 6.0 ? "#ff2a5f" : "#00ff88";
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            // 標籤
+            ctx.font = "bold 9px 'JetBrains Mono', monospace";
+            ctx.fillStyle = "#ff2a5f";
+            ctx.fillText("10m硬防線", centerX + r10 + 3, centerY - 12);
+
+            ctx.font = "bold 9.5px 'Rajdhani', sans-serif";
+            ctx.fillStyle = "#00f0ff";
+            ctx.fillText(`🦬 水牛 ${cur.totalCount}頭 [${cur.posture}]`, 10, 16);
+
+            ctx.fillStyle = cur.risk >= 6.0 ? "#ff8ba7" : "#00ff88";
+            ctx.fillText(`衝突 R: ${cur.risk.toFixed(2)} (TTC ${cur.ttc}s)`, 10, 32);
+
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#cbd5e1";
+            ctx.fillText(`航向: ${cur.vectorDeg}° @ ${cur.speed}m/s`, w - 10, 16);
+            ctx.fillText(`間距: ${cur.risk >= 6.0 ? '4.2m (破防線)' : '24.5m (安全)'}`, w - 10, 32);
+            ctx.textAlign = "left";
         }
 
         function checkAndApplyDeviceMode() {
@@ -963,7 +1197,7 @@
                 if (mapDesk) mapDesk.invalidateSize();
                 if (mapMob) mapMob.invalidateSize();
                 drawKinematics('kinematicsCanvasDesk');
-                drawKinematics('kinematicsCanvasMob');
+                drawMobileRadarCanvas();
             }, 100);
         }
 
@@ -1003,7 +1237,7 @@
                 opacity: 0.8
             }).bindPopup("<b style='color:#b026ff;'>桃源谷步道 (草嶺稜線)</b><br>埡口 ➔ 灣坑頭山 ➔ 桃源谷大草原").addTo(map);
 
-            // 3. 繪製 9 大獨立 POI 標記 (純地標，互不連線)
+            // 3. 繪製 9 大獨立 POI 標記 (加入 Hover 游標懸停即時呈現數值與狀況)
             VERIFIED_POIS.forEach(poi => {
                 const marker = L.circleMarker([poi.lat, poi.lng], {
                     radius: isDesktop ? 6.5 : 5.5,
@@ -1013,13 +1247,24 @@
                     opacity: 1,
                     fillOpacity: 0.95
                 });
-                marker.bindPopup(`
-                    <div class="poi-popup">
-                        <b style="color:${poi.color};">📍 ${poi.name}</b><br>
-                        <span>坐標: [${poi.lng.toFixed(4)}, ${poi.lat.toFixed(4)}]</span><br>
-                        <span>機能: ${poi.desc}</span>
+                
+                const popupContent = `
+                    <div class="text-[11px] font-mono space-y-1">
+                        <div class="border-b border-cyberBorder/60 pb-1 flex items-center justify-between">
+                            <b style="color:${poi.color};" class="text-xs">📍 ${poi.name}</b>
+                            <span class="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-300">據點哨站</span>
+                        </div>
+                        <div><span class="text-slate-400">實體座標：</span><b class="text-neonCyan">[${poi.lng.toFixed(4)}, ${poi.lat.toFixed(4)}]</b></div>
+                        <div><span class="text-slate-400">目前狀況：</span><span class="text-slate-200">${poi.desc}</span></div>
+                        <div class="border-t border-cyberBorder/60 pt-1 text-[10px] text-amber-300">
+                            <span>🔮 空間防線：</span>路寬管制 & 10m Flight Zone 監測點
+                        </div>
                     </div>
-                `);
+                `;
+
+                marker.bindPopup(popupContent);
+                // 游標懸停觸發
+                marker.on('mouseover', function () { this.openPopup(); });
                 marker.addTo(map);
             });
 
@@ -1030,13 +1275,13 @@
             return { map, tileLayer, buffaloLayer, futureLayer, ekfLayer };
         }
 
-        /* 渲染 14 頭牛泡泡圖 (依聚集量與風險即時伸縮) */
+        /* 渲染 14 頭牛泡泡圖 (加入游標移至該點呈現數值、未來趨勢、位置、向量、目前狀況) */
         function renderBuffaloBubbles(layerGroup, curData) {
             if (!layerGroup) return;
             layerGroup.clearLayers();
 
-            curData.herds.forEach(herd => {
-                const isCrit = herd.isDanger || curData.risk >= 6.0;
+            curData.herds.forEach((herd, idx) => {
+                const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
                 const bubbleColor = isCrit ? "#ff2a5f" : (herd.count >= 4 ? "#b026ff" : "#00ff88");
                 const radiusMeters = 20 + herd.count * 4.5;
 
@@ -1060,21 +1305,48 @@
                 const label = L.marker([herd.lat, herd.lng], {
                     icon: L.divIcon({
                         className: 'herd-bubble-label',
-                        html: `<div style="transform: translate(-50%, -140%); white-space:nowrap; text-align:center;">🦬 ${herd.count}頭</div>`,
+                        html: `<div style="transform: translate(-50%, -140%); white-space:nowrap; text-align:center;">🐮 ${herd.count}頭</div>`,
                         iconSize: [0, 0]
                     })
                 });
 
-                marker.bindPopup(`
-                    <div class="poi-popup">
-                        <b style="color:${bubbleColor};">🦬 ${herd.name} (${herd.count} 頭)</b><br>
-                        <span>行為狀態: <b>${herd.role}</b></span><br>
-                        <span>姿態辨識: <b>${curData.posture}</b></span><br>
-                        <span>移動向量: ${curData.vectorDeg}° @ ${curData.speed} m/s</span><br>
-                        <span>碰撞倒數: <b style="color:#ff2a5f;">TTC ${curData.ttc}s</b></span><br>
-                        <span>衝突風險: <b class="${curData.risk >= 6.0 ? 'text-red-600' : 'text-emerald-600'}">R: ${curData.risk.toFixed(2)}</b></span>
+                // 核心關鍵修正：浮動呈現【位置、向量、目前狀況、未來趨勢、數值】
+                const detailedPopup = `
+                    <div class="text-[11px] font-mono space-y-1.5 min-w-[220px]">
+                        <div class="border-b border-cyberBorder/80 pb-1 flex items-center justify-between">
+                            <b style="color:${bubbleColor};" class="text-xs">🐮 ${herd.name} (${herd.count} 頭)</b>
+                            <span class="text-[9px] px-1.5 py-0.2 rounded ${isCrit ? 'bg-rose-950 text-rose-300 border border-neonRed' : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'} font-bold">
+                                ${isCrit ? '🔴 侵入硬防線' : '🟢 常態放牧'}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1 text-[10px]">
+                            <div><span class="text-slate-400">位置：</span><b class="text-neonCyan">[${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}]</b></div>
+                            <div><span class="text-slate-400">姿態：</span><b class="text-amber-300">${curData.posture}</b></div>
+                        </div>
+                        <div class="text-[10px]">
+                            <span class="text-slate-400">移動向量：</span><b class="text-neonPurple">${curData.vectorDeg}° (${curData.thi > 78 ? '南南東' : '東北'}) @ ${curData.speed} m/s</b>
+                        </div>
+                        <div class="text-[10px]">
+                            <span class="text-slate-400">目前狀況：</span><b class="text-slate-100">${herd.role}</b>
+                            <span class="text-slate-400"> (間距 ${isCrit ? '4.2m' : '28.5m'})</span>
+                        </div>
+                        <div class="text-[10px] flex items-center justify-between">
+                            <span>衝突風險：<b class="${curData.risk >= 6.0 ? 'text-neonRed' : 'text-neonGreen'} font-orbitron">R=${curData.risk.toFixed(2)}</b></span>
+                            <span>碰撞倒數：<b class="text-amber-300 font-orbitron">TTC ${curData.ttc}s</b></span>
+                        </div>
+                        <div class="border-t border-cyberBorder/80 pt-1 text-[10px] text-amber-200 bg-cyberCard/80 p-1.5 rounded">
+                            <span class="font-bold text-neonAmber">🔮 未來趨勢 (HMM 外推)：</span><br>
+                            <span>${herd.future || '+15m 往護管所泥塘下切 (65% 機率，走廊 ±6.8m)'}</span>
+                        </div>
                     </div>
-                `);
+                `;
+
+                marker.bindPopup(detailedPopup);
+                aura.bindPopup(detailedPopup);
+
+                // 游標懸停 (Hover) 自動打開資訊卡
+                marker.on('mouseover', function () { this.openPopup(); });
+                aura.on('mouseover', function () { this.openPopup(); });
 
                 layerGroup.addLayer(aura);
                 layerGroup.addLayer(marker);
@@ -1181,8 +1453,56 @@
             }
         }
     </script>
+
     <script>
-        /* 渲染草嶺古道各重要據點即時人流統計表 (桌面版與手機版同步渲染) */
+        /* 渲染【水牛當日各時段出沒變化量動態表】 (桌面版與手機版同步) */
+        function renderBuffaloHourlyVariation(curIdx) {
+            const tbodyDesk = document.getElementById('desk-buffalo-hourly-variation-body');
+            const tbodyMob = document.getElementById('mob-buffalo-variation-tbody');
+            const timeTagMob = document.getElementById('mob-variation-current-time');
+            if (timeTagMob) timeTagMob.innerText = HOURLY_DATA[curIdx].time;
+
+            const rowsHtml = HOURLY_DATA.map((d, idx) => {
+                const isCurrent = idx === curIdx;
+                const highlightCls = isCurrent ? "bg-cyan-950/80 border-l-4 border-neonCyan" : "hover:bg-slate-800/40";
+                
+                let badgeLight = "🟢 常態安全";
+                let badgeCls = "text-emerald-300 bg-emerald-950/80 border border-emerald-500/40";
+                if (d.risk >= 6.0) {
+                    badgeLight = "🔴 極致警戒";
+                    badgeCls = "text-rose-200 bg-rose-950 border border-neonRed font-bold";
+                } else if (d.risk >= 3.0) {
+                    badgeLight = "🟡 偏高警戒";
+                    badgeCls = "text-amber-200 bg-amber-950 border border-neonAmber";
+                }
+
+                return `
+                    <tr class="${highlightCls} transition-all duration-200">
+                        <td class="font-bold ${isCurrent ? 'text-neonCyan' : 'text-slate-200'} text-[12px]">
+                            ${d.time} ${isCurrent ? '◀' : ''}
+                        </td>
+                        <td class="text-center font-orbitron font-bold text-white text-[12.5px]">
+                            🐮 ${d.totalCount}頭
+                            <span class="text-[9.5px] block text-purple-300 font-normal font-sans">${d.deltaBuffalo}</span>
+                        </td>
+                        <td class="text-[11.5px] text-slate-100 font-medium">
+                            ${d.primaryLoc}
+                            <span class="text-[9px] block text-slate-400 font-mono">${d.gridId}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-bold ${badgeCls}">
+                                ${badgeLight}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (tbodyDesk) tbodyDesk.innerHTML = rowsHtml;
+            if (tbodyMob) tbodyMob.innerHTML = rowsHtml;
+        }
+
+        /* 渲染草嶺古道各重要據點即時人流統計表 */
         function renderStationsFootfall(curData) {
             const timeLabel = document.getElementById('stations-active-time');
             if (timeLabel) timeLabel.innerText = curData.time;
@@ -1209,16 +1529,16 @@
                     }
 
                     const card = document.createElement('div');
-                    card.className = "bg-cyberCard/90 p-1.5 rounded border border-cyberBorder flex flex-col justify-between";
+                    card.className = "bg-cyberCard p-1.5 rounded-lg border border-cyberBorder flex flex-col justify-between";
                     card.innerHTML = `
-                        <div class="flex items-center justify-between text-[9px]">
+                        <div class="flex items-center justify-between text-[10px]">
                             <span class="font-bold text-slate-200 truncate">${sta.name}</span>
-                            <span class="font-orbitron font-bold ${statusColor}">${count} <span class="text-[7.5px] font-normal text-slate-400">/ ${sta.maxCap}人</span></span>
+                            <span class="font-orbitron font-bold ${statusColor}">${count} <span class="text-[8px] font-normal text-slate-400">/ ${sta.maxCap}人</span></span>
                         </div>
                         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden my-1 border border-cyberBorder/60">
                             <div class="bg-gradient-to-r ${barGrad} h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                         </div>
-                        <div class="flex items-center justify-between text-[7.5px] text-slate-400">
+                        <div class="flex items-center justify-between text-[8px] text-slate-400">
                             <span>${sta.role}</span>
                             <span class="font-mono ${statusColor}">${pct}% (${badge})</span>
                         </div>
@@ -1239,19 +1559,19 @@
                     const pct = Math.min(100, Math.round((count / sta.maxCap) * 100));
 
                     let badgeSymbol = "🟢";
-                    let badgeColor = "text-emerald-300 bg-emerald-950/80 border-emerald-500/40";
+                    let badgeColor = "text-emerald-300 bg-emerald-950/80 border border-emerald-500/40";
                     let badgeText = "常態";
-                    let advice = "自由通暢步行";
+                    let advice = "步道通暢可自由通行";
                     if (pct >= 85) {
                         badgeSymbol = "🔴";
-                        badgeColor = "text-rose-200 bg-rose-950 border-neonRed";
+                        badgeColor = "text-rose-200 bg-rose-950 border border-neonRed";
                         badgeText = "過載";
                         advice = "啟動 E-Bike 導流";
                     } else if (pct >= 60) {
                         badgeSymbol = "🟡";
-                        badgeColor = "text-amber-200 bg-amber-950 border-neonAmber";
+                        badgeColor = "text-amber-200 bg-amber-950 border border-neonAmber";
                         badgeText = "偏高";
-                        advice = "放慢步調暫停";
+                        advice = "放慢步調 / 錯峰";
                     }
 
                     const tr = document.createElement('tr');
@@ -1265,7 +1585,7 @@
                             ${count} <span class="text-[10px] text-slate-400 font-normal">/ ${sta.maxCap}</span>
                         </td>
                         <td class="text-center">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[11px] font-bold ${badgeColor}">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold ${badgeColor}">
                                 ${badgeSymbol} ${pct}% (${badgeText})
                             </span>
                         </td>
@@ -1278,16 +1598,17 @@
             }
         }
 
-        /* 人牛動態交織矩陣 Canvas 繪製 */
+        /* 人牛動態交織矩陣 Canvas 繪製 (修復重疊問題，優化避讓與高度) */
         function drawKinematics(canvasId) {
             const cvs = document.getElementById(canvasId);
             if (!cvs) return;
             const ctx = cvs.getContext('2d');
             const w = cvs.width = cvs.offsetWidth || 340;
-            const h = cvs.height = cvs.offsetHeight || 120;
+            const h = cvs.height = cvs.offsetHeight || 135;
             ctx.clearRect(0, 0, w, h);
 
-            const padX = 26, padTop = 18, padBottom = 22;
+            // 調整邊距，頂部留出 30px 給浮動卡，避免覆蓋氣泡
+            const padX = 26, padTop = 30, padBottom = 22;
             const plotW = w - padX * 2, plotH = h - padTop - padBottom;
             const n = HOURLY_DATA.length;
             const stepX = plotW / (n - 1);
@@ -1313,8 +1634,8 @@
             ctx.lineTo(padX + plotW, padTop + plotH);
             ctx.closePath();
             const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
-            grad.addColorStop(0, "rgba(0, 240, 255, 0.35)");
-            grad.addColorStop(1, "rgba(0, 240, 255, 0.05)");
+            grad.addColorStop(0, "rgba(0, 240, 255, 0.32)");
+            grad.addColorStop(1, "rgba(0, 240, 255, 0.04)");
             ctx.fillStyle = grad;
             ctx.fill();
 
@@ -1328,11 +1649,11 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // 4. 時・位・險 節點氣泡
+            // 4. 時・位・險 節點氣泡 (文字與圖形重疊修復)
             HOURLY_DATA.forEach((d, i) => {
                 const px = padX + i * stepX;
                 const py = (padTop + plotH) - (d.speed / 1.0) * plotH;
-                const radius = 3.0 + d.totalCount * 0.5;
+                const radius = 3.2 + d.totalCount * 0.45;
 
                 let nodeColor = "#00ff88";
                 let auraColor = "rgba(0, 255, 136, 0.3)";
@@ -1357,11 +1678,13 @@
                 ctx.lineWidth = 1.2;
                 ctx.stroke();
 
-                if (d.risk >= 6.0) {
-                    ctx.font = "8px 'Orbitron', sans-serif";
+                // 數值文字標註：若為當前選中則不重疊渲染避免遮擋
+                if (d.risk >= 6.0 && i !== currentTimeIndex) {
+                    ctx.font = "bold 8.5px 'JetBrains Mono', monospace";
                     ctx.fillStyle = "#ff2a5f";
                     ctx.textAlign = "center";
-                    ctx.fillText(`R:${d.risk.toFixed(1)}`, px, py - radius - 3);
+                    const textY = py > padTop + 24 ? py - radius - 3 : py + radius + 10;
+                    ctx.fillText(`R:${d.risk.toFixed(1)}`, px, textY);
                 }
             });
 
@@ -1380,7 +1703,7 @@
             const curY = (padTop + plotH) - (cur.speed / 1.0) * plotH;
 
             ctx.beginPath();
-            ctx.moveTo(curX, padTop - 4);
+            ctx.moveTo(curX, padTop - 6);
             ctx.lineTo(curX, padTop + plotH + 4);
             ctx.strokeStyle = "#00f0ff";
             ctx.lineWidth = 1.5;
@@ -1389,31 +1712,31 @@
             ctx.setLineDash([]);
 
             ctx.beginPath();
-            ctx.arc(curX, curY, 7.0 + cur.totalCount * 0.5, 0, Math.PI * 2);
+            ctx.arc(curX, curY, 7.5 + cur.totalCount * 0.45, 0, Math.PI * 2);
             ctx.strokeStyle = "#00f0ff";
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.8;
             ctx.stroke();
 
-            // 頂部浮動標記
+            // 頂部浮動標記 (固定在頂部安全高度，永不覆蓋氣泡)
             const badgeText = `${cur.time} [${cur.primaryLoc}] 🦬${cur.totalCount}頭 R=${cur.risk.toFixed(2)}`;
-            ctx.font = "bold 8.5px 'Rajdhani', sans-serif";
-            const tw = ctx.measureText(badgeText).width + 10;
+            ctx.font = "bold 9px 'Rajdhani', sans-serif";
+            const tw = ctx.measureText(badgeText).width + 14;
             const badgeX = Math.min(Math.max(curX, padX + tw / 2), w - padX - tw / 2);
-            const badgeY = 11;
+            const badgeY = 14;
 
-            ctx.fillStyle = "rgba(4, 7, 17, 0.95)";
+            ctx.fillStyle = "rgba(4, 7, 17, 0.96)";
             ctx.strokeStyle = cur.risk >= 6.0 ? "#ff2a5f" : (cur.risk >= 3.0 ? "#ffaa00" : "#00f0ff");
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
-            ctx.roundRect(badgeX - tw / 2, badgeY - 9, tw, 14, 3);
+            ctx.roundRect(badgeX - tw / 2, badgeY - 11, tw, 18, 4);
             ctx.fill();
             ctx.stroke();
 
             ctx.fillStyle = cur.risk >= 6.0 ? "#ff8ba7" : (cur.risk >= 3.0 ? "#ffd166" : "#e2e8f0");
-            ctx.fillText(badgeText, badgeX, badgeY + 1.5);
+            ctx.fillText(badgeText, badgeX, badgeY + 2);
         }
 
-        /* 渲染 14 頭牛群時空泡泡分佈清冊 (桌面版卡片與手機版結構化表格同步) */
+        /* 渲染 14 頭牛群時空泡泡分佈清冊 */
         function renderHerdsInventory(curData) {
             const containerDesk = document.getElementById('herds-inventory-container');
             const tbodyMob = document.getElementById('mob-herds-table-body');
@@ -1437,15 +1760,15 @@
                     const borderCls = isCrit ? 'border-neonRed/50 bg-rose-950/40 text-rose-200' : (herd.count >= 4 ? 'border-neonPurple/50 bg-purple-950/40 text-purple-200' : 'border-neonCyan/40 bg-cyan-950/30 text-cyan-200');
                     const labelCls = isCrit ? 'text-neonRed' : (herd.count >= 4 ? 'text-purple-300' : 'text-neonCyan');
 
-                    card.className = `flex items-center justify-between p-1.5 rounded border ${borderCls} transition-all duration-200`;
+                    card.className = `flex items-center justify-between p-1.5 rounded-lg border ${borderCls} transition-all duration-200`;
                     card.innerHTML = `
                         <div class="truncate pr-1">
                             <span class="font-bold ${labelCls}">[聚落 ${String.fromCharCode(65 + idx)}] ${herd.name}</span>
-                            <div class="text-[8px] text-slate-400">坐標: [${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}] • ${herd.role}</div>
+                            <div class="text-[8.5px] text-slate-400">坐標: [${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}] • ${herd.role}</div>
                         </div>
                         <div class="text-right shrink-0">
-                            <span class="font-orbitron font-bold text-xs ${labelCls}">🦬 ${herd.count} 頭</span>
-                            <div class="text-[7.5px] ${isCrit ? 'text-rose-400 font-bold' : 'text-slate-400'}">${isCrit ? '🔴 侵入硬防線' : '常態監控'}</div>
+                            <span class="font-orbitron font-bold text-xs ${labelCls}">🐮 ${herd.count} 頭</span>
+                            <div class="text-[8px] ${isCrit ? 'text-rose-400 font-bold' : 'text-slate-400'}">${isCrit ? '🔴 侵入硬防線' : '常態監控'}</div>
                         </div>
                     `;
                     containerDesk.appendChild(card);
@@ -1457,11 +1780,10 @@
                 tbodyMob.innerHTML = '';
                 curData.herds.forEach((herd, idx) => {
                     const isCrit = herd.isDanger || (curData.risk >= 6.0 && idx === 0);
-                    const symbol = isCrit ? "🔴" : (herd.count >= 4 ? "🟣" : "🟢");
                     const labelColor = isCrit ? "text-neonRed" : (herd.count >= 4 ? "text-purple-300" : "text-neonCyan");
                     const statusBadge = isCrit 
-                        ? `<span class="px-2 py-0.5 rounded bg-rose-950 text-rose-200 border border-neonRed text-[11px] font-bold">🔴 侵入硬防線</span>`
-                        : `<span class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold">🟢 常態監控</span>`;
+                        ? `<span class="px-2 py-0.5 rounded bg-rose-950 text-rose-200 border border-neonRed text-[11px] font-bold">🔴 破防線</span>`
+                        : `<span class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold">🟢 常態</span>`;
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-800/40 transition";
@@ -1471,7 +1793,7 @@
                             <span class="text-[10px] text-slate-400 block font-mono font-normal">[${herd.lng.toFixed(4)}, ${herd.lat.toFixed(4)}]</span>
                         </td>
                         <td class="text-center font-orbitron font-bold text-neonCyan text-[14px]">
-                            🦬 ${herd.count}頭
+                            🐮 ${herd.count}頭
                         </td>
                         <td class="text-[12px] text-slate-200 font-medium">
                             ${herd.role}
@@ -1485,12 +1807,13 @@
             }
         }
     </script>
+
     <script>
         function applyTimeState(idx) {
             currentTimeIndex = Math.max(0, Math.min(HOURLY_DATA.length - 1, idx));
             const cur = HOURLY_DATA[currentTimeIndex];
 
-            // 數值更新
+            // 桌面版控制項
             const sliderDesk = document.getElementById('slider-timeline');
             if (sliderDesk) sliderDesk.value = idx;
             const timeLabel = document.getElementById('label-timeline-time');
@@ -1505,7 +1828,7 @@
             const valCount = document.getElementById('val-count');
             if (valCount) valCount.innerText = cur.totalCount;
 
-            // 頂部全日累積人流與即時承載率更新
+            // 全日人流累積更新
             const topDailyCrowd = document.getElementById('top-daily-total-crowd');
             if (topDailyCrowd) topDailyCrowd.innerText = cur.dailyCumulative.toLocaleString();
             const deskFootfallSum = document.getElementById('desk-footfall-summary');
@@ -1518,10 +1841,10 @@
                 topCapacityBar.innerHTML = `<span class="bg-gradient-to-r from-emerald-400 via-amber-400 to-neonRed h-full transition-all duration-300" style="width: ${cur.capacityRate}%"></span>`;
             }
 
-            // 矩陣資訊列更新 (時・位・險 核心連動)
+            // 矩陣資訊列
             const matrixActiveInfo = document.getElementById('desk-matrix-active-info');
             if (matrixActiveInfo) {
-                matrixActiveInfo.innerText = `${cur.time} @ ${cur.primaryLoc} [R=${cur.risk.toFixed(2)} ${cur.risk >= 6.0 ? '極高' : (cur.risk >= 3.0 ? '中' : '安全')}]`;
+                matrixActiveInfo.innerText = `${cur.time} @ ${cur.primaryLoc} [R=${cur.risk.toFixed(2)}]`;
                 matrixActiveInfo.className = `text-[9px] font-mono font-bold ${cur.risk >= 6.0 ? 'text-neonRed' : (cur.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
             }
 
@@ -1552,7 +1875,7 @@
             const hudDetail = document.getElementById('hud-pred-detail');
             if (hudDetail) {
                 if (cur.risk >= 6.0) {
-                    hudDetail.innerHTML = `⚠️ <b>[TTC 碰撞倒數 ${cur.ttc}s]</b> 人牛相對速度 $v_{rel}=${cur.vRel}\\text{ m/s}$，水牛進入【${cur.posture}】防禦姿態。<br>🎯 <b>[HMM +15m 投射]</b> 估測向泥塘下切機率 65%，強制啟動 E-Bike 導流。`;
+                    hudDetail.innerHTML = `⚠️ <b>[TTC 碰撞倒數 ${cur.ttc}s]</b> 人牛相對速度 v_rel=${cur.vRel} m/s，水牛進入【${cur.posture}】防禦姿態。<br>🎯 <b>[HMM +15m 投射]</b> 估測向泥塘下切機率 65%，啟動 E-Bike 導流。`;
                 } else {
                     hudDetail.innerHTML = `🌿 <b>[常態採食巡檢]</b> THI=${cur.thi.toFixed(1)} 氣候涼爽，水牛群沿【${cur.primaryLoc}】芒花稜線背風放牧。<br>💤 <b>[HMM +30m 投射]</b> 步道周邊林緣樹蔭暫憩反芻。`;
                 }
@@ -1563,7 +1886,7 @@
             if (deskAlertBanner) {
                 if (cur.risk >= 6.0) {
                     deskAlertBanner.className = "absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 z-30 bg-rose-950/95 border-neonRed text-rose-200 shadow-[0_0_25px_rgba(255,42,95,0.65)] whitespace-nowrap posture-badge-pulse";
-                    deskAlertBanner.innerHTML = `🔴 RED_ALERT: TTC ${cur.ttc}s！水牛 ${cur.totalCount} 頭 @${cur.primaryLoc} (觸發 Flight Zone 離根懲罰，啟動 E-Bike 導流)`;
+                    deskAlertBanner.innerHTML = `🔴 RED_ALERT: TTC ${cur.ttc}s！水牛 ${cur.totalCount} 頭 @${cur.primaryLoc} (侵入 10m 硬防線，啟動 E-Bike 導流)`;
                     deskAlertBanner.style.display = "flex";
                 } else {
                     deskAlertBanner.className = "absolute bottom-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg backdrop-blur-md border font-mono font-bold text-xs flex items-center gap-2 z-30 bg-emerald-950/90 border-emerald-500 text-emerald-200 shadow-[0_0_15px_rgba(0,255,136,0.3)] whitespace-nowrap";
@@ -1586,7 +1909,6 @@
             const mobCount = document.getElementById('mob-val-count');
             if (mobCount) mobCount.innerText = `${cur.totalCount}頭`;
 
-            // 手機版每日人流總量更新
             const mobDailyTotal = document.getElementById('mob-val-daily-total');
             if (mobDailyTotal) mobDailyTotal.innerText = cur.dailyCumulative.toLocaleString();
             const mobHudDailyCrowd = document.getElementById('mob-hud-daily-crowd');
@@ -1599,16 +1921,16 @@
             const mobHudRiskBadge = document.getElementById('mob-hud-risk-badge');
             if (mobHudRiskBadge) {
                 mobHudRiskBadge.innerText = `R=${cur.risk.toFixed(2)} ${cur.risk >= 6.0 ? '極高' : (cur.risk >= 3.0 ? '中度' : '安全')}`;
-                mobHudRiskBadge.className = `px-2 py-0.5 rounded text-[9px] font-bold ${cur.risk >= 6.0 ? 'bg-rose-950 text-rose-200 border border-neonRed' : (cur.risk >= 3.0 ? 'bg-amber-950 text-amber-200 border border-neonAmber' : 'bg-emerald-950 text-emerald-200 border border-neonGreen')}`;
+                mobHudRiskBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold ${cur.risk >= 6.0 ? 'bg-rose-950 text-rose-200 border border-neonRed' : (cur.risk >= 3.0 ? 'bg-amber-950 text-amber-200 border border-neonAmber' : 'bg-emerald-950 text-emerald-200 border border-neonGreen')}`;
             }
 
-            const mobMatrixActiveInfo = document.getElementById('mob-matrix-active-info');
-            if (mobMatrixActiveInfo) {
-                mobMatrixActiveInfo.innerText = `${cur.time} @ ${cur.primaryLoc}`;
-                mobMatrixActiveInfo.className = `text-[9px] font-bold ${cur.risk >= 6.0 ? 'text-neonRed' : (cur.risk >= 3.0 ? 'text-neonAmber' : 'text-neonGreen')}`;
+            const canvasTag = document.getElementById('mob-canvas-status-tag');
+            if (canvasTag) {
+                canvasTag.innerText = cur.risk >= 6.0 ? `🔴 TTC ${cur.ttc}s 倒數` : `🟢 間距安全 (R=${cur.risk.toFixed(1)})`;
+                canvasTag.className = `text-[10px] px-1.5 py-0.2 rounded font-bold ${cur.risk >= 6.0 ? 'bg-rose-950 text-rose-300 border border-neonRed' : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'}`;
             }
 
-            // 更新地圖水牛泡泡、EKF 誤差範圍與 HMM 走廊
+            // 更新地圖圖層
             renderBuffaloBubbles(deskBuffaloLayer, cur);
             renderBuffaloBubbles(mobBuffaloLayer, cur);
             renderEKFUncertainty(deskEkfLayer, cur);
@@ -1616,19 +1938,18 @@
             renderFuturePrediction(deskFutureLayer, cur);
             renderFuturePrediction(mobFutureLayer, cur);
 
-            // 更新各據點人流統計、清冊與 Canvas
+            // 更新各據點人流、14頭牛清冊、各時段出沒變化量動態表與 Canvas
             renderStationsFootfall(cur);
             renderHerdsInventory(cur);
+            renderBuffaloHourlyVariation(idx);
             drawKinematics('kinematicsCanvasDesk');
-            drawKinematics('kinematicsCanvasMob');
+            drawMobileRadarCanvas();
         }
 
         /* 視窗載入與事件註冊 */
         window.onload = function() {
-            // 1. 初始化實時時鐘與心跳同步器
             initRealtimeClockAndHeartbeat();
 
-            // 2. 初始化桌面與手機 GIS 地圖
             const deskSys = initGISMap('leafletMap', true);
             const mobSys = initGISMap('leafletMapMobile', false);
 
@@ -1648,17 +1969,16 @@
                 mobEkfLayer = mobSys.ekfLayer;
             }
 
-            // 3. 執行載具自動辨識 (桌面 vs 手機)
             checkAndApplyDeviceMode();
             window.addEventListener('resize', () => {
                 checkAndApplyDeviceMode();
                 if (mapDesk) mapDesk.invalidateSize();
                 if (mapMob) mapMob.invalidateSize();
                 drawKinematics('kinematicsCanvasDesk');
-                drawKinematics('kinematicsCanvasMob');
+                drawMobileRadarCanvas();
             });
 
-            // 4. 圖層切換監聽
+            // 圖磚切換監聽
             const tileSelector = document.getElementById('select-tile-layer');
             if (tileSelector) {
                 tileSelector.addEventListener('change', (e) => {
@@ -1692,7 +2012,7 @@
                 });
             }
 
-            // 5. Edge AI 姿態切換檢測
+            // Edge AI 姿態快捷切換
             const postureSelector = document.getElementById('select-edge-posture');
             if (postureSelector) {
                 postureSelector.addEventListener('change', (e) => {
@@ -1701,21 +2021,43 @@
                     if (val === 'CHARGING') {
                         HOURLY_DATA[currentTimeIndex].risk = 16.5;
                         HOURLY_DATA[currentTimeIndex].ttc = 1.2;
+                        HOURLY_DATA[currentTimeIndex].vRel = 1.60;
                     } else if (val === 'DEFENSIVE_HEAD_LOW') {
                         HOURLY_DATA[currentTimeIndex].risk = 13.05;
                         HOURLY_DATA[currentTimeIndex].ttc = 2.9;
+                        HOURLY_DATA[currentTimeIndex].vRel = 1.45;
                     } else if (val === 'STANDING') {
                         HOURLY_DATA[currentTimeIndex].risk = 5.2;
                         HOURLY_DATA[currentTimeIndex].ttc = 14.0;
+                        HOURLY_DATA[currentTimeIndex].vRel = 0.8;
                     } else {
                         HOURLY_DATA[currentTimeIndex].risk = 1.5;
                         HOURLY_DATA[currentTimeIndex].ttc = 45.0;
+                        HOURLY_DATA[currentTimeIndex].vRel = 0.4;
                     }
+
+                    // 同步更新手機版即時資訊框文字與徽章
+                    const mobPostureText = document.getElementById('mob-live-posture-text');
+                    const mobPostureBadge = document.getElementById('mob-live-posture-badge');
+                    if (mobPostureText) mobPostureText.innerText = val;
+                    if (mobPostureBadge) {
+                        if (val === 'CHARGING') {
+                            mobPostureBadge.className = 'px-2 py-0.5 rounded bg-rose-950 text-rose-300 text-[10.5px] font-bold border border-neonRed';
+                            mobPostureBadge.innerText = '🚨 防禦衝撞 3.5x';
+                        } else if (val === 'DEFENSIVE_HEAD_LOW') {
+                            mobPostureBadge.className = 'px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10.5px] font-bold border border-amber-500/40';
+                            mobPostureBadge.innerText = '⚠️ 低頭抵角 1.8x';
+                        } else {
+                            mobPostureBadge.className = 'px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10.5px] font-bold border border-emerald-500/40';
+                            mobPostureBadge.innerText = '🟢 常態站立 1.0x';
+                        }
+                    }
+
                     applyTimeState(currentTimeIndex);
                 });
             }
 
-            // 6. 時間軸 Slider 監聽 (桌面與手機同步)
+            // 時間軸 Slider 監聽
             const sliderDesk = document.getElementById('slider-timeline');
             if (sliderDesk) {
                 sliderDesk.addEventListener('input', (e) => applyTimeState(parseInt(e.target.value, 10)));
@@ -1725,7 +2067,7 @@
                 sliderMob.addEventListener('input', (e) => applyTimeState(parseInt(e.target.value, 10)));
             }
 
-            // 7. 點擊 Canvas 快速跳轉時程
+            // 點擊 Canvas 快速跳轉時程
             const deskCanvas = document.getElementById('kinematicsCanvasDesk');
             if (deskCanvas) {
                 deskCanvas.addEventListener('click', (e) => {
@@ -1738,20 +2080,8 @@
                     applyTimeState(targetIdx);
                 });
             }
-            const mobCanvas = document.getElementById('kinematicsCanvasMob');
-            if (mobCanvas) {
-                mobCanvas.addEventListener('click', (e) => {
-                    const rect = mobCanvas.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const padX = 26;
-                    const plotW = mobCanvas.width - padX * 2;
-                    const ratio = Math.max(0, Math.min(1, (clickX - padX) / plotW));
-                    const targetIdx = Math.round(ratio * (HOURLY_DATA.length - 1));
-                    applyTimeState(targetIdx);
-                });
-            }
 
-            // 8. 載具切換按鈕 (手動覆蓋自動偵測)
+            // 載具切換按鈕
             const btnToggleView = document.getElementById('btn-toggle-view');
             if (btnToggleView) {
                 btnToggleView.addEventListener('click', () => {
@@ -1773,12 +2103,12 @@
                         if (mapDesk) mapDesk.invalidateSize();
                         if (mapMob) mapMob.invalidateSize();
                         drawKinematics('kinematicsCanvasDesk');
-                        drawKinematics('kinematicsCanvasMob');
+                        drawMobileRadarCanvas();
                     }, 120);
                 });
             }
 
-            // 9. 播放/暫停時間軸模擬
+            // 播放時間軸
             let isPlaying = false;
             let playInterval = null;
             const togglePlayTimeline = () => {
@@ -1803,7 +2133,7 @@
             const btnPlayMob = document.getElementById('mob-btn-play-timeline');
             if (btnPlayMob) btnPlayMob.addEventListener('click', togglePlayTimeline);
 
-            // 10. Notion DB 數位存根彈窗
+            // Notion DB 數位存根彈窗
             const modal = document.getElementById('audit-modal');
             const btnOpenAudit = document.getElementById('btn-open-audit-modal');
             const btnCloseAudit = document.getElementById('btn-close-audit');
@@ -1839,7 +2169,7 @@
                 btnCloseAudit.addEventListener('click', () => modal.classList.add('hidden'));
             }
 
-            // 初始化應用 12:00 資料
+            // 初始化應用 12:00
             setTimeout(() => {
                 applyTimeState(4);
             }, 100);
