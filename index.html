@@ -184,35 +184,35 @@
 </head>
 <body class="h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden">
 
-    <!-- 頂部戰情旗艦導航列 -->
-    <header class="h-[52px] border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-50">
-        <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_18px_rgba(0,240,255,0.4)] text-white text-base">
+    <!-- 頂部戰情旗艦導航列 (針對手機版極致瘦身防擠壓) -->
+    <header class="h-[48px] md:h-[52px] border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-2 md:px-3 flex items-center justify-between shrink-0 z-50">
+        <!-- 品牌與心跳時鐘 -->
+        <div class="flex items-center gap-2">
+            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)] text-white text-sm md:text-base shrink-0">
                 🐮
             </div>
-            <div>
-                <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1.5">
+            <div class="min-w-0">
+                <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1 leading-tight truncate">
                     GEM<span class="text-neonCyan">ENGINE</span> 
-                    <span class="text-[8px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0 MASTER 🐮</span>
+                    <span class="text-[7.5px] md:text-[8px] px-1 md:px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-neonPurple/50 font-mono">v27.0</span>
                 </h1>
-                <!-- 即時日期、時間與心跳資訊更新燈號 -->
-                <div class="flex items-center gap-2 text-[9.5px] text-slate-300 font-mono">
-                    <span class="flex items-center gap-1 text-neonCyan font-bold">
-                        <i class="fa-regular fa-clock"></i>
-                        <span id="live-datetime-display">2026-10-09 09:19:04 CST</span>
+                <!-- 即時日期、時間與心跳更新燈號 -->
+                <div class="flex items-center gap-1.5 text-[8.5px] md:text-[9.5px] text-slate-300 font-mono leading-tight">
+                    <span class="text-neonCyan font-bold flex items-center gap-0.5 truncate">
+                        <i class="fa-regular fa-clock text-[8px]"></i>
+                        <span id="live-datetime-display">2026-10-09 09:30 CST</span>
                     </span>
-                    <span class="hidden md:inline text-slate-500">|</span>
-                    <!-- 心跳更新燈號與更新累計次數 -->
-                    <span class="flex items-center gap-1 text-slate-300">
-                        <span id="heartbeat-indicator" class="w-2 h-2 rounded-full bg-neonGreen animate-ping"></span>
-                        <span class="text-[8.5px] text-neonGreen font-bold">LIVE SYNC</span>
-                        <span class="text-slate-400 font-mono">(第 <b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,525</b> 次)</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="flex items-center gap-1 text-slate-300 shrink-0">
+                        <span id="heartbeat-indicator" class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-neonGreen animate-ping"></span>
+                        <span class="text-[8px] md:text-[8.5px] text-neonGreen font-bold hidden xs:inline">LIVE</span>
+                        <span class="text-slate-400 text-[8px] md:text-[8.5px] font-mono">(<b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,530</b>)</span>
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- 頂部中心：全日人流累積總量與即時過載率 -->
+        <!-- 頂部中心：全日人流累積總量與即時過載率 (桌面版限定呈現) -->
         <div class="hidden lg:flex items-center gap-3 bg-cyberDark/90 px-3 py-1 rounded-lg border border-cyberBorder text-xs font-mono">
             <div class="flex items-center gap-1.5 border-r border-cyberBorder/80 pr-2.5">
                 <i class="fa-solid fa-person-walking text-neonCyan"></i>
@@ -230,25 +230,25 @@
             </div>
         </div>
 
-        <!-- 頂部功能樞紐區 -->
-        <div class="flex items-center gap-2 text-xs font-mono">
-            <!-- 載具自適應狀態提示標籤 -->
-            <span id="device-mode-badge" class="hidden sm:inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-cyan-950/90 text-neonCyan border border-cyan-500/40">
+        <!-- 頂部功能樞紐區 (響應式精簡配置，手機版不堆疊塞車) -->
+        <div class="flex items-center gap-1 md:gap-2 text-xs font-mono shrink-0">
+            <!-- 載具自適應標籤 (僅在寬度足夠時顯示) -->
+            <span id="device-mode-badge" class="hidden md:inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-cyan-950/90 text-neonCyan border border-cyan-500/40">
                 <i class="fa-solid fa-microchip"></i> 偵測中...
             </span>
 
-            <!-- 底圖圖層選擇器 -->
+            <!-- 底圖圖層選擇器 (手機版精簡按鈕或緊湊選單) -->
             <div class="flex items-center bg-cyberDark/90 p-0.5 rounded border border-cyberBorder text-[10px]">
-                <span class="text-slate-400 px-1 hidden md:inline"><i class="fa-solid fa-layer-group text-neonCyan"></i> 底圖:</span>
-                <select id="select-tile-layer" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1.5 py-0.5 outline-none cursor-pointer">
-                    <option value="none" selected>🌌 純向量拓樸戰情 (純黑底・無阻擋)</option>
-                    <option value="googleHybrid">🛰️ Google 高清衛星航照</option>
-                    <option value="googleTerrain">⛰️ Google 地形山勢圖</option>
-                    <option value="esriSat">🌐 Esri 全球衛星航照</option>
+                <span class="text-slate-400 px-1 hidden lg:inline"><i class="fa-solid fa-layer-group text-neonCyan"></i> 底圖:</span>
+                <select id="select-tile-layer" class="bg-cyberCard text-slate-200 border border-cyberBorder rounded px-1 md:px-1.5 py-0.5 outline-none cursor-pointer text-[9.5px] md:text-[10px] max-w-[95px] sm:max-w-none">
+                    <option value="none" selected>🌌 純黑底向量</option>
+                    <option value="googleHybrid">🛰️ Google 航照</option>
+                    <option value="googleTerrain">⛰️ Google 地形</option>
+                    <option value="esriSat">🌐 Esri 衛星</option>
                 </select>
             </div>
 
-            <!-- Edge AI 姿態快捷切換 (模擬檢驗) -->
+            <!-- Edge AI 姿態快捷切換 (桌面寬螢幕專用) -->
             <div class="hidden xl:flex items-center bg-cyberDark/90 p-0.5 rounded border border-cyberBorder text-[10px]">
                 <span class="text-slate-400 px-1"><i class="fa-solid fa-camera text-neonAmber"></i> 姿態:</span>
                 <select id="select-edge-posture" class="bg-cyberCard text-amber-300 border border-cyberBorder rounded px-1.5 py-0.5 outline-none cursor-pointer">
@@ -259,13 +259,14 @@
                 </select>
             </div>
 
-            <!-- 載具手動覆蓋切換按鈕 -->
-            <button id="btn-toggle-view" class="px-2.5 py-1 bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700 transition rounded flex items-center gap-1 text-[11px]">
-                <i class="fa-solid fa-mobile-screen"></i> <span id="btn-toggle-view-text">載具切換</span>
+            <!-- 載具切換按鈕 (手機版精簡為圖示，桌面版含文字) -->
+            <button id="btn-toggle-view" class="px-2 py-1 bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700 transition rounded flex items-center gap-1 text-[10px] md:text-[11px]" title="載具手動切換">
+                <i class="fa-solid fa-mobile-screen"></i> <span id="btn-toggle-view-text" class="hidden sm:inline">載具切換</span>
             </button>
 
-            <button id="btn-open-audit-modal" class="px-2.5 py-1 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-900 transition flex items-center gap-1 text-[11px] font-bold">
-                <i class="fa-solid fa-signature"></i> Notion 存根
+            <!-- Notion 存根按鈕 (手機版保留小圖示按鈕) -->
+            <button id="btn-open-audit-modal" class="px-2 py-1 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-900 transition flex items-center gap-1 text-[10px] md:text-[11px] font-bold" title="Notion HMAC 存根">
+                <i class="fa-solid fa-signature"></i> <span class="hidden sm:inline">Notion</span>
             </button>
         </div>
     </header>
