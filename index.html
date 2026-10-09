@@ -166,6 +166,12 @@
             vertical-align: middle;
         }
 
+        /* 手機版滾動容器安全區與平滑滾動 */
+        .mobile-scroll-container {
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem)) !important;
+        }
+
         /* 手機版極簡雙字燈號專用徽章 (嚴格不折行、不超出外框) */
         .badge-compact-2char {
             display: inline-flex;
@@ -504,7 +510,7 @@
     </div>
 
     <!-- 手機版介面 ROOT (上 45% 地圖 + 下 55% 滾動式完整表格資訊清單) -->
-    <div id="mobile-root" class="h-[calc(100vh-52px)] w-full flex-col hidden relative overflow-hidden bg-cyberDark">
+    <div id="mobile-root" class="h-[calc(100dvh-48px)] md:h-[calc(100vh-52px)] w-full flex-col hidden relative overflow-hidden bg-cyberDark">
         <!-- 上半部：GIS 地圖與浮動狀態 (佔 45%) -->
         <div class="relative w-full h-[45%] min-h-0 bg-cyberDark shrink-0">
             <div id="leafletMapMobile"></div>
@@ -531,8 +537,8 @@
             </div>
         </div>
 
-        <!-- 下半部：滾動式完整表格資訊清單 (佔 55%) -->
-        <div class="w-full flex-1 min-h-0 bg-cyberPanel border-t border-cyberBorder p-2 overflow-y-auto text-xs font-mono space-y-2.5">
+        <!-- 下半部：滾動式完整表格資訊清單 (佔 55%，加強底部安全距離防止遮擋) -->
+        <div class="w-full flex-1 min-h-0 bg-cyberPanel border-t border-cyberBorder p-2.5 mobile-scroll-container overflow-y-auto text-xs font-mono space-y-2.5 overscroll-contain">
             
             <!-- 1. 【手機版第一優先：極簡即時動態感知卡 (文字嚴格不超過2個字，不擠不溢出)】 -->
             <div class="bg-cyberDark p-2.5 rounded-xl border border-neonPurple/60 shadow-[0_0_15px_rgba(176,38,255,0.2)] space-y-1.5">
@@ -764,7 +770,7 @@
             </div>
 
             <!-- 8. 現場防線管制準則 (易知易從・極簡要點) -->
-            <div class="bg-cyberDark p-2 rounded-xl border border-neonGreen/40 space-y-1 text-slate-300 shadow-md">
+            <div class="bg-cyberDark p-2.5 rounded-xl border border-neonGreen/50 space-y-1.5 text-slate-300 shadow-lg">
                 <div class="text-neonGreen font-bold text-xs flex items-center justify-between border-b border-cyberBorder pb-1 font-orbitron">
                     <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-neonGreen"></i> 現場防線準則</span>
                     <span class="badge-compact-2char bg-emerald-950 text-emerald-300 border border-emerald-500/40">🟢 鎖定</span>
@@ -797,6 +803,14 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- 底部防切安全緩衝區 (確保 iOS/Android 手機螢幕 Home Bar / 底部網址列完全不遮擋) -->
+            <div class="w-full pt-2 pb-6 flex flex-col items-center justify-center text-[10px] text-slate-500 font-mono border-t border-cyberBorder/30">
+                <span class="text-slate-400 flex items-center gap-1 font-bold">
+                    🐮 GEM ENGINE v27.0 • 現場防線指引完畢
+                </span>
+                <span class="text-[9px] text-slate-600 mt-0.5">滑動已至最底端 • 保持安全距離</span>
             </div>
 
         </div>
