@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GEM Engine v30.2 | 草嶺古道 × 桃源谷全域國道路況戰情總台 (TDX官方精度對齊版)</title>
+    <title>GEM Engine v30.2 | 草嶺古道 × 桃源谷全域國道路況戰情總台 (Mobile-Card & Desktop Dual Mode)</title>
     
-    <!-- PWA & Favicon Icons -->
+    <!-- PWA & Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23030712'/><rect x='3' y='3' width='94' height='94' rx='20' fill='none' stroke='%2300f0ff' stroke-width='3'/><text x='50%' y='55%' font-size='56' dominant-baseline='central' text-anchor='middle'>🐮</text></svg>">
     <meta name="theme-color" content="#030712">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,7 +22,7 @@
     <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@600;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -37,8 +37,8 @@
                     },
                     colors: {
                         cyberDark: '#030712',
-                        cyberPanel: 'rgba(8, 14, 28, 0.96)',
-                        cyberCard: 'rgba(13, 23, 44, 0.94)',
+                        cyberPanel: 'rgba(8, 14, 28, 0.98)',
+                        cyberCard: 'rgba(13, 23, 44, 0.96)',
                         cyberBorder: '#162b4d',
                         neonCyan: '#00f0ff',
                         neonPurple: '#b026ff',
@@ -81,42 +81,85 @@
             background: #080e1c !important;
         }
 
+        /* 徹底重置 Leaflet DivIcon 預設方塊，防止黑框破圖 */
+        .leaflet-div-icon {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        /* 極簡高對比戰術據點節點 (常態無文字，告別重疊壅塞) */
+        .cp-waypoint-marker {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 16px !important;
+            height: 16px !important;
+            cursor: pointer !important;
+        }
+        .cp-waypoint-core {
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            box-shadow: 0 0 10px currentColor, 0 2px 6px rgba(0, 0, 0, 0.9);
+            border: 2px solid #ffffff;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+        }
+        .cp-waypoint-ring {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            border: 1.5px solid currentColor;
+            opacity: 0.6;
+            animation: waypoint-pulse 2s infinite ease-out;
+            pointer-events: none;
+        }
+        .cp-waypoint-marker:hover .cp-waypoint-core {
+            transform: scale(1.4);
+        }
+
+        @keyframes waypoint-pulse {
+            0% { transform: scale(0.7); opacity: 0.9; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        /* 游標移至該點之懸浮簡要戰情標籤 (Tooltip) */
+        .leaflet-tooltip.cp-hover-tooltip {
+            background: rgba(6, 11, 24, 0.96) !important;
+            border: 1.5px solid #00f0ff !important;
+            border-radius: 8px !important;
+            padding: 5px 9px !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85), 0 0 12px rgba(0, 240, 255, 0.4) !important;
+            color: #f1f5f9 !important;
+            font-family: 'Rajdhani', sans-serif !important;
+            font-size: 12px !important;
+            backdrop-filter: blur(8px) !important;
+            white-space: nowrap !important;
+        }
+        .leaflet-tooltip-top.cp-hover-tooltip::before {
+            border-top-color: #00f0ff !important;
+        }
+
         .leaflet-popup-content-wrapper {
             background: rgba(6, 11, 24, 0.96) !important;
-            border: 1px solid rgba(0, 240, 255, 0.6) !important;
+            border: 2px solid #00f0ff !important;
             border-radius: 8px !important;
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35) !important;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4) !important;
             padding: 2px !important;
             color: #f1f5f9 !important;
         }
         .leaflet-popup-tip {
             background: rgba(6, 11, 24, 0.96) !important;
-            border: 1px solid rgba(0, 240, 255, 0.6) !important;
+            border: 2px solid #00f0ff !important;
         }
         .leaflet-popup-content {
             margin: 8px 10px !important;
             line-height: 1.45 !important;
         }
 
-        .posture-badge-pulse-red { animation: pulse-glow-red 1.5s infinite; }
-        @keyframes pulse-glow-red {
-            0%, 100% { box-shadow: 0 0 12px rgba(255, 42, 95, 0.4); }
-            50% { box-shadow: 0 0 24px rgba(255, 42, 95, 0.95); }
-        }
-
-        .posture-badge-pulse-purple { animation: pulse-glow-purple 1.8s infinite; }
-        @keyframes pulse-glow-purple {
-            0%, 100% { box-shadow: 0 0 10px rgba(176, 38, 255, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(176, 38, 255, 0.85); }
-        }
-
-        .posture-badge-pulse-green { animation: pulse-glow-green 2.2s infinite; }
-        @keyframes pulse-glow-green {
-            0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
-            50% { box-shadow: 0 0 18px rgba(0, 255, 136, 0.8); }
-        }
-
-        /* 雙模態智慧自適應檢測規則 */
+        /* 雙模態智慧自適應模式切換 */
         body.mode-desktop #view-desktop-root { display: grid !important; }
         body.mode-desktop #view-mobile-root { display: none !important; }
         body.mode-mobile #view-desktop-root { display: none !important; }
@@ -126,47 +169,36 @@
         ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: #162b4d; border-radius: 3px; }
 
-        .tactical-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .tactical-table th {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            padding: 6px 8px;
-            background: rgba(13, 23, 44, 0.95);
-            color: #94a3b8;
+        /* 手機專屬 Table-Card 優化結構 (防文字擠壓截斷、字體顯著放大) */
+        .m-card-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px 12px;
+            background: rgba(13, 23, 44, 0.94);
+            border-left: 4px solid #00f0ff;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-top: 1px solid rgba(22, 43, 77, 0.8);
+            border-right: 1px solid rgba(22, 43, 77, 0.8);
             border-bottom: 1px solid rgba(22, 43, 77, 0.8);
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
-        .tactical-table td {
-            font-size: 11.5px;
-            padding: 6px 8px;
-            vertical-align: middle;
-            border-bottom: 1px solid rgba(22, 43, 77, 0.5);
-        }
+        .m-card-item.border-red { border-left-color: #ff2a5f !important; }
+        .m-card-item.border-amber { border-left-color: #ffaa00 !important; }
+        .m-card-item.border-purple { border-left-color: #b026ff !important; }
+        .m-card-item.border-green { border-left-color: #00ff88 !important; }
 
-        .badge-compact-2char {
+        .m-badge-badge {
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            padding: 3px 8px !important;
+            border-radius: 6px !important;
+            white-space: nowrap !important;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 2px;
-            white-space: nowrap;
-            font-weight: 800;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 6px;
-            line-height: 1.2;
-            letter-spacing: 0.02em;
+            gap: 4px;
         }
 
-        /* 國道即時路況圖例光暈 */
-        .highway-glow-green { filter: drop-shadow(0 0 4px #00ff88); }
-        .highway-glow-amber { filter: drop-shadow(0 0 5px #ffaa00); }
-        .highway-glow-red { filter: drop-shadow(0 0 6px #ff2a5f); }
-        .highway-glow-purple { filter: drop-shadow(0 0 5px #b026ff); }
-
-        /* 險風衝擊走廊與動態運動學光暈 */
         .hazard-cone-pulse {
             animation: hazard-pulse 2s infinite ease-in-out;
         }
@@ -179,67 +211,66 @@
 <body class="h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden mode-desktop">
 
     <header class="h-[48px] md:h-[52px] border-b border-cyberBorder bg-cyberPanel backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-50">
-        <!-- 品牌與秒級心跳時鐘 -->
+        <!-- 品牌與心跳時鐘 -->
         <div class="flex items-center gap-2">
-            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)] text-white text-sm md:text-base shrink-0">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 via-indigo-600 to-neonPurple flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)] text-white text-base shrink-0">
                 🐮
             </div>
             <div class="min-w-0">
                 <h1 class="font-orbitron font-extrabold text-xs md:text-sm tracking-wider text-white flex items-center gap-1.5 leading-tight truncate">
                     GEM<span class="text-neonCyan">ENGINE</span> 
-                    <span class="text-[8px] md:text-[8.5px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 font-mono">v30.2 國道動態路況版</span>
+                    <span class="text-[8px] md:text-[8.5px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 font-mono">v30.2 國道動態版</span>
                 </h1>
-                <div class="flex items-center gap-1.5 text-[8.5px] md:text-[9.5px] text-slate-300 font-mono leading-tight">
-                    <span class="text-neonCyan font-bold flex items-center gap-0.5 truncate">
+                <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-slate-300 font-mono leading-tight">
+                    <span class="text-neonCyan font-bold flex items-center gap-1 truncate">
                         <i class="fa-regular fa-clock text-[8px]"></i>
-                        <span id="live-datetime-display">2026-10-10 12:26 CST</span>
+                        <span id="live-datetime-display">2026-10-10 12:57:32 CST</span>
                     </span>
                     <span class="text-slate-500">|</span>
                     <span class="flex items-center gap-1 text-slate-300 shrink-0">
-                        <span id="heartbeat-indicator" class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-neonGreen animate-ping"></span>
-                        <span class="text-[8px] md:text-[8.5px] text-neonGreen font-bold">TDX LIVE</span>
-                        <span class="text-slate-400 text-[8px] md:text-[8.5px] font-mono">(<b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,612</b>)</span>
+                        <span id="heartbeat-indicator" class="w-2 h-2 rounded-full bg-neonGreen animate-ping"></span>
+                        <span class="text-[9px] text-neonGreen font-bold">TDX LIVE</span>
+                        <span class="text-slate-400 text-[9px] font-mono">(<b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,648</b>)</span>
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- 頂部中心：國道即時路況圖例與兩大步道系統狀態 -->
+        <!-- 頂部中心：國道路況燈號概覽 (桌機寬螢幕限定) -->
         <div class="hidden xl:flex items-center gap-3 bg-cyberDark/90 px-3 py-1 rounded-lg border border-cyberBorder text-xs font-mono">
             <div class="flex items-center gap-2 border-r border-cyberBorder/80 pr-2.5">
-                <span class="text-[10px] text-slate-400 font-bold">步道路況即時燈號:</span>
-                <span class="inline-flex items-center gap-1 text-neonGreen text-[10px] font-bold"><span class="w-2.5 h-1 rounded-full bg-neonGreen"></span>順暢(&lt;60%)</span>
-                <span class="inline-flex items-center gap-1 text-neonAmber text-[10px] font-bold"><span class="w-2.5 h-1 rounded-full bg-neonAmber"></span>繁忙(60-80%)</span>
-                <span class="inline-flex items-center gap-1 text-neonRed text-[10px] font-bold"><span class="w-2.5 h-1 rounded-full bg-neonRed animate-pulse"></span>壅塞(&gt;80%)</span>
-                <span class="inline-flex items-center gap-1 text-purple-300 text-[10px] font-bold"><span class="w-2.5 h-1 rounded-full bg-neonPurple"></span>泥塘/濕滑</span>
+                <span class="text-[10.5px] text-slate-400 font-bold">路況燈號:</span>
+                <span class="inline-flex items-center gap-1 text-neonGreen text-[10.5px] font-bold"><span class="w-2 h-2 rounded-full bg-neonGreen"></span>順暢(&lt;60%)</span>
+                <span class="inline-flex items-center gap-1 text-neonAmber text-[10.5px] font-bold"><span class="w-2 h-2 rounded-full bg-neonAmber"></span>繁忙(60-80%)</span>
+                <span class="inline-flex items-center gap-1 text-neonRed text-[10.5px] font-bold"><span class="w-2 h-2 rounded-full bg-neonRed animate-pulse"></span>壅塞(&gt;80%)</span>
+                <span class="inline-flex items-center gap-1 text-purple-300 text-[10.5px] font-bold"><span class="w-2 h-2 rounded-full bg-neonPurple"></span>泥塘/濕滑</span>
             </div>
             <div class="flex items-center gap-1.5 border-r border-cyberBorder/80 pr-2.5">
                 <i class="fa-solid fa-mountain text-neonCyan"></i>
-                <span class="text-slate-400 text-[10px]">草嶺古道全線:</span>
+                <span class="text-slate-400 text-[10.5px]">草嶺古道:</span>
                 <span class="font-orbitron font-bold text-xs text-neonAmber">77.0%</span>
             </div>
             <div class="flex items-center gap-1.5">
                 <i class="fa-solid fa-seedling text-neonGreen"></i>
-                <span class="text-slate-400 text-[10px]">桃源谷步道群:</span>
+                <span class="text-slate-400 text-[10.5px]">桃源谷:</span>
                 <span class="font-orbitron font-bold text-xs text-neonGreen">48.5%</span>
             </div>
         </div>
 
-        <!-- 頂部右側：載具切換偵測模式與圖層切換 -->
-        <div class="flex items-center gap-2">
+        <!-- 頂部右側：載具切換與底圖操作 -->
+        <div class="flex items-center gap-1.5">
             <div class="flex items-center bg-slate-900 border border-cyberBorder rounded-lg p-0.5 text-[10px] font-mono">
                 <button id="btn-device-auto" onclick="setDeviceMode('auto')" class="px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold" title="自動偵測螢幕寬度">
                     <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>AUTO
                 </button>
-                <button id="btn-device-desktop" onclick="setDeviceMode('desktop')" class="px-2 py-1 rounded text-slate-400 hover:text-white" title="強制桌面版 8:4">
+                <button id="btn-device-desktop" onclick="setDeviceMode('desktop')" class="px-2 py-1 rounded text-slate-400 hover:text-white" title="切換為桌面版 8:4">
                     <i class="fa-solid fa-desktop"></i>
                 </button>
-                <button id="btn-device-mobile" onclick="setDeviceMode('mobile')" class="px-2 py-1 rounded text-slate-400 hover:text-white" title="強制手機版 上下分屏">
+                <button id="btn-device-mobile" onclick="setDeviceMode('mobile')" class="px-2 py-1 rounded text-slate-400 hover:text-white" title="切換為手機版 上地圖+下卡片">
                     <i class="fa-solid fa-mobile-screen"></i>
                 </button>
             </div>
 
-            <!-- 底圖圖層一鍵切換 -->
             <div class="hidden sm:flex items-center bg-slate-900 border border-cyberBorder rounded-lg p-0.5 text-[10px] font-mono">
                 <button id="btn-layer-emap" onclick="switchBaseLayer('EMAP')" class="px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold">NLSC向量</button>
                 <button id="btn-layer-photo" onclick="switchBaseLayer('PHOTO2')" class="px-2 py-1 rounded text-slate-400 hover:text-white">正射影像</button>
@@ -254,24 +285,21 @@
 
     <main id="view-desktop-root" class="flex-1 grid grid-cols-12 overflow-hidden relative">
         
-        <!-- 左側主視角：GIS 戰情地圖容器 (佔 8 欄) -->
+        <!-- 左側：8 欄 GIS 空間拓樸大地圖 -->
         <section class="relative h-full col-span-8 flex flex-col border-r border-cyberBorder bg-[#080e1c]">
-            <!-- Leaflet 地圖主圖台 -->
             <div id="leafletMapDesktop" class="w-full h-full"></div>
 
-            <!-- 地圖覆蓋 HUD 浮動儀表板 -->
+            <!-- 地圖懸浮 HUD 儀表板 -->
             <div class="absolute top-3 left-3 z-[400] flex flex-col gap-2 pointer-events-none">
-                <!-- 空間定位與不確定性半徑狀態卡 -->
                 <div class="bg-cyberPanel/95 backdrop-blur-md border border-cyberBorder rounded-lg p-2.5 px-3 pointer-events-auto shadow-2xl hud-bracket max-w-xs">
                     <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
                         <span class="flex items-center gap-1.5 text-white font-bold">
                             <span class="w-2 h-2 rounded-full bg-neonRed animate-ping"></span>
                             2D-EKF 空間定位 (草嶺埡口鞍部)
                         </span>
-                        <span class="text-neonCyan">±1.35m 橢圓</span>
+                        <span class="text-neonCyan">±0.45m</span>
                     </div>
                     <div class="text-xs font-mono space-y-0.5">
-                        <div class="text-slate-300">TWD97: <span class="text-white font-bold">X:334230.0, Y:2762600.0</span></div>
                         <div class="text-slate-300">WGS84: <span class="text-white font-bold">24.980100, 121.926190</span></div>
                         <div class="flex items-center justify-between pt-1 border-t border-slate-700/60 text-[10px]">
                             <span class="text-slate-400">姿態: <b class="text-neonRed">DEFENSIVE_HEAD_LOW</b></span>
@@ -280,87 +308,20 @@
                     </div>
                 </div>
 
-                <!-- 牛隻未來移動變量與險風走廊浮動卡 (新升級) -->
-                <div class="bg-cyberPanel/95 backdrop-blur-md border border-neonRed/50 rounded-lg p-2 px-3 pointer-events-auto shadow-2xl text-[11px] font-mono space-y-1.5 max-w-xs">
+                <div class="bg-cyberPanel/95 backdrop-blur-md border border-neonRed/50 rounded-lg p-2 px-3 pointer-events-auto shadow-2xl text-[11px] font-mono space-y-1 max-w-xs">
                     <div class="text-neonRed font-bold flex items-center justify-between border-b border-slate-800 pb-1">
                         <span class="flex items-center gap-1"><i class="fa-solid fa-compass-drafting text-neonAmber"></i>牛隻運動學變量 & 險風走廊</span>
                         <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-950 text-neonRed border border-red-500 font-bold">HMM 預判</span>
                     </div>
-                    <div class="text-[10px] space-y-0.5">
-                        <div class="flex items-center justify-between text-slate-300">
-                            <span>當前速度向量:</span>
-                            <span class="text-neonCyan font-bold">v=(-0.35, +0.20) m/s (0.40m/s)</span>
-                        </div>
-                        <div class="flex items-center justify-between text-slate-300">
-                            <span>運動方位角 / TTC:</span>
-                            <span class="text-neonAmber font-bold">150.3° (東南) | 碰撞倒數 4.2s</span>
-                        </div>
-                        <div class="flex items-center justify-between text-slate-300">
-                            <span>險風範圍半徑:</span>
-                            <span class="text-neonRed font-bold">🔴 10m 硬防線 | 🟡 30m 警戒</span>
-                        </div>
-                        <div class="flex items-center justify-between text-slate-300 pt-0.5 border-t border-slate-800">
-                            <span>時空外推走廊帶:</span>
-                            <span class="text-purple-300 font-bold">+15m(6.8m) ➔ +30m(14.2m) ➔ +60m(28.5m)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 14 頭水牛三大聚落即時動態氣泡浮動卡 -->
-                <div class="bg-cyberPanel/95 backdrop-blur-md border border-cyberBorder rounded-lg p-2 px-3 pointer-events-auto shadow-2xl text-[11px] font-mono space-y-1 max-w-xs">
-                    <div class="text-neonCyan font-bold flex items-center justify-between border-b border-slate-800 pb-1">
-                        <span><i class="fa-solid fa-cow mr-1 text-neonAmber"></i>三大聚落動態監測 (共14頭)</span>
-                        <span class="text-[9px] text-neonGreen font-bold">TDX-ALIGNED</span>
-                    </div>
-                    <div class="flex items-center justify-between text-slate-300">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neonRed animate-pulse"></span>聚落A (埡口鞍部)</span>
-                        <span class="font-bold text-neonRed">7頭 | 4.2m 防禦對峙 🔴</span>
-                    </div>
-                    <div class="flex items-center justify-between text-slate-300">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neonPurple"></span>聚落B (護管所泥塘)</span>
-                        <span class="font-bold text-purple-300">4頭 | 泥浴散熱 🟣</span>
-                    </div>
-                    <div class="flex items-center justify-between text-slate-300">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neonGreen"></span>聚落C (桃源谷稜線草坡)</span>
-                        <span class="font-bold text-neonGreen">3頭 | 避風採食 🟢</span>
-                    </div>
-                </div>
-
-                <!-- 步道系統切換與精確跳轉導航卡 -->
-                <div class="bg-cyberPanel/95 backdrop-blur-md border border-cyan-500/40 rounded-lg p-2 px-3 pointer-events-auto shadow-2xl text-[11px] font-mono space-y-1.5 max-w-xs">
-                    <div class="text-neonCyan font-bold flex items-center justify-between border-b border-slate-800 pb-1">
-                        <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-signs-post text-neonCyan"></i>
-                            國道路況步道全線 (點擊飛躍)
-                        </span>
-                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-600/40">全長 17.5km</span>
-                    </div>
-                    <div class="text-[10px] text-slate-300 space-y-1">
-                        <div class="flex items-center justify-between">
-                            <span class="text-slate-400">草嶺古道 (8.5km):</span>
-                            <div class="flex gap-1">
-                                <button onclick="flyToCheckpoint('CP1')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-slate-300 hover:text-white">遠望坑</button>
-                                <button onclick="flyToCheckpoint('CP2')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-slate-300 hover:text-white">蠻煙碑</button>
-                                <button onclick="flyToCheckpoint('CP3')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-slate-300 hover:text-white">虎字碑</button>
-                                <button onclick="flyToCheckpoint('CP4')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-neonRed hover:text-white">埡口</button>
-                                <button onclick="flyToCheckpoint('CP5')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-slate-300 hover:text-white">客棧</button>
-                                <button onclick="flyToCheckpoint('CP6')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-cyan-900/60 text-slate-300 hover:text-white">天公廟</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between pt-1 border-t border-slate-800/80">
-                            <span class="text-slate-400">桃源谷線 (9.0km):</span>
-                            <div class="flex gap-1">
-                                <button onclick="flyToCheckpoint('TY1')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-emerald-900/60 text-slate-300 hover:text-white">灣坑頭山</button>
-                                <button onclick="flyToCheckpoint('TY2')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-emerald-900/60 text-neonGreen hover:text-white">大草原</button>
-                                <button onclick="flyToCheckpoint('TY3')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-emerald-900/60 text-slate-300 hover:text-white">內寮蕭家</button>
-                                <button onclick="flyToCheckpoint('TY4')" class="px-1 py-0.5 rounded bg-slate-800 hover:bg-emerald-900/60 text-slate-300 hover:text-white">大溪車站</button>
-                            </div>
-                        </div>
+                    <div class="text-[10px] space-y-0.5 text-slate-300">
+                        <div>速度向量: <b class="text-neonCyan">v=(-0.35, +0.20) m/s (0.40m/s)</b></div>
+                        <div>航向角/TTC: <b class="text-neonAmber">150.3° (東南) | 碰撞倒數 4.2s</b></div>
+                        <div>險風半徑: <b class="text-neonRed">🔴 10m 硬防線 | 🟡 30m 警戒</b></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 地圖右下角快捷縮放與視角重置 -->
+            <!-- 地圖視角快捷控制 -->
             <div class="absolute bottom-3 right-3 z-[400] flex flex-col gap-1.5">
                 <button onclick="resetMapView()" class="w-8 h-8 rounded-lg bg-cyberPanel border border-cyberBorder text-neonCyan flex items-center justify-center hover:bg-slate-800 shadow-lg text-xs" title="回到草嶺古道埡口">
                     <i class="fa-solid fa-crosshairs"></i>
@@ -371,7 +332,7 @@
             </div>
         </section>
 
-        <!-- 右側資訊清冊戰情報告 (佔 4 欄) -->
+        <!-- 右側：4 欄資訊清冊戰情報告 -->
         <section class="h-full col-span-4 flex flex-col bg-cyberPanel border-l border-cyberBorder overflow-y-auto">
             
             <!-- 核心指標四維快覽 -->
@@ -381,7 +342,7 @@
                         <i class="fa-solid fa-shield-halved text-neonCyan"></i>
                         雙步道時位險調控總台
                     </span>
-                    <span id="badge-yi-state" class="badge-compact-2char bg-red-950/90 text-neonRed border border-neonRed/60">
+                    <span id="badge-yi-state" class="m-badge-badge bg-red-950/90 text-neonRed border border-neonRed/60">
                         🔴 埡口極限過載 (老陽)
                     </span>
                 </div>
@@ -405,142 +366,107 @@
                 </div>
             </div>
 
-            <!-- 右側各模組滾動區域 -->
+            <!-- 右側滾動區域 -->
             <div class="p-3 space-y-4">
 
-                <!-- 模組一：時・位・險整合矩陣 (Canvas Kinematics Matrix，支援點選時段連動) -->
+                <!-- 模組一：時・位・險整合矩陣 Canvas (支援點選時段連動) -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-mono">
                         <span class="text-slate-300 font-bold flex items-center gap-1">
                             <i class="fa-solid fa-chart-line text-neonPurple"></i>
-                            一、時・位・險全日矩陣 (點選時段可切換全域動態)
+                            一、時・位・險全日矩陣 (點選切換全域動態)
                         </span>
-                        <span id="label-selected-time" class="text-[10px] px-1.5 py-0.5 rounded bg-neonCyan/20 text-neonCyan font-bold">12:00 (當前時段)</span>
+                        <span id="label-selected-time" class="text-[10px] px-1.5 py-0.5 rounded bg-neonCyan/20 text-neonCyan font-bold">12:00</span>
                     </div>
-                    <!-- 時段快速選鈕 -->
                     <div class="grid grid-cols-6 gap-1 font-mono text-[10px]">
-                        <button onclick="setTimeSlot('08:00')" id="btn-slot-0800" class="py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder">08:00</button>
-                        <button onclick="setTimeSlot('10:00')" id="btn-slot-1000" class="py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder">10:00</button>
+                        <button onclick="setTimeSlot('08:00')" id="btn-slot-0800" class="py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400 hover:text-white">08:00</button>
+                        <button onclick="setTimeSlot('10:00')" id="btn-slot-1000" class="py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400 hover:text-white">10:00</button>
                         <button onclick="setTimeSlot('12:00')" id="btn-slot-1200" class="py-1 rounded bg-neonCyan/20 text-neonCyan font-bold border border-neonCyan">12:00</button>
-                        <button onclick="setTimeSlot('14:00')" id="btn-slot-1400" class="py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder">14:00</button>
-                        <button onclick="setTimeSlot('16:00')" id="btn-slot-1600" class="py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder">16:00</button>
-                        <button onclick="setTimeSlot('18:30')" id="btn-slot-1830" class="py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder">18:30</button>
+                        <button onclick="setTimeSlot('14:00')" id="btn-slot-1400" class="py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400 hover:text-white">14:00</button>
+                        <button onclick="setTimeSlot('16:00')" id="btn-slot-1600" class="py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400 hover:text-white">16:00</button>
+                        <button onclick="setTimeSlot('18:30')" id="btn-slot-1830" class="py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400 hover:text-white">18:30</button>
                     </div>
                     <div class="p-2.5 rounded-lg border border-cyberBorder bg-cyberDark/90 relative">
                         <canvas id="kinematicsCanvasDesktop" width="380" height="150" class="w-full h-[150px] cursor-pointer" onclick="handleCanvasClick(event, 'desktop')"></canvas>
-                        <div class="flex items-center justify-between text-[9.5px] font-mono text-slate-400 mt-2 border-t border-slate-800 pt-1">
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-1.5 bg-cyan-500/40 inline-block"></span> 人流壓力 v6</span>
-                            <span class="flex items-center gap-1"><span class="w-2.5 h-0.5 bg-neonPurple inline-block"></span> 水牛速度 (m/s)</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neonRed inline-block"></span> 時位險高危據點</span>
-                        </div>
                     </div>
                 </div>
 
-                <!-- 模組二：14 頭水牛三大棲地聚落姿態與 10m Flight Zone (隨時段連動) -->
+                <!-- 模組二：14 頭水牛三大棲地聚落態勢 -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-mono">
                         <span class="text-slate-300 font-bold flex items-center gap-1">
                             <i class="fa-solid fa-cow text-neonAmber"></i>
-                            二、14頭水牛棲地聚落姿態與 10m Flight Zone
+                            二、14頭水牛棲地聚落與 10m 防線 (隨時段連動)
                         </span>
                         <span class="text-[10px] text-neonRed font-bold">14 頭群聚連動</span>
                     </div>
                     <div class="rounded-lg border border-cyberBorder overflow-hidden bg-cyberDark/70">
-                        <table class="tactical-table">
-                            <thead>
+                        <table class="w-full text-left font-mono text-[11px]">
+                            <thead class="bg-slate-900/90 text-slate-400">
                                 <tr>
-                                    <th>棲地聚落</th>
-                                    <th>頭數 / 姿態</th>
-                                    <th>人牛間距</th>
-                                    <th>TTC 倒數</th>
-                                    <th>風險 R</th>
+                                    <th class="p-2">棲地聚落</th>
+                                    <th class="p-2">頭數/姿態</th>
+                                    <th class="p-2">間距</th>
+                                    <th class="p-2">TTC</th>
+                                    <th class="p-2">風險 R</th>
                                 </tr>
                             </thead>
-                            <tbody class="font-mono text-[11px]" id="table-buffalo-desktop">
-                                <!-- 動態渲染水牛聚落連動數據 -->
+                            <tbody id="table-buffalo-desktop" class="divide-y divide-slate-800">
+                                <!-- 動態渲染 -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 模組三：草嶺古道 × 桃源谷各步道路段 國道即時路況清冊 -->
+                <!-- 模組三：步道路段國道即時路況 -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-mono">
                         <span class="text-slate-300 font-bold flex items-center gap-1">
                             <i class="fa-solid fa-traffic-light text-neonCyan"></i>
-                            三、各步道路段國道即時路況 (點擊地圖定位)
+                            三、各步道路段國道即時路況 (點選定位)
                         </span>
                         <span id="label-network-load" class="text-[10px] text-neonAmber font-bold">全域負載: 62.8%</span>
                     </div>
                     <div class="rounded-lg border border-cyberBorder overflow-hidden bg-cyberDark/70">
-                        <table class="tactical-table">
-                            <thead>
+                        <table class="w-full text-left font-mono text-[11px]">
+                            <thead class="bg-slate-900/90 text-slate-400">
                                 <tr>
-                                    <th>步道路段</th>
-                                    <th>即時人流</th>
-                                    <th>承載率</th>
-                                    <th>路況燈號</th>
+                                    <th class="p-2">步道路段</th>
+                                    <th class="p-2">即時人流</th>
+                                    <th class="p-2">承載率</th>
+                                    <th class="p-2">燈號</th>
                                 </tr>
                             </thead>
-                            <tbody class="font-mono text-[11px]" id="table-trails-desktop">
-                                <!-- 動態渲染各路段即時路況 -->
+                            <tbody id="table-trails-desktop" class="divide-y divide-slate-800">
+                                <!-- 動態渲染 -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 模組四：兩大步道 10 大關鍵據點即時統計 (隨時段連動) -->
+                <!-- 模組四：10 大關鍵據點 -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-mono">
                         <span class="text-slate-300 font-bold flex items-center gap-1">
                             <i class="fa-solid fa-map-pin text-neonCyan"></i>
-                            四、關鍵景觀與避難據點 (TDX 精確坐標)
+                            四、關鍵景觀與避難據點
                         </span>
                         <span class="text-[10px] text-neonAmber font-bold">10 大監測節點</span>
                     </div>
                     <div class="rounded-lg border border-cyberBorder overflow-hidden bg-cyberDark/70 max-h-48 overflow-y-auto">
-                        <table class="tactical-table">
-                            <thead>
+                        <table class="w-full text-left font-mono text-[11px]">
+                            <thead class="bg-slate-900/90 text-slate-400 sticky top-0">
                                 <tr>
-                                    <th>據點名稱</th>
-                                    <th>即時人流</th>
-                                    <th>負載率</th>
-                                    <th>狀態</th>
+                                    <th class="p-2">據點名稱</th>
+                                    <th class="p-2">人流</th>
+                                    <th class="p-2">負載率</th>
+                                    <th class="p-2">狀態</th>
                                 </tr>
                             </thead>
-                            <tbody class="font-mono text-[11px]" id="table-checkpoints-desktop">
-                                <!-- 動態渲染 10 大據點 -->
+                            <tbody id="table-checkpoints-desktop" class="divide-y divide-slate-800">
+                                <!-- 動態渲染 -->
                             </tbody>
                         </table>
-                    </div>
-                </div>
-
-                <!-- 模組五：Neural-Bandits 導流與 LBS 避險推播 -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between text-xs font-mono">
-                        <span class="text-slate-300 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-wand-magic-sparkles text-neonCyan"></i>
-                            五、Neural-Bandits 決策與 LBS 避險推播
-                        </span>
-                        <span class="text-[10px] text-neonPurple font-bold">雙卦算子</span>
-                    </div>
-                    <div class="p-2.5 rounded-lg border border-neonCyan/40 bg-gradient-to-br from-cyberDark via-slate-900 to-indigo-950/40 text-xs space-y-2">
-                        <div class="flex items-center justify-between text-slate-300 font-mono text-[11px]">
-                            <span>LinUCB 推薦動作:</span>
-                            <span id="label-linucb-action" class="text-neonCyan font-bold">TAOYUANGU_REROUTE (導流至桃源谷大草原)</span>
-                        </div>
-                        <div class="flex items-center justify-between text-slate-300 font-mono text-[11px]">
-                            <span>UCB 得分 / 矩陣自癒:</span>
-                            <span id="label-ucb-score" class="text-neonGreen font-bold">0.8620 / SVD 已收斂</span>
-                        </div>
-                        <div>
-                            <div class="text-[10px] font-mono text-neonCyan font-bold flex items-center gap-1">
-                                <i class="fa-solid fa-bullhorn"></i> LBS 離火緊急避險推播 (PWA / LINE@ @slowcoast):
-                            </div>
-                            <div id="label-lbs-msg" class="text-white mt-1 leading-relaxed bg-black/40 p-2 rounded border border-cyberBorder text-xs">
-                                📢【草嶺×桃源谷步道安全通報】草嶺古道埡口段人牛間距緊迫（4.2m），建議遊客配合導流改由 <b>桃源谷草嶺線</b> 或 <b>內寮線</b> 暢遊廣闊大草原，風景開闊且人流順暢！
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -548,137 +474,98 @@
         </section>
     </main>
 
-    <!-- 手機端畫面佈局容器 -->
     <main id="view-mobile-root" class="flex-1 flex flex-col overflow-hidden relative">
         
-        <!-- 手機版上方 48% 地圖舞台 -->
-        <section class="h-[48dvh] w-full relative border-b border-cyberBorder bg-[#080e1c] shrink-0">
+        <!-- 手機版上方：38dvh 精密地圖舞台 -->
+        <section class="h-[38dvh] w-full relative border-b border-cyberBorder bg-[#080e1c] shrink-0">
             <div id="leafletMapMobile" class="w-full h-full"></div>
             
-            <!-- 手機版浮動小標籤 -->
-            <div class="absolute top-2 left-2 z-[400] bg-cyberPanel/95 backdrop-blur-md border border-cyberBorder px-2.5 py-1 rounded text-[10px] font-mono flex items-center gap-2">
+            <!-- 手機版微型 HUD -->
+            <div class="absolute top-2 left-2 z-[400] bg-cyberPanel/95 border border-neonCyan/60 px-2.5 py-1 rounded text-xs font-mono flex items-center gap-2 shadow-lg">
                 <span class="flex items-center gap-1 text-white font-bold">
                     <span class="w-2 h-2 rounded-full bg-neonRed animate-ping"></span>
                     埡口高危 | 桃源谷順暢
                 </span>
-                <span class="text-neonCyan">±1.35m</span>
+                <span class="text-neonCyan">±0.45m</span>
             </div>
 
-            <div class="absolute bottom-2 right-2 z-[400] flex flex-col gap-1">
-                <button onclick="resetMapView()" class="w-7 h-7 rounded bg-cyberPanel border border-cyberBorder text-neonCyan flex items-center justify-center text-xs" title="埡口">
-                    <i class="fa-solid fa-crosshairs"></i>
-                </button>
-                <button onclick="flyToTaoyuanguOverview()" class="w-7 h-7 rounded bg-cyberPanel border border-cyberBorder text-neonGreen flex items-center justify-center text-xs" title="桃源谷">
-                    <i class="fa-solid fa-mountain-sun"></i>
-                </button>
+            <!-- 手機版時段快速按鈕列 -->
+            <div class="absolute bottom-2 left-2 right-2 z-[400] flex justify-center gap-1 bg-cyberDark/90 p-1 rounded border border-cyberBorder backdrop-blur">
+                <button onclick="setTimeSlot('08:00')" id="m-btn-0800" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300">08:00</button>
+                <button onclick="setTimeSlot('10:00')" id="m-btn-1000" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300">10:00</button>
+                <button onclick="setTimeSlot('12:00')" id="m-btn-1200" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-neonCyan text-black shadow-[0_0_8px_#00f0ff]">12:00</button>
+                <button onclick="setTimeSlot('14:00')" id="m-btn-1400" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300">14:00</button>
+                <button onclick="setTimeSlot('16:00')" id="m-btn-1600" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300">16:00</button>
+                <button onclick="setTimeSlot('18:30')" id="m-btn-1830" class="flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300">18:30</button>
             </div>
         </section>
 
-        <!-- 手機版下方 52% 滾動式全域資訊清冊 -->
-        <section class="flex-1 overflow-y-auto bg-cyberPanel p-3 space-y-3.5">
+        <!-- 手機版下方：62dvh 滾動式全域「大字體、零切邊、卡片式」清冊 -->
+        <section class="flex-1 overflow-y-auto bg-cyberDark p-3 space-y-3" style="-webkit-overflow-scrolling: touch; padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));">
             
-            <!-- 核心指標四宮格 -->
-            <div class="grid grid-cols-4 gap-1.5 font-mono text-center">
-                <div class="bg-cyberDark/90 p-1.5 rounded border border-cyberBorder">
-                    <div class="text-[9px] text-slate-400">溫濕 THI</div>
-                    <div id="stat-thi-mobile" class="text-xs font-bold text-purple-400">83.6</div>
+            <!-- 手機核心指標 2x2 大卡片 -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-cyberCard p-2.5 rounded-lg border border-cyberBorder flex flex-col justify-between">
+                    <span class="text-xs text-slate-400 font-bold">溫濕應力 THI</span>
+                    <span id="stat-thi-mobile" class="text-xl font-bold font-mono text-purple-400">83.6</span>
+                    <span class="text-[11px] text-purple-300 font-bold">🟣 強烈熱應力 (泥浴)</span>
                 </div>
-                <div class="bg-cyberDark/90 p-1.5 rounded border border-cyberBorder">
-                    <div class="text-[9px] text-slate-400">衝突風險 R</div>
-                    <div id="stat-risk-mobile" class="text-xs font-bold text-neonRed">14.82</div>
-                </div>
-                <div class="bg-cyberDark/90 p-1.5 rounded border border-cyberBorder">
-                    <div class="text-[9px] text-slate-400">草嶺古道</div>
-                    <div id="stat-caoling-load-mobile" class="text-xs font-bold text-neonAmber">77.0%</div>
-                </div>
-                <div class="bg-cyberDark/90 p-1.5 rounded border border-cyberBorder">
-                    <div class="text-[9px] text-slate-400">桃源谷</div>
-                    <div id="stat-ty-load-mobile" class="text-xs font-bold text-neonGreen">48.5%</div>
+                <div class="bg-cyberCard p-2.5 rounded-lg border border-neonRed/60 flex flex-col justify-between">
+                    <span class="text-xs text-slate-400 font-bold">衝突風險 R</span>
+                    <span id="stat-risk-mobile" class="text-xl font-bold font-mono text-neonRed">14.82</span>
+                    <span class="text-[11px] text-neonRed font-bold">🔴 埡口極限過載</span>
                 </div>
             </div>
 
-            <!-- 手機版：時・位・險整合矩陣 Canvas (支援時段切換) -->
+            <!-- 手機：時・位・險整合矩陣 Canvas (放大直觀) -->
             <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-xs font-mono">
-                    <span class="text-slate-200 font-bold flex items-center gap-1">
+                <div class="flex items-center justify-between text-sm px-1">
+                    <span class="text-white font-bold flex items-center gap-1.5">
                         <i class="fa-solid fa-chart-line text-neonPurple"></i>
-                        時・位・險全日走廊 (點選時段連動)
+                        時・位・險走廊 (點選時段連動)
                     </span>
-                    <span id="label-selected-time-mobile" class="text-[10px] text-neonCyan font-bold">12:00</span>
-                </div>
-                <!-- 手機版時段快速選鈕 -->
-                <div class="grid grid-cols-6 gap-1 font-mono text-[9px]">
-                    <button onclick="setTimeSlot('08:00')" class="py-0.5 rounded bg-slate-900 border border-cyberBorder">08:00</button>
-                    <button onclick="setTimeSlot('10:00')" class="py-0.5 rounded bg-slate-900 border border-cyberBorder">10:00</button>
-                    <button onclick="setTimeSlot('12:00')" class="py-0.5 rounded bg-neonCyan/20 text-neonCyan font-bold border border-neonCyan">12:00</button>
-                    <button onclick="setTimeSlot('14:00')" class="py-0.5 rounded bg-slate-900 border border-cyberBorder">14:00</button>
-                    <button onclick="setTimeSlot('16:00')" class="py-0.5 rounded bg-slate-900 border border-cyberBorder">16:00</button>
-                    <button onclick="setTimeSlot('18:30')" class="py-0.5 rounded bg-slate-900 border border-cyberBorder">18:30</button>
+                    <span id="label-selected-time-mobile" class="text-xs text-neonCyan font-mono font-bold">12:00</span>
                 </div>
                 <div class="p-2 rounded-lg border border-cyberBorder bg-cyberDark/90">
-                    <canvas id="kinematicsCanvasMobile" width="340" height="130" class="w-full h-[130px] cursor-pointer" onclick="handleCanvasClick(event, 'mobile')"></canvas>
+                    <canvas id="kinematicsCanvasMobile" width="340" height="110" class="w-full h-[110px] cursor-pointer" onclick="handleCanvasClick(event, 'mobile')"></canvas>
                 </div>
             </div>
 
-            <!-- 手機版：14 頭水牛三大聚落狀態 (隨時段連動) -->
+            <!-- 手機：14頭水牛棲地聚落態勢 (大字卡片，絕不切字) -->
             <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-xs font-mono">
-                    <span class="text-slate-200 font-bold flex items-center gap-1">
+                <div class="flex items-center justify-between text-sm px-1">
+                    <span class="text-white font-bold flex items-center gap-1.5">
                         <i class="fa-solid fa-cow text-neonAmber"></i>
-                        水牛聚落、頭數與姿態連動
+                        水牛聚落與 10m 防線態勢
                     </span>
-                    <span class="text-[10px] text-neonRed font-bold">14 頭群聚</span>
+                    <span class="text-xs text-neonRed font-mono font-bold">14 頭群聚連動</span>
                 </div>
-                <div class="rounded-lg border border-cyberBorder overflow-hidden bg-cyberDark/80">
-                    <table class="tactical-table">
-                        <thead>
-                            <tr>
-                                <th>聚落位置</th>
-                                <th>頭數/姿態</th>
-                                <th>間距</th>
-                                <th>TTC/風險</th>
-                            </tr>
-                        </thead>
-                        <tbody class="font-mono text-[11px]" id="table-buffalo-mobile">
-                            <!-- 動態渲染水牛聚落連動數據 -->
-                        </tbody>
-                    </table>
+                <div id="cards-buffalo-mobile" class="space-y-2">
+                    <!-- 動態渲染卡片 -->
                 </div>
             </div>
 
-            <!-- 手機版：各路段國道即時路況 -->
+            <!-- 手機：步道路段國道即時路況 (大字卡片，絕不截斷) -->
             <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-xs font-mono">
-                    <span class="text-slate-200 font-bold flex items-center gap-1">
+                <div class="flex items-center justify-between text-sm px-1">
+                    <span class="text-white font-bold flex items-center gap-1.5">
                         <i class="fa-solid fa-traffic-light text-neonCyan"></i>
-                        步道路段國道路況 (點選跳轉)
+                        各步道路段國道路況 (點選定位)
                     </span>
-                    <span class="text-[10px] text-neonGreen font-bold">17.5km 全網</span>
+                    <span class="text-xs text-neonGreen font-mono font-bold">17.5km 全網</span>
                 </div>
-                <div class="rounded-lg border border-cyberBorder overflow-hidden bg-cyberDark/80">
-                    <table class="tactical-table">
-                        <thead>
-                            <tr>
-                                <th>步道路段</th>
-                                <th>承載率</th>
-                                <th>即時人數</th>
-                                <th>路況</th>
-                            </tr>
-                        </thead>
-                        <tbody class="font-mono text-[11px]" id="table-trails-mobile">
-                            <!-- 動態渲染各路段即時路況 -->
-                        </tbody>
-                    </table>
+                <div id="cards-trails-mobile" class="space-y-2">
+                    <!-- 動態渲染卡片 -->
                 </div>
             </div>
 
-            <!-- 手機版：LBS 避險文案 -->
-            <div class="p-2.5 rounded-lg border border-neonCyan/40 bg-gradient-to-br from-cyberDark to-indigo-950/40 text-xs space-y-1.5">
-                <div class="text-[10px] font-mono text-neonCyan font-bold flex items-center gap-1">
-                    <i class="fa-solid fa-bullhorn"></i> LBS 緊急避險推播 (PWA / LINE@):
+            <!-- 手機：LBS 避險文案 -->
+            <div class="p-3 rounded-lg border border-neonCyan/50 bg-cyberCard text-xs space-y-1">
+                <div class="text-sm font-bold text-neonCyan flex items-center gap-1.5">
+                    <i class="fa-solid fa-bullhorn animate-bounce"></i> 避險推播與導流建議:
                 </div>
-                <div id="label-lbs-msg-mobile" class="text-white leading-relaxed bg-black/40 p-2 rounded border border-cyberBorder text-xs">
-                    📢【草嶺古道安全通報】埡口鞍部水牛群呈防禦姿態，人牛間距緊迫！請配合導引改走 <b>桃源谷大草原草嶺線</b> 或客棧休憩！
+                <div id="label-lbs-msg-mobile" class="text-xs font-bold text-white leading-relaxed">
+                    📢【草嶺×桃源谷步道安全通報】埡口鞍部水牛群呈防禦姿態，人牛間距緊迫（4.2m），建議遊客配合導流改走 <b>桃源谷大草原草嶺線</b> 或 <b>內寮線</b> 暢遊廣闊大草原！
                 </div>
             </div>
 
@@ -686,7 +573,7 @@
     </main>
 
     <script>
-        // 核心地圖與圖層變數
+        // 核心地圖與狀態變數
         let mapDesktop = null;
         let mapMobile = null;
         let baseLayersDesktop = {};
@@ -699,800 +586,710 @@
         let buffaloMarkersMobile = {};
         let buffaloCirclesDesktop = {};
         let buffaloCirclesMobile = {};
-        let tickCount = 1612;
+        let tickCount = 1648;
         let currentDeviceMode = 'auto';
-
-        // 當前選定時段 (預設為正午老陽高峰 12:00)
         let currentTimeSlot = '12:00';
 
-        // ==============================================================================
-        // 【核心坐標】草嶺古道埡口觀景亭與桃源谷大草原中心坐標 (WGS84)
-        // ==============================================================================
-        const CAOLING_YAKOU = [24.980100, 121.926190]; // 標高 348m
-        const TAOYUANGU_CENTER = [24.960200, 121.905400]; // 標高 500m 大草原
+        const CAOLING_YAKOU = [24.980100, 121.926190];
+        const TAOYUANGU_CENTER = [24.960200, 121.905400];
 
-        // ==============================================================================
-        // 【全日時段水牛動態時空數據庫 (08:00 ~ 18:30)】
-        // 每個時段精確對應：
-        // 1. 各棲地聚落位置坐標、牛隻頭數、姿態、人牛間距、TTC 碰撞倒數、衝突風險 R
-        // 2. 泡泡圖動態半徑與顏色 (依照風險與頭數縮放)
-        // 3. 核心指標 THI、衝突風險、全域人流負載
-        // 4. 對應據點活動狀態與導流對策
-        // ==============================================================================
         const TIME_SLOT_DATABASE = {
             "08:00": {
-                time: "08:00",
-                name: "清晨採食期",
-                thi: 65.2,
-                risk: 0.95,
-                accel: "+0.05/t",
-                yiState: "🟢 少陰常態 (晨光採食)",
-                yiClass: "bg-emerald-950/90 text-neonGreen border-emerald-500/60",
-                caolingLoad: "32.0%",
-                tyLoad: "25.0%",
-                networkLoad: "28.5%",
-                action: "MONITOR_NORMAL (常態景觀監測與晨行導引)",
-                ucbScore: "0.3210",
+                time: "08:00", name: "清晨採食期", thi: 65.2, risk: 0.95, accel: "+0.05/t",
+                yiState: "🟢 少陰常態 (晨光採食)", yiClass: "bg-emerald-950/90 text-neonGreen border-emerald-500/60",
+                caolingLoad: "32.0%", tyLoad: "25.0%", networkLoad: "28.5%",
+                action: "MONITOR_NORMAL (常態景觀監測與晨行導引)", ucbScore: "0.3210",
                 lbsMsg: "早晨氣候涼爽宜人，草嶺古道與桃源谷全線順暢，水牛群多於開闊草坡採食，請維持15m以上距離輕聲通過。",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (虎字碑草坡邊界)",
-                        coords: [24.981200, 121.925700],
-                        count: 4,
-                        posture: "STANDING",
-                        postureText: "4頭 | STANDING (晨露採食)",
-                        distance: 22.0,
-                        ttc: "> 60 秒",
-                        risk: 1.15,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 18,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.25
+                        name: "聚落 A (虎字碑外緣草坡)", coords: [24.981200, 121.925700], count: 4,
+                        posture: "STANDING", postureText: "4頭 ‧ 站立採食", distance: 22.0, ttc: "> 60 秒",
+                        risk: 1.15, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 18, bubbleColor: "#00ff88", bubbleOpacity: 0.25
                     },
                     "cluster_b": {
-                        name: "聚落 B (客棧下方山凹溪流)",
-                        coords: [24.974800, 121.926100],
-                        count: 4,
-                        posture: "TRANSIT",
-                        postureText: "4頭 | TRANSIT (林下慢步)",
-                        distance: 35.0,
-                        ttc: "> 60 秒",
-                        risk: 0.85,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 16,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.2
+                        name: "聚落 B (客棧下方山凹溪流)", coords: [24.974800, 121.926100], count: 4,
+                        posture: "TRANSIT", postureText: "4頭 ‧ 林下漫步", distance: 35.0, ttc: "> 60 秒",
+                        risk: 0.85, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 16, bubbleColor: "#00ff88", bubbleOpacity: 0.2
                     },
                     "cluster_c": {
-                        name: "聚落 C (桃源谷大草原核心草坡)",
-                        coords: [24.960200, 121.905400],
-                        count: 6,
-                        posture: "GRAZING",
-                        postureText: "6頭 | GRAZING (草原廣域採食)",
-                        distance: 45.0,
-                        ttc: "> 60 秒",
-                        risk: 0.70,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 28,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.35
+                        name: "聚落 C (桃源谷大草原草坡)", coords: [24.960200, 121.905400], count: 6,
+                        posture: "GRAZING", postureText: "6頭 ‧ 草原廣域採食", distance: 45.0, ttc: "> 60 秒",
+                        risk: 0.70, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 28, bubbleColor: "#00ff88", bubbleOpacity: 0.35
                     }
                 }
             },
             "10:00": {
-                time: "10:00",
-                name: "上午人流升溫期",
-                thi: 74.8,
-                risk: 4.85,
-                accel: "+0.15/t",
-                yiState: "🟡 少陽升溫 (動態監測)",
-                yiClass: "bg-amber-950/90 text-neonAmber border-amber-500/60",
-                caolingLoad: "58.5%",
-                tyLoad: "36.0%",
-                networkLoad: "48.2%",
-                action: "TRAIL_WARNING_DISPATCH (隘口人牛交會預防提醒)",
-                ucbScore: "0.5840",
+                time: "10:00", name: "上午升溫期", thi: 74.8, risk: 4.85, accel: "+0.15/t",
+                yiState: "🟡 少陽升溫 (動態監測)", yiClass: "bg-amber-950/90 text-neonAmber border-amber-500/60",
+                caolingLoad: "58.5%", tyLoad: "36.0%", networkLoad: "48.2%",
+                action: "TRAIL_WARNING_DISPATCH (隘口人牛交會提醒)", ucbScore: "0.5840",
                 lbsMsg: "上午入山遊客量迅速攀升，埡口風口前哨水牛聚落A逐漸向步道收攏，請遊客放慢步伐，勿大聲喧嘩。",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (虎字碑近隘口處)",
-                        coords: [24.980600, 121.925942],
-                        count: 6,
-                        posture: "DEFENSIVE",
-                        postureText: "6頭 | DEFENSIVE (聚集群聚警戒)",
-                        distance: 9.8,
-                        ttc: "14.5 秒",
-                        risk: 4.85,
-                        riskColor: "text-neonAmber",
-                        badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
-                        bubbleRadius: 26,
-                        bubbleColor: "#ffaa00",
-                        bubbleOpacity: 0.4
+                        name: "聚落 A (虎字碑隘口前哨)", coords: [24.980600, 121.925942], count: 6,
+                        posture: "DEFENSIVE", postureText: "6頭 ‧ 聚集群聚警戒", distance: 9.8, ttc: "14.5 秒",
+                        risk: 4.85, riskColor: "text-neonAmber", borderClass: "border-amber", badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
+                        bubbleRadius: 26, bubbleColor: "#ffaa00", bubbleOpacity: 0.4
                     },
                     "cluster_b": {
-                        name: "聚落 B (護管所山谷路緣)",
-                        coords: [24.975400, 121.926200],
-                        count: 4,
-                        posture: "STANDING",
-                        postureText: "4頭 | STANDING (避陽樹下歇息)",
-                        distance: 25.0,
-                        ttc: "> 40 秒",
-                        risk: 1.80,
-                        riskColor: "text-neonAmber",
-                        badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
-                        bubbleRadius: 18,
-                        bubbleColor: "#ffaa00",
-                        bubbleOpacity: 0.25
+                        name: "聚落 B (護管所山谷路緣)", coords: [24.975400, 121.926200], count: 4,
+                        posture: "STANDING", postureText: "4頭 ‧ 避陽樹下歇息", distance: 25.0, ttc: "> 40 秒",
+                        risk: 1.80, riskColor: "text-neonAmber", borderClass: "border-amber", badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
+                        bubbleRadius: 18, bubbleColor: "#ffaa00", bubbleOpacity: 0.25
                     },
                     "cluster_c": {
-                        name: "聚落 C (桃源谷草嶺稜線坡)",
-                        coords: [24.965000, 121.912000],
-                        count: 4,
-                        posture: "GRAZING",
-                        postureText: "4頭 | GRAZING (背風採食)",
-                        distance: 50.0,
-                        ttc: "> 60 秒",
-                        risk: 0.85,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 22,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.25
+                        name: "聚落 C (桃源谷草嶺稜線坡)", coords: [24.965000, 121.912000], count: 4,
+                        posture: "GRAZING", postureText: "4頭 ‧ 背風採食", distance: 50.0, ttc: "> 60 秒",
+                        risk: 0.85, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 22, bubbleColor: "#00ff88", bubbleOpacity: 0.25
                     }
                 }
             },
             "12:00": {
-                time: "12:00",
-                name: "正午老陽極限過載峰值",
-                thi: 83.6,
-                risk: 14.82,
-                accel: "+0.18/t",
-                yiState: "🔴 埡口極限過載 (老陽破防)",
-                yiClass: "bg-red-950/90 text-neonRed border-neonRed/60",
-                caolingLoad: "77.0%",
-                tyLoad: "48.5%",
-                networkLoad: "62.8%",
-                action: "TAOYUANGU_REROUTE (導流至桃源谷大草原)",
-                ucbScore: "0.8620",
-                lbsMsg: "🚨【草嶺×桃源谷步道安全通報】埡口鞍部水牛群呈防禦姿態，人牛間距緊迫（4.2m），建議遊客配合導流改由 <b>桃源谷草嶺線</b> 或 <b>內寮線</b> 暢遊廣闊大草原！",
+                time: "12:00", name: "正午老陽過載峰值", thi: 83.6, risk: 14.82, accel: "+0.18/t",
+                yiState: "🔴 埡口極限過載 (老陽破防)", yiClass: "bg-red-950/90 text-neonRed border-neonRed/60",
+                caolingLoad: "77.0%", tyLoad: "48.5%", networkLoad: "62.8%",
+                action: "TAOYUANGU_REROUTE (導流至桃源谷大草原)", ucbScore: "0.8620",
+                lbsMsg: "🚨【草嶺×桃源谷步道安全通報】埡口鞍部水牛群呈防禦姿態，人牛間距緊迫（4.2m），建議遊客配合導流改走 <b>桃源谷草嶺線</b> 或 <b>內寮線</b> 暢遊廣闊大草原！",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (埡口鞍部風口核心)",
-                        coords: [24.980100, 121.926190],
-                        count: 7,
-                        posture: "DEFENSIVE_HEAD_LOW",
-                        postureText: "7頭 | DEFENSIVE (低頭抵角對峙)",
-                        distance: 4.2,
-                        ttc: "4.2 秒",
-                        risk: 14.82,
-                        riskColor: "text-neonRed font-bold",
-                        badgeClass: "bg-red-950 text-neonRed border border-red-500",
-                        bubbleRadius: 38,
-                        bubbleColor: "#ff2a5f",
-                        bubbleOpacity: 0.55
+                        name: "聚落 A (埡口鞍部核心)", coords: [24.980100, 121.926190], count: 7,
+                        posture: "DEFENSIVE_HEAD_LOW", postureText: "7頭 ‧ 低頭抵角對峙", distance: 4.2, ttc: "4.2 秒",
+                        risk: 14.82, riskColor: "text-neonRed", borderClass: "border-red", badgeClass: "bg-red-950 text-neonRed border border-red-500",
+                        bubbleRadius: 38, bubbleColor: "#ff2a5f", bubbleOpacity: 0.55
                     },
                     "cluster_b": {
-                        name: "聚落 B (護管所山谷泥塘)",
-                        coords: [24.975660, 121.926210],
-                        count: 4,
-                        posture: "MUD_BATHING",
-                        postureText: "4頭 | MUD_BATHING (沼澤泥浴散熱)",
-                        distance: 28.5,
-                        ttc: "> 30 秒",
-                        risk: 2.14,
-                        riskColor: "text-purple-300",
-                        badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
-                        bubbleRadius: 24,
-                        bubbleColor: "#b026ff",
-                        bubbleOpacity: 0.4
+                        name: "聚落 B (護管所山谷泥塘)", coords: [24.975660, 121.926210], count: 4,
+                        posture: "MUD_BATHING", postureText: "4頭 ‧ 沼澤泥浴散熱", distance: 28.5, ttc: "> 30 秒",
+                        risk: 2.14, riskColor: "text-purple-300", borderClass: "border-purple", badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
+                        bubbleRadius: 24, bubbleColor: "#b026ff", bubbleOpacity: 0.4
                     },
                     "cluster_c": {
-                        name: "聚落 C (桃源谷稜線草坡)",
-                        coords: [24.962000, 121.908000],
-                        count: 3,
-                        posture: "GRAZING",
-                        postureText: "3頭 | GRAZING (背風採食)",
-                        distance: 55.0,
-                        ttc: "> 60 秒",
-                        risk: 0.92,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 20,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.25
+                        name: "聚落 C (桃源谷稜線草坡)", coords: [24.962000, 121.908000], count: 3,
+                        posture: "GRAZING", postureText: "3頭 ‧ 背風採食", distance: 55.0, ttc: "> 60 秒",
+                        risk: 0.92, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 20, bubbleColor: "#00ff88", bubbleOpacity: 0.25
                     }
                 }
             },
             "14:00": {
-                time: "14:00",
-                name: "午後高溫泥塘散熱期",
-                thi: 81.5,
-                risk: 11.20,
-                accel: "+0.08/t",
-                yiState: "🔴 溫濕極限泥浴 (老陽持溫)",
-                yiClass: "bg-red-950/90 text-neonRed border-neonRed/60",
-                caolingLoad: "71.5%",
-                tyLoad: "52.0%",
-                networkLoad: "61.0%",
-                action: "MUD_BATH_ISOLATION (護管所泥塘圍籬防線加強)",
-                ucbScore: "0.7950",
-                lbsMsg: "高溫持續觸發熱應力，聚落B於護管所泥塘大規模泥浴，聚落A沿鞍部背風面下切，步道泥濘度升高，請遊客注意防滑並切勿靠近水潭。",
+                time: "14:00", name: "午後高溫泥塘散熱期", thi: 81.5, risk: 11.20, accel: "+0.08/t",
+                yiState: "🔴 溫濕極限泥浴 (老陽持溫)", yiClass: "bg-red-950/90 text-neonRed border-neonRed/60",
+                caolingLoad: "71.5%", tyLoad: "52.0%", networkLoad: "61.0%",
+                action: "MUD_BATH_ISOLATION (護管所泥塘圍籬加強)", ucbScore: "0.7950",
+                lbsMsg: "高溫持續觸發熱應力，聚落B於護管所泥塘大規模泥浴，聚落A沿鞍部背風面下切，步道泥濘度升高，請注意防滑勿靠近水潭。",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (埡口東南邊緣緩坡)",
-                        coords: [24.979600, 121.926450],
-                        count: 6,
-                        posture: "DEFENSIVE",
-                        postureText: "6頭 | DEFENSIVE (下切避風聚集)",
-                        distance: 6.5,
-                        ttc: "8.0 秒",
-                        risk: 11.20,
-                        riskColor: "text-neonRed font-bold",
-                        badgeClass: "bg-red-950 text-neonRed border border-red-500",
-                        bubbleRadius: 32,
-                        bubbleColor: "#ff2a5f",
-                        bubbleOpacity: 0.5
+                        name: "聚落 A (埡口東南邊緣緩坡)", coords: [24.979600, 121.926450], count: 6,
+                        posture: "DEFENSIVE", postureText: "6頭 ‧ 下切避風聚集", distance: 6.5, ttc: "8.0 秒",
+                        risk: 11.20, riskColor: "text-neonRed", borderClass: "border-red", badgeClass: "bg-red-950 text-neonRed border border-red-500",
+                        bubbleRadius: 32, bubbleColor: "#ff2a5f", bubbleOpacity: 0.5
                     },
                     "cluster_b": {
-                        name: "聚落 B (護管所深水沼澤)",
-                        coords: [24.975660, 121.926210],
-                        count: 5,
-                        posture: "MUD_BATHING",
-                        postureText: "5頭 | MUD_BATHING (深潭全浸泡)",
-                        distance: 20.0,
-                        ttc: "> 30 秒",
-                        risk: 3.50,
-                        riskColor: "text-purple-300",
-                        badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
-                        bubbleRadius: 28,
-                        bubbleColor: "#b026ff",
-                        bubbleOpacity: 0.45
+                        name: "聚落 B (護管所深水沼澤)", coords: [24.975660, 121.926210], count: 5,
+                        posture: "MUD_BATHING", postureText: "5頭 ‧ 深潭全浸泡", distance: 20.0, ttc: "> 30 秒",
+                        risk: 3.50, riskColor: "text-purple-300", borderClass: "border-purple", badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
+                        bubbleRadius: 28, bubbleColor: "#b026ff", bubbleOpacity: 0.45
                     },
                     "cluster_c": {
-                        name: "聚落 C (灣坑頭山背風單面山)",
-                        coords: [24.966000, 121.915000],
-                        count: 3,
-                        posture: "LYING",
-                        postureText: "3頭 | LYING (芒草凹處反芻)",
-                        distance: 60.0,
-                        ttc: "> 60 秒",
-                        risk: 0.65,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 18,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.25
+                        name: "聚落 C (灣坑頭山背風草坡)", coords: [24.966000, 121.915000], count: 3,
+                        posture: "LYING", postureText: "3頭 ‧ 芒草凹處反芻", distance: 60.0, ttc: "> 60 秒",
+                        risk: 0.65, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 18, bubbleColor: "#00ff88", bubbleOpacity: 0.25
                     }
                 }
             },
             "16:00": {
-                time: "16:00",
-                name: "午後人流下山疏散期",
-                thi: 72.0,
-                risk: 3.40,
-                accel: "-0.22/t",
-                yiState: "🟡 少陽降溫 (人流疏退)",
-                yiClass: "bg-amber-950/90 text-neonAmber border-amber-500/60",
-                caolingLoad: "45.0%",
-                tyLoad: "38.0%",
-                networkLoad: "42.0%",
-                action: "DESCENT_GUIDANCE (大里天公廟端客運接駁疏散)",
-                ucbScore: "0.4520",
-                lbsMsg: "氣溫逐漸下降，埡口風力增強，遊客正分批朝大里慶雲宮或大溪車站疏散，水牛群開始由山谷向稜線步道緩步移動。",
+                time: "16:00", name: "午後人流疏散期", thi: 72.0, risk: 3.40, accel: "-0.22/t",
+                yiState: "🟡 少陽降溫 (人流疏退)", yiClass: "bg-amber-950/90 text-neonAmber border-amber-500/60",
+                caolingLoad: "45.0%", tyLoad: "38.0%", networkLoad: "42.0%",
+                action: "DESCENT_GUIDANCE (大里天公廟客運接駁)", ucbScore: "0.4520",
+                lbsMsg: "氣溫逐漸下降，埡口風力增強，遊客正分批朝大里慶雲宮疏散，水牛群開始由山谷向稜線步道緩步移動。",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (埡口觀景亭後方坡)",
-                        coords: [24.980300, 121.926600],
-                        count: 5,
-                        posture: "STANDING",
-                        postureText: "5頭 | STANDING (迎風站立望海)",
-                        distance: 14.0,
-                        ttc: "25.0 秒",
-                        risk: 3.40,
-                        riskColor: "text-neonAmber",
-                        badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
-                        bubbleRadius: 22,
-                        bubbleColor: "#ffaa00",
-                        bubbleOpacity: 0.35
+                        name: "聚落 A (埡口觀景亭後方坡)", coords: [24.980300, 121.926600], count: 5,
+                        posture: "STANDING", postureText: "5頭 ‧ 迎風站立望海", distance: 14.0, ttc: "25.0 秒",
+                        risk: 3.40, riskColor: "text-neonAmber", borderClass: "border-amber", badgeClass: "bg-amber-950 text-neonAmber border border-amber-500",
+                        bubbleRadius: 22, bubbleColor: "#ffaa00", bubbleOpacity: 0.35
                     },
                     "cluster_b": {
-                        name: "聚落 B (客棧石階旁泥潭邊緣)",
-                        coords: [24.975200, 121.926150],
-                        count: 4,
-                        posture: "TRANSIT",
-                        postureText: "4頭 | TRANSIT (踏出泥塘梳理)",
-                        distance: 22.0,
-                        ttc: "> 40 秒",
-                        risk: 1.95,
-                        riskColor: "text-purple-300",
-                        badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
-                        bubbleRadius: 18,
-                        bubbleColor: "#b026ff",
-                        bubbleOpacity: 0.3
+                        name: "聚落 B (客棧石階旁泥潭)", coords: [24.975200, 121.926150], count: 4,
+                        posture: "TRANSIT", postureText: "4頭 ‧ 踏出泥塘梳理", distance: 22.0, ttc: "> 40 秒",
+                        risk: 1.95, riskColor: "text-purple-300", borderClass: "border-purple", badgeClass: "bg-purple-950 text-purple-300 border border-purple-500",
+                        bubbleRadius: 18, bubbleColor: "#b026ff", bubbleOpacity: 0.3
                     },
                     "cluster_c": {
-                        name: "聚落 C (桃源谷大草原稜線上)",
-                        coords: [24.960200, 121.905400],
-                        count: 5,
-                        posture: "GRAZING",
-                        postureText: "5頭 | GRAZING (傍晚草坡進食)",
-                        distance: 40.0,
-                        ttc: "> 60 秒",
-                        risk: 0.80,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 24,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.3
+                        name: "聚落 C (桃源谷大草原稜線)", coords: [24.960200, 121.905400], count: 5,
+                        posture: "GRAZING", postureText: "5頭 ‧ 傍晚草坡進食", distance: 40.0, ttc: "> 60 秒",
+                        risk: 0.80, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 24, bubbleColor: "#00ff88", bubbleOpacity: 0.3
                     }
                 }
             },
             "18:30": {
-                time: "18:30",
-                name: "日落夜息期",
-                thi: 63.5,
-                risk: 0.60,
-                accel: "-0.40/t",
-                yiState: "🟢 少陰靜謐 (夜間棲息)",
-                yiClass: "bg-emerald-950/90 text-neonGreen border-emerald-500/60",
-                caolingLoad: "8.5%",
-                tyLoad: "5.0%",
-                networkLoad: "7.0%",
-                action: "NIGHT_PATROL (步道清山與夜間紅外線監控)",
-                ucbScore: "0.1800",
+                time: "18:30", name: "日落夜息期", thi: 63.5, risk: 0.60, accel: "-0.40/t",
+                yiState: "🟢 少陰靜謐 (夜間棲息)", yiClass: "bg-emerald-950/90 text-neonGreen border-emerald-500/60",
+                caolingLoad: "8.5%", tyLoad: "5.0%", networkLoad: "7.0%",
+                action: "NIGHT_PATROL (步道清山與紅外線監控)", ucbScore: "0.1800",
                 lbsMsg: "夜幕低垂，古道全線遊客已疏退完畢，14頭水牛回歸廣闊草坡安靜臥息，系統轉為夜間低功耗巡檢模式。",
                 buffalos: {
                     "cluster_a": {
-                        name: "聚落 A (埡口背風草坳)",
-                        coords: [24.979200, 121.927000],
-                        count: 6,
-                        posture: "LYING",
-                        postureText: "6頭 | LYING (夜間群臥反芻)",
-                        distance: 80.0,
-                        ttc: "> 90 秒",
-                        risk: 0.60,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 20,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.25
+                        name: "聚落 A (埡口背風草坳)", coords: [24.979200, 121.927000], count: 6,
+                        posture: "LYING", postureText: "6頭 ‧ 夜間群臥反芻", distance: 80.0, ttc: "> 90 秒",
+                        risk: 0.60, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 20, bubbleColor: "#00ff88", bubbleOpacity: 0.25
                     },
                     "cluster_b": {
-                        name: "聚落 B (客棧上方林緣草生帶)",
-                        coords: [24.976000, 121.926000],
-                        count: 4,
-                        posture: "LYING",
-                        postureText: "4頭 | LYING (林下避風臥息)",
-                        distance: 75.0,
-                        ttc: "> 90 秒",
-                        risk: 0.45,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 16,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.2
+                        name: "聚落 B (客棧上方林緣草帶)", coords: [24.976000, 121.926000], count: 4,
+                        posture: "LYING", postureText: "4頭 ‧ 林下避風臥息", distance: 75.0, ttc: "> 90 秒",
+                        risk: 0.45, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 16, bubbleColor: "#00ff88", bubbleOpacity: 0.2
                     },
                     "cluster_c": {
-                        name: "聚落 C (桃源谷大牛埔核心)",
-                        coords: [24.960200, 121.905400],
-                        count: 4,
-                        posture: "LYING",
-                        postureText: "4頭 | LYING (萬坪草坡夜棲)",
-                        distance: 90.0,
-                        ttc: "> 90 秒",
-                        risk: 0.40,
-                        riskColor: "text-neonGreen",
-                        badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
-                        bubbleRadius: 22,
-                        bubbleColor: "#00ff88",
-                        bubbleOpacity: 0.2
+                        name: "聚落 C (桃源谷大牛埔核心)", coords: [24.960200, 121.905400], count: 4,
+                        posture: "LYING", postureText: "4頭 ‧ 萬坪草坡夜棲", distance: 90.0, ttc: "> 90 秒",
+                        risk: 0.40, riskColor: "text-neonGreen", borderClass: "border-green", badgeClass: "bg-emerald-950 text-neonGreen border border-emerald-500",
+                        bubbleRadius: 22, bubbleColor: "#00ff88", bubbleOpacity: 0.2
                     }
                 }
             }
         };
 
-        // 時段對應各據點人流比例加權倍率
-        const CHECKPOINT_PEOPLE_FACTORS = {
-            "08:00": 0.42,
-            "10:00": 0.78,
-            "12:00": 1.00, // 基準值
-            "14:00": 0.92,
-            "16:00": 0.58,
-            "18:30": 0.12
-        };
-
-        // 時段對應各步道路況加權倍率
-        const TRAIL_PEOPLE_FACTORS = {
-            "08:00": 0.45,
-            "10:00": 0.80,
-            "12:00": 1.00,
-            "14:00": 0.90,
-            "16:00": 0.60,
-            "18:30": 0.15
-        };
-
-        // ==============================================================================
-        // 【TDX 官方高精度坐標數據庫】草嶺古道 6 大據點 + 桃源谷 4 大據點
-        // ==============================================================================
         const CHECKPOINTS_DATA = [
-            { id: "CP1", name: "遠望坑親水公園", trail: "草嶺古道 (北端登山口)", coords: [25.003750, 121.929290], elevation: 25, people: 120, max: 250 },
-            { id: "CP2", name: "雄鎮蠻煙碑 (古蹟)", trail: "草嶺古道 (林蔭石階段)", coords: [24.990359, 121.925001], elevation: 240, people: 185, max: 240 },
-            { id: "CP3", name: "虎字碑隘口 (風口)", trail: "草嶺古道 (隘口前哨段)", coords: [24.980600, 121.925942], elevation: 330, people: 215, max: 250 },
-            { id: "CP4", name: "埡口觀景亭 (縣界鞍部)", trail: "草嶺古道 (風口核心段)", coords: [24.980100, 121.926190], elevation: 348, people: 280, max: 300 },
-            { id: "CP5", name: "客棧遺址 (護管所泥塘)", trail: "草嶺古道 (山谷背風段)", coords: [24.975660, 121.926210], elevation: 265, people: 150, max: 250 },
-            { id: "CP6", name: "大里天公廟 (慶雲宮)", trail: "草嶺古道 (南端出口)", coords: [24.969600, 121.925190], elevation: 35, people: 195, max: 350 },
-            { id: "TY1", name: "灣坑頭山 (二等三角點)", trail: "桃源谷草嶺線 (稜線峰頂)", coords: [24.974550, 121.910440], elevation: 616, people: 85, max: 180 },
-            { id: "TY2", name: "桃源谷大草原 (核心草坡)", trail: "桃源谷稜線 (萬坪草坡)", coords: [24.960200, 121.905400], elevation: 500, people: 160, max: 350 },
-            { id: "TY3", name: "內寮蕭家莊 (西端登山口)", trail: "桃源谷內寮線 (貢寮端)", coords: [24.958200, 121.892500], elevation: 360, people: 110, max: 220 },
-            { id: "TY4", name: "大溪車站 (海岸線端點)", trail: "桃源谷大溪線 (頭城海濱)", coords: [24.938800, 121.895500], elevation: 15, people: 75, max: 200 }
+            { id: "CP1", name: "遠望坑親水公園", trail: "草嶺古道 (登山口)", coords: [25.003750, 121.929290], people: 120, max: 250 },
+            { id: "CP2", name: "雄鎮蠻煙碑 (古蹟)", trail: "草嶺古道 (石階段)", coords: [24.990359, 121.925001], people: 185, max: 240 },
+            { id: "CP3", name: "虎字碑隘口 (風口)", trail: "草嶺古道 (隘口前哨)", coords: [24.980600, 121.925942], people: 215, max: 250 },
+            { id: "CP4", name: "埡口觀景亭 (鞍部)", trail: "草嶺古道 (風口核心)", coords: [24.980100, 121.926190], people: 280, max: 300 },
+            { id: "CP5", name: "客棧遺址 (護管所)", trail: "草嶺古道 (山谷背風)", coords: [24.975660, 121.926210], people: 150, max: 250 },
+            { id: "CP6", name: "大里天公廟 (慶雲宮)", trail: "草嶺古道 (南端出口)", coords: [24.969600, 121.925190], people: 195, max: 350 },
+            { id: "TY1", name: "灣坑頭山 (二等點)", trail: "桃源谷草嶺線", coords: [24.974550, 121.910440], people: 85, max: 180 },
+            { id: "TY2", name: "桃源谷大草原 (核心)", trail: "桃源谷稜線", coords: [24.960200, 121.905400], people: 160, max: 350 },
+            { id: "TY3", name: "內寮蕭家莊 (登山口)", trail: "桃源谷內寮線", coords: [24.958200, 121.892500], people: 110, max: 220 },
+            { id: "TY4", name: "大溪車站 (海岸端點)", trail: "桃源谷大溪線", coords: [24.938800, 121.895500], people: 75, max: 200 }
         ];
 
-        // ==============================================================================
-        // 【TDX 官方高精度幾何路網】草嶺古道全線 (8.5km) + 桃源谷步道群 (9.0km)
-        // 國道即時路況著色體系：綠(<60%) / 黃(60-80%) / 紅(>80%) / 紫(泥濘濕滑)
-        // ==============================================================================
         const TRAILS_HIGHWAY_DATA = [
             {
-                id: "TR_CL_NORTH",
-                name: "草嶺古道北段 (遠望坑 ➔ 雄鎮蠻煙碑)",
-                trail_system: "草嶺古道",
-                length_km: "2.8 km",
-                width: 2.2,
-                people: 245,
-                max: 450,
-                speed: "3.4 km/h",
-                status_color: "#00ff88",
-                path: [
-                    [25.003750, 121.929290],
-                    [25.000500, 121.928100],
-                    [24.996800, 121.926800],
-                    [24.993200, 121.925800],
-                    [24.990359, 121.925001]
-                ]
+                id: "TR_CL_NORTH", name: "草嶺古道北段 (遠望坑➔蠻煙碑)", system: "草嶺古道", length: "2.8km", width: "2.2m", people: 245, max: 450, color: "#00ff88", status: "🟢 順暢",
+                path: [[25.003750, 121.929290], [25.000500, 121.928100], [24.996800, 121.926800], [24.993200, 121.925800], [24.990359, 121.925001]]
             },
             {
-                id: "TR_CL_MID",
-                name: "草嶺古道中段 (雄鎮蠻煙碑 ➔ 虎字碑)",
-                trail_system: "草嶺古道",
-                length_km: "1.6 km",
-                width: 1.8,
-                people: 260,
-                max: 350,
-                speed: "2.8 km/h",
-                status_color: "#ffaa00",
-                path: [
-                    [24.990359, 121.925001],
-                    [24.987200, 121.924800],
-                    [24.984100, 121.925200],
-                    [24.981800, 121.925700],
-                    [24.980600, 121.925942]
-                ]
+                id: "TR_CL_MID", name: "草嶺古道中段 (蠻煙碑➔虎字碑)", system: "草嶺古道", length: "1.6km", width: "1.8m", people: 260, max: 350, color: "#ffaa00", status: "🟡 繁忙",
+                path: [[24.990359, 121.925001], [24.987200, 121.924800], [24.984100, 121.925200], [24.981800, 121.925700], [24.980600, 121.925942]]
             },
             {
-                id: "TR_CL_PASS",
-                name: "草嶺古道隘口核心 (虎字碑 ➔ 埡口鞍部)",
-                trail_system: "草嶺古道",
-                length_km: "0.5 km",
-                width: 1.5,
-                people: 280,
-                max: 300,
-                speed: "1.2 km/h",
-                status_color: "#ff2a5f",
-                path: [
-                    [24.980600, 121.925942],
-                    [24.980350, 121.926050],
-                    [24.980100, 121.926190]
-                ]
+                id: "TR_CL_PASS", name: "草嶺隘口核心 (虎字碑➔埡口)", system: "草嶺古道", length: "0.5km", width: "1.5m", people: 280, max: 300, color: "#ff2a5f", status: "🔴 壅塞",
+                path: [[24.980600, 121.925942], [24.980350, 121.926050], [24.980100, 121.926190]]
             },
             {
-                id: "TR_CL_SOUTH",
-                name: "草嶺古道南段 (埡口 ➔ 客棧 ➔ 大里天公廟)",
-                trail_system: "草嶺古道",
-                length_km: "3.6 km",
-                width: 2.0,
-                people: 310,
-                max: 500,
-                speed: "3.2 km/h",
-                status_color: "#ffaa00",
-                path: [
-                    [24.980100, 121.926190],
-                    [24.978200, 121.926300],
-                    [24.975660, 121.926210],
-                    [24.973200, 121.926000],
-                    [24.970800, 121.925600],
-                    [24.969600, 121.925190]
-                ]
+                id: "TR_CL_SOUTH", name: "草嶺古道南段 (埡口➔大里天公廟)", system: "草嶺古道", length: "3.6km", width: "2.0m", people: 310, max: 500, color: "#ffaa00", status: "🟡 繁忙",
+                path: [[24.980100, 121.926190], [24.978200, 121.926300], [24.975660, 121.926210], [24.973200, 121.926000], [24.970800, 121.925600], [24.969600, 121.925190]]
             },
             {
-                id: "TR_TY_RIDGE",
-                name: "桃源谷草嶺稜線線 (埡口 ➔ 灣坑頭山 ➔ 大草原)",
-                trail_system: "桃源谷步道",
-                length_km: "4.5 km",
-                width: 1.6,
-                people: 145,
-                max: 350,
-                speed: "2.9 km/h",
-                status_color: "#00ff88",
-                path: [
-                    [24.980100, 121.926190],
-                    [24.978800, 121.921500],
-                    [24.976500, 121.916000],
-                    [24.974550, 121.910440],
-                    [24.970200, 121.908200],
-                    [24.965000, 121.907000],
-                    [24.960200, 121.905400]
-                ]
+                id: "TR_TY_RIDGE", name: "桃源谷草嶺線 (埡口➔大草原)", system: "桃源谷", length: "4.5km", width: "1.6m", people: 145, max: 350, color: "#00ff88", status: "🟢 順暢",
+                path: [[24.980100, 121.926190], [24.978800, 121.921500], [24.976500, 121.916000], [24.974550, 121.910440], [24.970200, 121.908200], [24.965000, 121.907000], [24.960200, 121.905400]]
             },
             {
-                id: "TR_TY_NEILIAO",
-                name: "桃源谷內寮線 (蕭家莊 ➔ 桃源谷大草原)",
-                trail_system: "桃源谷步道",
-                length_km: "1.2 km",
-                width: 1.8,
-                people: 125,
-                max: 300,
-                speed: "3.6 km/h",
-                status_color: "#00ff88",
-                path: [
-                    [24.958200, 121.892500],
-                    [24.958900, 121.897000],
-                    [24.959600, 121.901500],
-                    [24.960200, 121.905400]
-                ]
+                id: "TR_TY_NEILIAO", name: "桃源谷內寮線 (蕭家莊➔大草原)", system: "桃源谷", length: "1.2km", width: "1.8m", people: 125, max: 300, color: "#00ff88", status: "🟢 順暢",
+                path: [[24.958200, 121.892500], [24.958900, 121.897000], [24.959600, 121.901500], [24.960200, 121.905400]]
             },
             {
-                id: "TR_TY_DAXI",
-                name: "桃源谷大溪線 (大溪河濱 ➔ 番子寮山 ➔ 大草原)",
-                trail_system: "桃源谷步道",
-                length_km: "5.0 km",
-                width: 1.4,
-                people: 95,
-                max: 250,
-                speed: "2.1 km/h",
-                status_color: "#00ff88",
-                path: [
-                    [24.938800, 121.895500],
-                    [24.945000, 121.898000],
-                    [24.952000, 121.902000],
-                    [24.960200, 121.905400]
-                ]
+                id: "TR_TY_DAXI", name: "桃源谷大溪線 (大溪海濱➔大草原)", system: "桃源谷", length: "5.0km", width: "1.4m", people: 95, max: 250, color: "#00ff88", status: "🟢 順暢",
+                path: [[24.938800, 121.895500], [24.945000, 121.898000], [24.952000, 121.902000], [24.960200, 121.905400]]
             },
             {
-                id: "TR_TY_SHIGUAN",
-                name: "桃源谷石觀音線 (石觀音寺 ➔ 大草原稜線)",
-                trail_system: "桃源谷步道",
-                length_km: "3.5 km",
-                width: 1.3,
-                people: 65,
-                max: 180,
-                speed: "2.0 km/h",
-                status_color: "#b026ff",
-                path: [
-                    [24.952000, 121.918000],
-                    [24.956000, 121.912000],
-                    [24.960200, 121.905400]
-                ]
+                id: "TR_TY_SHIGUAN", name: "桃源谷石觀音線 (石觀音寺➔稜線)", system: "桃源谷", length: "3.5km", width: "1.3m", people: 65, max: 180, color: "#b026ff", status: "🟣 泥濘",
+                path: [[24.952000, 121.918000], [24.956000, 121.912000], [24.960200, 121.905400]]
             }
         ];
 
-        // ==============================================================================
-        // 【地圖路網渲染函數】繪製國道路況發光外框與即時路況實線
-        // ==============================================================================
-        function renderHighwayTrafficTrails(mapInstance, isDesktop = true) {
-            const polyStore = isDesktop ? trailPolylinesDesktop : trailPolylinesMobile;
-
+        function renderHighwayTrails(mapInst, isDesktop) {
+            const store = isDesktop ? trailPolylinesDesktop : trailPolylinesMobile;
             TRAILS_HIGHWAY_DATA.forEach(t => {
-                // 1. 底層光暈外框線
-                L.polyline(t.path, {
-                    color: t.status_color,
-                    weight: 8,
-                    opacity: 0.28,
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                }).addTo(mapInstance);
-
-                // 2. 主路網實線
-                const mainPoly = L.polyline(t.path, {
-                    color: t.status_color,
-                    weight: 4,
-                    opacity: 0.95,
-                    lineCap: 'round',
-                    lineJoin: 'round'
-                }).addTo(mapInstance);
-
+                L.polyline(t.path, { color: t.color, weight: 8, opacity: 0.28, lineCap: 'round', lineJoin: 'round' }).addTo(mapInst);
+                const poly = L.polyline(t.path, { color: t.color, weight: 4, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }).addTo(mapInst);
                 const rate = Math.round((t.people / t.max) * 100);
-                mainPoly.bindPopup(`
+                poly.bindPopup(`
                     <div class="text-xs font-mono space-y-1">
                         <div class="font-bold text-white flex items-center gap-1.5 border-b border-slate-700 pb-1">
-                            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${t.status_color}"></span>
+                            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${t.color}"></span>
                             <span>${t.name}</span>
                         </div>
-                        <div class="text-slate-300">系統群: <b class="text-neonCyan">${t.trail_system}</b> (${t.length_km})</div>
-                        <div class="text-slate-300">路面寬度: <b>${t.width}m</b> | 平均步速: <b class="text-neonGreen">${t.speed}</b></div>
-                        <div class="text-slate-300">即時人流: <b class="text-white">${t.people} 人</b> / 容量 <b>${t.max} 人</b></div>
-                        <div class="text-slate-300">承載率: <b style="color: ${t.status_color}">${rate}%</b></div>
+                        <div>系統: <b class="text-neonCyan">${t.system}</b> (${t.length})</div>
+                        <div>路寬: <b>${t.width}</b> | 容留: <b>${t.people}/${t.max}人</b></div>
+                        <div>承載率: <b style="color:${t.color}">${rate}% (${t.status})</b></div>
                     </div>
                 `);
-
-                polyStore[t.id] = mainPoly;
+                store[t.id] = poly;
             });
         }
 
-        // ==============================================================================
-        // 【地圖據點圖釘渲染函數】繪製 10 大關鍵據點客製化標記
-        // ==============================================================================
-        function renderCheckpointsMarkers(mapInstance, isDesktop = true) {
-            const markerStore = isDesktop ? checkpointMarkersDesktop : checkpointMarkersMobile;
-
+        function renderCheckpoints(mapInst, isDesktop) {
+            const store = isDesktop ? checkpointMarkersDesktop : checkpointMarkersMobile;
             CHECKPOINTS_DATA.forEach(cp => {
                 const rate = Math.round((cp.people / cp.max) * 100);
-                let pinColor = "#00ff88";
-                if (rate > 85) pinColor = "#ff2a5f";
-                else if (rate > 65) pinColor = "#ffaa00";
+                
+                // 依據人流承載率判定燈號等級與色碼
+                let dotColor = "#00ff88";
+                let statusText = "🟢 順暢";
+                let badgeClass = "text-neonGreen border-emerald-500/50 bg-emerald-950/80";
 
-                const icon = L.divIcon({
-                    className: 'custom-cp-pin',
+                if (rate > 80) {
+                    dotColor = "#ff2a5f";
+                    statusText = "🔴 壅塞";
+                    badgeClass = "text-neonRed border-red-500/50 bg-red-950/80";
+                } else if (rate > 60) {
+                    dotColor = "#ffaa00";
+                    statusText = "🟡 繁忙";
+                    badgeClass = "text-neonAmber border-amber-500/50 bg-amber-950/80";
+                }
+
+                // 常態下僅繪製極簡高對比圓形雷達節點 (杜絕畫面文字雜亂互壓)
+                const nodeIcon = L.divIcon({
+                    className: '',
                     html: `
-                        <div class="flex items-center gap-1 bg-black/85 px-1.5 py-0.5 rounded border shadow-lg cursor-pointer transform -translate-x-1/2 -translate-y-1/2" style="border-color: ${pinColor}">
-                            <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${pinColor}"></span>
-                            <span class="text-[9.5px] font-mono font-bold text-white whitespace-nowrap">${cp.name}</span>
-                            <span class="text-[9px] font-mono font-bold" style="color: ${pinColor}">${rate}%</span>
+                        <div class="cp-waypoint-marker" style="color: ${dotColor};" title="${cp.name}">
+                            <span class="cp-waypoint-ring"></span>
+                            <span class="cp-waypoint-core" style="background-color: ${dotColor};"></span>
                         </div>
                     `,
-                    iconSize: [0, 0]
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
                 });
 
-                const m = L.marker(cp.coords, { icon: icon }).addTo(mapInstance);
-                m.bindPopup(`
+                const marker = L.marker(cp.coords, { icon: nodeIcon }).addTo(mapInst);
+
+                // 游標移至該點 (Hover) 或觸控即時浮現簡要名稱與關鍵數值
+                marker.bindTooltip(`
+                    <div class="flex items-center gap-2 font-mono">
+                        <span style="width: 7px; height: 7px; border-radius: 9999px; background-color: ${dotColor}; display: inline-block;"></span>
+                        <span class="font-bold text-white text-[12.5px]">${cp.name}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[11px] font-extrabold border ${badgeClass}">${rate}%</span>
+                        <span class="text-[11px] text-slate-300 font-bold font-rajdhani">(${cp.people}/${cp.max}人 · ${statusText})</span>
+                    </div>
+                `, {
+                    direction: 'top',
+                    offset: [0, -10],
+                    opacity: 1.0,
+                    className: 'cp-hover-tooltip',
+                    sticky: false
+                });
+
+                // 點擊後顯示完整戰情資訊卡 (與右側清冊連動)
+                marker.bindPopup(`
                     <div class="text-xs font-mono space-y-1">
-                        <div class="font-bold text-white flex items-center gap-1 border-b border-slate-700 pb-1">
-                            <i class="fa-solid fa-location-dot text-neonCyan"></i>
-                            <span>${cp.name}</span>
+                        <div class="font-bold text-white border-b border-slate-700 pb-1 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5">
+                                <span style="width: 8px; height: 8px; border-radius: 9999px; background-color: ${dotColor}; display: inline-block;"></span>
+                                <span>📍 ${cp.name}</span>
+                            </span>
+                            <span class="text-[10px] px-1 rounded ${badgeClass}">${statusText}</span>
                         </div>
-                        <div class="text-slate-300">所屬路線: <b class="text-neonCyan">${cp.trail}</b></div>
-                        <div class="text-slate-300">標高高程: <b>${cp.elevation} m</b></div>
-                        <div class="text-slate-300">即時容留: <b class="text-white">${cp.people} 人</b> / 上限 <b>${cp.max} 人</b></div>
-                        <div class="text-slate-300">負載狀態: <b style="color: ${pinColor}">${rate}% (${rate > 85 ? '破防過載' : (rate > 65 ? '警戒繁忙' : '舒適順暢')})</b></div>
+                        <div>所屬步道: <b class="text-neonCyan">${cp.trail}</b></div>
+                        <div>即時容留: <b class="text-white">${cp.people} / ${cp.max} 人</b></div>
+                        <div>承載負荷率: <b style="color: ${dotColor}">${rate}%</b></div>
                     </div>
                 `);
 
-                markerStore[cp.id] = m;
+                store[cp.id] = marker;
             });
         }
 
-        // ==============================================================================
-        // 【HMM 險風走廊錐形帶渲染函數】
-        // ==============================================================================
-        function renderHMMPredictionCorridor(mapInstance) {
-            // 埡口鞍部風口核心出發之東南向衝擊走廊 (85% 機率擴散錐形)
-            const corridorCoords = [
-                [24.980100, 121.926190], // 埡口起點
-                [24.979800, 121.926900], // +15m 走廊邊界
-                [24.979000, 121.927600], // +30m 走廊邊界
-                [24.977800, 121.928400], // +60m 終端擴散面
-                [24.977200, 121.927200], // +60m 西翼
-                [24.978500, 121.926400], // +30m 西翼
-                [24.979500, 121.925800]  // +15m 西翼
-            ];
+        function renderBuffaloClusters(mapInst, isDesktop) {
+            const mStore = isDesktop ? buffaloMarkersDesktop : buffaloMarkersMobile;
+            const cStore = isDesktop ? buffaloCirclesDesktop : buffaloCirclesMobile;
 
-            L.polygon(corridorCoords, {
-                className: 'hazard-cone-pulse',
-                color: '#ff2a5f',
-                weight: 1.5,
-                dashArray: '5, 5',
-                fillColor: '#ff2a5f',
-                fillOpacity: 0.22
-            }).addTo(mapInstance).bindPopup(`
-                <div class="text-xs font-mono space-y-1">
-                    <div class="font-bold text-neonRed border-b border-slate-700 pb-1">
-                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>HMM 時空外推險風走廊帶 (60分鐘預判)
-                    </div>
-                    <div>受風面: <b>東北季風鞍部穿堂風</b></div>
-                    <div>主導動態: <b>水牛聚落A 朝東南背風山坳移動</b></div>
-                    <div>衝擊時程: <b>+15m (6.8m) ➔ +30m (14.2m) ➔ +60m (28.5m)</b></div>
-                </div>
-            `);
+            // 聚落 A
+            const iconA = L.divIcon({
+                className: 'buff-icon-a',
+                html: `<div class="w-8 h-8 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-sm shadow-lg animate-pulse cursor-pointer">🐮</div>`,
+                iconSize: [32, 32], iconAnchor: [16, 16]
+            });
+            const mA = L.marker(CAOLING_YAKOU, { icon: iconA }).addTo(mapInst);
+            const cA = L.circle(CAOLING_YAKOU, { radius: 38, color: '#ff2a5f', fillColor: '#ff2a5f', fillOpacity: 0.5, weight: 2 }).addTo(mapInst);
+            mStore["cluster_a"] = mA; cStore["cluster_a"] = cA;
 
-            // 繪製牛隻當前運動方向向量指示箭頭 (青色)
-            const arrowCoords = [
-                [24.980100, 121.926190],
-                [24.979300, 121.926700]
-            ];
-            L.polyline(arrowCoords, {
-                color: '#00f0ff',
-                weight: 3,
-                opacity: 0.9,
-                dashArray: '6, 3'
-            }).addTo(mapInstance);
+            // 聚落 B
+            const iconB = L.divIcon({
+                className: 'buff-icon-b',
+                html: `<div class="w-7 h-7 rounded-full bg-purple-600 border border-white flex items-center justify-center text-xs shadow-md cursor-pointer">🦬</div>`,
+                iconSize: [28, 28], iconAnchor: [14, 14]
+            });
+            const coordsB = [24.975660, 121.926210];
+            const mB = L.marker(coordsB, { icon: iconB }).addTo(mapInst);
+            const cB = L.circle(coordsB, { radius: 24, color: '#b026ff', fillColor: '#b026ff', fillOpacity: 0.4, weight: 2 }).addTo(mapInst);
+            mStore["cluster_b"] = mB; cStore["cluster_b"] = cB;
+
+            // 聚落 C
+            const iconC = L.divIcon({
+                className: 'buff-icon-c',
+                html: `<div class="w-7 h-7 rounded-full bg-emerald-600 border border-white flex items-center justify-center text-xs shadow-md cursor-pointer">🐂</div>`,
+                iconSize: [28, 28], iconAnchor: [14, 14]
+            });
+            const coordsC = [24.962000, 121.908000];
+            const mC = L.marker(coordsC, { icon: iconC }).addTo(mapInst);
+            const cC = L.circle(coordsC, { radius: 20, color: '#00ff88', fillColor: '#00ff88', fillOpacity: 0.25, weight: 1.5 }).addTo(mapInst);
+            mStore["cluster_c"] = mC; cStore["cluster_c"] = cC;
         }
 
-        // ==============================================================================
-        // 【視角控制與平滑導航】
-        // ==============================================================================
-        function flyToCheckpoint(cpId) {
-            const cp = CHECKPOINTS_DATA.find(c => c.id === cpId);
+        function renderHMMPrediction(mapInst) {
+            const corridorCoords = [
+                [24.980100, 121.926190], [24.979800, 121.926900], [24.979000, 121.927600],
+                [24.977800, 121.928400], [24.977200, 121.927200], [24.978500, 121.926400], [24.979500, 121.925800]
+            ];
+            L.polygon(corridorCoords, {
+                className: 'hazard-cone-pulse', color: '#ff2a5f', weight: 1.5, dashArray: '5, 5', fillColor: '#ff2a5f', fillOpacity: 0.2
+            }).addTo(mapInst).bindPopup("<b>HMM 險風走廊帶 (60分鐘預判)</b><br>朝東南鞍部下切");
+            
+            L.polyline([[24.980100, 121.926190], [24.979300, 121.926700]], {
+                color: '#00f0ff', weight: 3, opacity: 0.9, dashArray: '6, 3'
+            }).addTo(mapInst);
+        }
+
+        function setTimeSlot(slot) {
+            if (!TIME_SLOT_DATABASE[slot]) return;
+            currentTimeSlot = slot;
+            const data = TIME_SLOT_DATABASE[slot];
+
+            // 更新選鈕高亮
+            ['08:00', '10:00', '12:00', '14:00', '16:00', '18:30'].forEach(s => {
+                const sClean = s.replace(":", "");
+                const bDesk = document.getElementById(`btn-slot-${sClean}`);
+                if (bDesk) {
+                    bDesk.className = s === slot ? "py-1 rounded bg-neonCyan/20 text-neonCyan font-bold border border-neonCyan" : "py-1 rounded bg-slate-900 border border-cyberBorder text-slate-400";
+                }
+                const bMob = document.getElementById(`m-btn-${sClean}`);
+                if (bMob) {
+                    bMob.className = s === slot ? "flex-1 py-1 rounded text-[11px] font-bold font-mono bg-neonCyan text-black shadow-[0_0_8px_#00f0ff]" : "flex-1 py-1 rounded text-[11px] font-bold font-mono bg-cyberCard text-slate-300";
+                }
+            });
+
+            // 更新文字指標
+            const lTime = document.getElementById("label-selected-time");
+            const lTimeMob = document.getElementById("label-selected-time-mobile");
+            if (lTime) lTime.innerText = `${slot} (${data.name})`;
+            if (lTimeMob) lTimeMob.innerText = slot;
+
+            const bYi = document.getElementById("badge-yi-state");
+            if (bYi) { bYi.innerText = data.yiState; bYi.className = `m-badge-badge ${data.yiClass}`; }
+
+            const sThi = document.getElementById("stat-thi");
+            const sRisk = document.getElementById("stat-risk");
+            const sAccel = document.getElementById("stat-accel");
+            const sTy = document.getElementById("stat-ty-load");
+            if (sThi) sThi.innerText = data.thi;
+            if (sRisk) sRisk.innerText = data.risk;
+            if (sAccel) sAccel.innerText = data.accel;
+            if (sTy) sTy.innerText = data.tyLoad;
+
+            const sThiMob = document.getElementById("stat-thi-mobile");
+            const sRiskMob = document.getElementById("stat-risk-mobile");
+            if (sThiMob) sThiMob.innerText = data.thi;
+            if (sRiskMob) sRiskMob.innerText = data.risk;
+
+            const lMsg = document.getElementById("label-lbs-msg-mobile");
+            if (lMsg) lMsg.innerHTML = data.lbsMsg;
+
+            // 重新繪製水牛與表格卡片
+            updateBuffaloElements(slot);
+            renderTrailElements(slot);
+            renderCheckpointsDesktop(slot);
+
+            // 畫布重新繪製
+            drawKinematics('kinematicsCanvasDesktop');
+            drawKinematics('kinematicsCanvasMobile');
+        }
+
+        function updateBuffaloElements(slot) {
+            const buffalos = TIME_SLOT_DATABASE[slot].buffalos;
+
+            // 桌機版 Table
+            const tbodyDesk = document.getElementById("table-buffalo-desktop");
+            if (tbodyDesk) {
+                tbodyDesk.innerHTML = `
+                    <tr class="hover:bg-cyan-950/40 cursor-pointer" onclick="focusCluster('cluster_a')">
+                        <td class="p-2 font-bold text-white">${buffalos.cluster_a.name}</td>
+                        <td class="p-2 ${buffalos.cluster_a.riskColor} font-bold">${buffalos.cluster_a.postureText}</td>
+                        <td class="p-2 font-bold">${buffalos.cluster_a.distance}m</td>
+                        <td class="p-2 text-neonAmber">${buffalos.cluster_a.ttc}</td>
+                        <td class="p-2 ${buffalos.cluster_a.riskColor} font-bold">${buffalos.cluster_a.risk}</td>
+                    </tr>
+                    <tr class="hover:bg-cyan-950/40 cursor-pointer" onclick="focusCluster('cluster_b')">
+                        <td class="p-2 font-bold text-slate-300">${buffalos.cluster_b.name}</td>
+                        <td class="p-2 text-purple-300 font-bold">${buffalos.cluster_b.postureText}</td>
+                        <td class="p-2">${buffalos.cluster_b.distance}m</td>
+                        <td class="p-2">${buffalos.cluster_b.ttc}</td>
+                        <td class="p-2 text-purple-300 font-bold">${buffalos.cluster_b.risk}</td>
+                    </tr>
+                    <tr class="hover:bg-cyan-950/40 cursor-pointer" onclick="focusCluster('cluster_c')">
+                        <td class="p-2 font-bold text-slate-300">${buffalos.cluster_c.name}</td>
+                        <td class="p-2 text-neonGreen font-bold">${buffalos.cluster_c.postureText}</td>
+                        <td class="p-2">${buffalos.cluster_c.distance}m</td>
+                        <td class="p-2">${buffalos.cluster_c.ttc}</td>
+                        <td class="p-2 text-neonGreen font-bold">${buffalos.cluster_c.risk}</td>
+                    </tr>
+                `;
+            }
+
+            // 手機版：專屬大字體、高對比 Flex Card (完全杜絕切字)
+            const cardsMob = document.getElementById("cards-buffalo-mobile");
+            if (cardsMob) {
+                cardsMob.innerHTML = `
+                    <div class="m-card-item ${buffalos.cluster_a.borderClass}" onclick="focusCluster('cluster_a')">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-neonRed animate-pulse"></span> ${buffalos.cluster_a.name}
+                            </span>
+                            <span class="m-badge-badge ${buffalos.cluster_a.badgeClass}">
+                                ${buffalos.cluster_a.postureText}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-1.5 border-t border-slate-800">
+                            <span class="text-slate-300 font-bold">間距: <b class="${buffalos.cluster_a.distance < 10 ? 'text-neonRed font-bold text-sm' : 'text-white'}">${buffalos.cluster_a.distance}m</b></span>
+                            <span class="text-slate-300 font-bold">TTC: <b class="text-neonAmber font-mono text-sm">${buffalos.cluster_a.ttc}</b></span>
+                            <span class="text-slate-300 font-bold">風險 R: <b class="${buffalos.cluster_a.riskColor} font-mono text-sm">${buffalos.cluster_a.risk}</b></span>
+                        </div>
+                    </div>
+
+                    <div class="m-card-item ${buffalos.cluster_b.borderClass}" onclick="focusCluster('cluster_b')">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-neonPurple"></span> ${buffalos.cluster_b.name}
+                            </span>
+                            <span class="m-badge-badge ${buffalos.cluster_b.badgeClass}">
+                                ${buffalos.cluster_b.postureText}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-1.5 border-t border-slate-800">
+                            <span class="text-slate-300 font-bold">間距: <b class="text-white text-sm">${buffalos.cluster_b.distance}m</b></span>
+                            <span class="text-slate-300 font-bold">TTC: <b class="text-slate-200 font-mono text-sm">${buffalos.cluster_b.ttc}</b></span>
+                            <span class="text-slate-300 font-bold">風險 R: <b class="text-purple-300 font-mono text-sm">${buffalos.cluster_b.risk}</b></span>
+                        </div>
+                    </div>
+
+                    <div class="m-card-item ${buffalos.cluster_c.borderClass}" onclick="focusCluster('cluster_c')">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-neonGreen"></span> ${buffalos.cluster_c.name}
+                            </span>
+                            <span class="m-badge-badge ${buffalos.cluster_c.badgeClass}">
+                                ${buffalos.cluster_c.postureText}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-1.5 border-t border-slate-800">
+                            <span class="text-slate-300 font-bold">間距: <b class="text-white text-sm">${buffalos.cluster_c.distance}m</b></span>
+                            <span class="text-slate-300 font-bold">TTC: <b class="text-slate-200 font-mono text-sm">${buffalos.cluster_c.ttc}</b></span>
+                            <span class="text-slate-300 font-bold">風險 R: <b class="text-neonGreen font-mono text-sm">${buffalos.cluster_c.risk}</b></span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 更新地圖標記與氣泡
+            [mapDesktop, mapMobile].forEach((mapInst, idx) => {
+                if (!mapInst) return;
+                const mStore = idx === 0 ? buffaloMarkersDesktop : buffaloMarkersMobile;
+                const cStore = idx === 0 ? buffaloCirclesDesktop : buffaloCirclesMobile;
+
+                ["cluster_a", "cluster_b", "cluster_c"].forEach(key => {
+                    const c = buffalos[key];
+                    if (mStore[key]) mStore[key].setLatLng(c.coords);
+                    if (cStore[key]) {
+                        cStore[key].setLatLng(c.coords);
+                        cStore[key].setRadius(c.bubbleRadius);
+                        cStore[key].setStyle({ color: c.bubbleColor, fillColor: c.bubbleColor, fillOpacity: c.bubbleOpacity });
+                    }
+                });
+            });
+        }
+
+        function renderTrailElements(slot) {
+            const factor = slot === "12:00" ? 1.0 : (slot === "10:00" ? 0.8 : (slot === "14:00" ? 0.9 : 0.45));
+            
+            // 手機版：大字體雙列 Flex Card (完全無水平滾動與截斷)
+            const cardsMob = document.getElementById("cards-trails-mobile");
+            if (cardsMob) {
+                cardsMob.innerHTML = TRAILS_HIGHWAY_DATA.map(t => {
+                    const adjP = Math.round(t.people * factor);
+                    const rate = Math.min(100, Math.round((adjP / t.max) * 100));
+                    let bClass = rate > 80 ? "border-red" : (rate > 60 ? "border-amber" : "border-green");
+                    return `
+                        <div class="m-card-item ${bClass} cursor-pointer" onclick="flyToTrail('${t.id}')">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color:${t.color}"></span>
+                                        ${t.name}
+                                    </div>
+                                    <div class="text-xs text-slate-400 font-mono mt-0.5">${t.system} · 長度 ${t.length} · 路寬 ${t.width}</div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="m-badge-badge border font-mono" style="color:${t.color}; border-color:${t.color}60; background:${t.color}20">
+                                        ${t.status}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-xs pt-1.5 border-t border-slate-800">
+                                <span class="text-slate-300 font-bold">即時人數: <b class="text-white text-sm font-mono">${adjP} / ${t.max} 人</b></span>
+                                <span class="text-slate-300 font-bold">承載率: <b class="font-mono text-sm font-bold" style="color:${t.color}">${rate}%</b></span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 桌機版 Table
+            const tbodyDesk = document.getElementById("table-trails-desktop");
+            if (tbodyDesk) {
+                tbodyDesk.innerHTML = TRAILS_HIGHWAY_DATA.map(t => {
+                    const adjP = Math.round(t.people * factor);
+                    const rate = Math.min(100, Math.round((adjP / t.max) * 100));
+                    return `
+                        <tr class="hover:bg-cyan-950/40 cursor-pointer" onclick="flyToTrail('${t.id}')">
+                            <td class="p-2 font-bold text-white truncate max-w-[140px]">${t.name}</td>
+                            <td class="p-2 font-bold">${adjP}人</td>
+                            <td class="p-2 font-bold" style="color:${t.color}">${rate}%</td>
+                            <td class="p-2"><span class="m-badge-badge" style="color:${t.color}; border: 1px solid ${t.color}60; background:${t.color}15">${t.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderCheckpointsDesktop(slot) {
+            const factor = slot === "12:00" ? 1.0 : (slot === "10:00" ? 0.8 : (slot === "14:00" ? 0.9 : 0.45));
+            const tbodyDesk = document.getElementById("table-checkpoints-desktop");
+            if (tbodyDesk) {
+                tbodyDesk.innerHTML = CHECKPOINTS_DATA.map(cp => {
+                    const adjP = Math.round(cp.people * factor);
+                    const rate = Math.min(100, Math.round((adjP / cp.max) * 100));
+                    let color = rate > 80 ? "text-neonRed" : (rate > 60 ? "text-neonAmber" : "text-neonGreen");
+                    return `
+                        <tr class="hover:bg-cyan-950/40 cursor-pointer" onclick="flyToCheckpoint('${cp.id}')">
+                            <td class="p-2 font-bold text-white">${cp.name}</td>
+                            <td class="p-2 font-bold">${adjP}人</td>
+                            <td class="p-2 font-bold ${color}">${rate}%</td>
+                            <td class="p-2 ${color} font-bold">${rate > 80 ? '🔴 破防' : (rate > 60 ? '🟡 警戒' : '🟢 順暢')}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function drawKinematics(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // 網格線
+            ctx.strokeStyle = 'rgba(22, 43, 77, 0.4)';
+            ctx.lineWidth = 1;
+            for (let x = 30; x < w; x += 50) {
+                ctx.beginPath(); ctx.moveTo(x, 10); ctx.lineTo(x, h - 20); ctx.stroke();
+            }
+
+            // 人流面積
+            const pts = [
+                { x: 30, y: h * 0.75, slot: "08:00" }, { x: 85, y: h * 0.55, slot: "10:00" },
+                { x: 155, y: h * 0.20, slot: "12:00" }, { x: 215, y: h * 0.30, slot: "14:00" },
+                { x: 275, y: h * 0.60, slot: "16:00" }, { x: 335, y: h * 0.85, slot: "18:30" }
+            ];
+
+            const grad = ctx.createLinearGradient(0, 10, 0, h - 20);
+            grad.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
+            grad.addColorStop(1, 'rgba(0, 240, 255, 0.02)');
+
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, h - 20);
+            pts.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.lineTo(pts[pts.length - 1].x, h - 20);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // 水牛速度線
+            ctx.beginPath();
+            const buffV = [{ x: 30, y: h * 0.7 }, { x: 85, y: h * 0.6 }, { x: 155, y: h * 0.25 }, { x: 215, y: h * 0.4 }, { x: 275, y: h * 0.65 }, { x: 335, y: h * 0.8 }];
+            ctx.strokeStyle = '#b026ff'; ctx.lineWidth = 2.5;
+            buffV.forEach((p, idx) => { if (idx === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+            ctx.stroke();
+
+            // 時間節點標示
+            pts.forEach(p => {
+                const isSel = p.slot === currentTimeSlot;
+                const risk = TIME_SLOT_DATABASE[p.slot].risk;
+                const col = risk > 10 ? '#ff2a5f' : (risk > 3 ? '#ffaa00' : '#00ff88');
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, isSel ? 7 : 4, 0, Math.PI * 2);
+                ctx.fillStyle = col;
+                ctx.fill();
+
+                if (isSel) {
+                    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9px Orbitron';
+                    ctx.fillText(`${p.slot}`, p.x - 12, p.y - 10);
+                }
+            });
+        }
+
+        function handleCanvasClick(event, mode) {
+            const rect = event.target.getBoundingClientRect();
+            const ratio = (event.clientX - rect.left) / rect.width;
+            let slot = "12:00";
+            if (ratio < 0.18) slot = "08:00";
+            else if (ratio < 0.35) slot = "10:00";
+            else if (ratio < 0.53) slot = "12:00";
+            else if (ratio < 0.70) slot = "14:00";
+            else if (ratio < 0.85) slot = "16:00";
+            else slot = "18:30";
+            setTimeSlot(slot);
+        }
+
+        function flyToCheckpoint(id) {
+            const cp = CHECKPOINTS_DATA.find(c => c.id === id);
             if (!cp) return;
-
-            const isMob = currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches);
-            const targetMap = isMob ? mapMobile : mapDesktop;
-            const markersStore = isMob ? checkpointMarkersMobile : checkpointMarkersDesktop;
-
+            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
+            const store = targetMap === mapMobile ? checkpointMarkersMobile : checkpointMarkersDesktop;
             if (targetMap) {
                 targetMap.flyTo(cp.coords, 17, { duration: 1.2 });
-                setTimeout(() => {
-                    if (markersStore[cpId]) markersStore[cpId].openPopup();
-                }, 1300);
+                setTimeout(() => { if (store[id]) store[id].openPopup(); }, 1300);
             }
         }
 
-        function flyToTrail(trailId) {
-            const trail = TRAILS_HIGHWAY_DATA.find(t => t.id === trailId);
-            if (!trail) return;
-
-            const midIndex = Math.floor(trail.path.length / 2);
-            const midCoord = trail.path[midIndex];
-
-            const isMob = currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches);
-            const targetMap = isMob ? mapMobile : mapDesktop;
-            const polyStore = isMob ? trailPolylinesMobile : trailPolylinesDesktop;
-
+        function flyToTrail(id) {
+            const t = TRAILS_HIGHWAY_DATA.find(x => x.id === id);
+            if (!t) return;
+            const mid = t.path[Math.floor(t.path.length / 2)];
+            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
+            const store = targetMap === mapMobile ? trailPolylinesMobile : trailPolylinesDesktop;
             if (targetMap) {
-                targetMap.flyTo(midCoord, 16, { duration: 1.2 });
-                setTimeout(() => {
-                    if (polyStore[trailId]) polyStore[trailId].openPopup();
-                }, 1300);
+                targetMap.flyTo(mid, 16, { duration: 1.2 });
+                setTimeout(() => { if (store[id]) store[id].openPopup(); }, 1300);
             }
+        }
+
+        function focusCluster(key) {
+            const c = TIME_SLOT_DATABASE[currentTimeSlot].buffalos[key];
+            if (!c) return;
+            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
+            if (targetMap) targetMap.flyTo(c.coords, 17, { duration: 1.2 });
         }
 
         function resetMapView() {
-            const isMob = currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches);
-            const targetMap = isMob ? mapMobile : mapDesktop;
-            if (targetMap) {
-                targetMap.flyTo(CAOLING_YAKOU, 16, { duration: 1.0 });
-            }
+            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
+            if (targetMap) targetMap.flyTo(CAOLING_YAKOU, 16, { duration: 1.0 });
         }
 
         function flyToTaoyuanguOverview() {
-            const isMob = currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches);
-            const targetMap = isMob ? mapMobile : mapDesktop;
-            if (targetMap) {
-                targetMap.flyTo(TAOYUANGU_CENTER, 15, { duration: 1.2 });
-            }
-        }
-
-        // ==============================================================================
-        // 【底圖切換與載具模式】
-        // ==============================================================================
-        function switchBaseLayer(layerKey) {
-            ['btn-layer-emap', 'btn-layer-photo', 'btn-layer-topo'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.className = "px-2 py-1 rounded text-slate-400 hover:text-white";
-            });
-
-            if (layerKey === 'EMAP') {
-                const el = document.getElementById('btn-layer-emap');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
-            } else if (layerKey === 'PHOTO2') {
-                const el = document.getElementById('btn-layer-photo');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
-            } else if (layerKey === 'TOPO') {
-                const el = document.getElementById('btn-layer-topo');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
-            }
-
-            const applyLayer = (mapInst, baseStore) => {
-                if (!mapInst || !baseStore) return;
-                Object.keys(baseStore).forEach(k => {
-                    if (mapInst.hasLayer(baseStore[k])) mapInst.removeLayer(baseStore[k]);
-                });
-                if (baseStore[layerKey]) baseStore[layerKey].addTo(mapInst);
-            };
-
-            applyLayer(mapDesktop, baseLayersDesktop);
-            applyLayer(mapMobile, baseLayersMobile);
+            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
+            if (targetMap) targetMap.flyTo(TAOYUANGU_CENTER, 15, { duration: 1.2 });
         }
 
         function setDeviceMode(mode) {
@@ -1501,19 +1298,15 @@
                 const el = document.getElementById(id);
                 if (el) el.className = "px-2 py-1 rounded text-slate-400 hover:text-white";
             });
+            const activeBtn = document.getElementById(`btn-device-${mode}`);
+            if (activeBtn) activeBtn.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
 
             if (mode === 'auto') {
-                const el = document.getElementById('btn-device-auto');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
                 applyAutoDeviceDetection();
             } else if (mode === 'desktop') {
-                const el = document.getElementById('btn-device-desktop');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
                 document.body.className = "h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden mode-desktop";
                 if (mapDesktop) mapDesktop.invalidateSize();
             } else if (mode === 'mobile') {
-                const el = document.getElementById('btn-device-mobile');
-                if (el) el.className = "px-2 py-1 rounded bg-neonCyan/20 text-neonCyan font-bold";
                 document.body.className = "h-screen w-screen flex flex-col bg-cyberDark text-slate-100 font-rajdhani overflow-hidden mode-mobile";
                 if (mapMobile) mapMobile.invalidateSize();
             }
@@ -1531,6 +1324,23 @@
             }
         }
 
+        function switchBaseLayer(layerKey) {
+            const applyLayer = (mapInst, baseStore) => {
+                if (!mapInst || !baseStore) return;
+                Object.keys(baseStore).forEach(k => { if (mapInst.hasLayer(baseStore[k])) mapInst.removeLayer(baseStore[k]); });
+                if (baseStore[layerKey]) baseStore[layerKey].addTo(mapInst);
+            };
+            applyLayer(mapDesktop, baseLayersDesktop);
+            applyLayer(mapMobile, baseLayersMobile);
+        }
+
+        function triggerManualRefresh() {
+            tickCount += 5;
+            const tCounter = document.getElementById('heartbeat-tick-count');
+            if (tCounter) tCounter.innerText = tickCount.toLocaleString();
+            setTimeSlot(currentTimeSlot);
+        }
+
         function updateClock() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1539,569 +1349,42 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            const clockDisplay = document.getElementById('live-datetime-display');
-            if (clockDisplay) {
-                clockDisplay.innerText = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} CST`;
-            }
-
+            const clockEl = document.getElementById('live-datetime-display');
+            if (clockEl) clockEl.innerText = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} CST`;
             tickCount++;
-            const tickCounter = document.getElementById('heartbeat-tick-count');
-            if (tickCounter) {
-                tickCounter.innerText = tickCount.toLocaleString();
-            }
+            const tCounter = document.getElementById('heartbeat-tick-count');
+            if (tCounter) tCounter.innerText = tickCount.toLocaleString();
         }
 
-        function triggerManualRefresh() {
-            tickCount += 5;
-            const tickCounter = document.getElementById('heartbeat-tick-count');
-            if (tickCounter) tickCounter.innerText = tickCount.toLocaleString();
-
-            setTimeSlot(currentTimeSlot);
-            if (mapDesktop) mapDesktop.invalidateSize();
-            if (mapMobile) mapMobile.invalidateSize();
-        }
-
-        // ==============================================================================
-        // 【切換時段核心連動函數】時段 ➔ 牛隻數量/姿態 ➔ 泡泡圖 ➔ 指標 ➔ 據點人流 ➔ 地圖雙向響應
-        // ==============================================================================
-        function setTimeSlot(slot) {
-            if (!TIME_SLOT_DATABASE[slot]) return;
-            currentTimeSlot = slot;
-
-            const data = TIME_SLOT_DATABASE[slot];
-
-            // 1. 更新按鈕高亮樣式
-            const slots = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:30"];
-            slots.forEach(s => {
-                const sClean = s.replace(":", "");
-                const btnDesk = document.getElementById(`btn-slot-${sClean}`);
-                if (btnDesk) {
-                    if (s === slot) {
-                        btnDesk.className = "py-1 rounded bg-neonCyan/20 text-neonCyan font-bold border border-neonCyan";
-                    } else {
-                        btnDesk.className = "py-1 rounded bg-slate-900 hover:bg-cyan-950 text-slate-400 hover:text-white border border-cyberBorder";
-                    }
-                }
-            });
-
-            // 2. 更新頂部指標與狀態文字
-            const labelTime = document.getElementById("label-selected-time");
-            const labelTimeMob = document.getElementById("label-selected-time-mobile");
-            if (labelTime) labelTime.innerText = `${slot} (${data.name})`;
-            if (labelTimeMob) labelTimeMob.innerText = slot;
-
-            const badgeYi = document.getElementById("badge-yi-state");
-            if (badgeYi) {
-                badgeYi.innerText = data.yiState;
-                badgeYi.className = `badge-compact-2char ${data.yiClass}`;
-            }
-
-            // 更新四宮格統計值 (桌機與手機)
-            const statThi = document.getElementById("stat-thi");
-            const statRisk = document.getElementById("stat-risk");
-            const statAccel = document.getElementById("stat-accel");
-            const statTy = document.getElementById("stat-ty-load");
-            if (statThi) statThi.innerText = data.thi;
-            if (statRisk) statRisk.innerText = data.risk;
-            if (statAccel) statAccel.innerText = data.accel;
-            if (statTy) statTy.innerText = data.tyLoad;
-
-            const statThiMob = document.getElementById("stat-thi-mobile");
-            const statRiskMob = document.getElementById("stat-risk-mobile");
-            const statClMob = document.getElementById("stat-caoling-load-mobile");
-            const statTyMob = document.getElementById("stat-ty-load-mobile");
-            if (statThiMob) statThiMob.innerText = data.thi;
-            if (statRiskMob) statRiskMob.innerText = data.risk;
-            if (statClMob) statClMob.innerText = data.caolingLoad;
-            if (statTyMob) statTyMob.innerText = data.tyLoad;
-
-            const lblNetwork = document.getElementById("label-network-load");
-            if (lblNetwork) lblNetwork.innerText = `全域負載: ${data.networkLoad}`;
-
-            // 更新 LinUCB 導流動作與 LBS 推播詞
-            const lblAction = document.getElementById("label-linucb-action");
-            const lblUcb = document.getElementById("label-ucb-score");
-            const lblMsg = document.getElementById("label-lbs-msg");
-            const lblMsgMob = document.getElementById("label-lbs-msg-mobile");
-            if (lblAction) lblAction.innerText = data.action;
-            if (lblUcb) lblUcb.innerText = `${data.ucbScore} / SVD 已收斂`;
-            if (lblMsg) lblMsg.innerHTML = data.lbsMsg;
-            if (lblMsgMob) lblMsgMob.innerHTML = data.lbsMsg;
-
-            // 3. 更新 14 頭水牛三大聚落地圖位置、姿態與動態氣泡
-            updateBuffaloMapAndTable(slot);
-
-            // 4. 更新 10 大據點與步道路況表格人流
-            renderCheckpointsTables(slot);
-            renderTrailsTable(slot);
-
-            // 5. 重新繪製時・位・險 Canvas 矩陣指針
-            drawKinematicsMatrix('kinematicsCanvasDesktop');
-            drawKinematicsMatrix('kinematicsCanvasMobile');
-        }
-
-        // 更新水牛棲地地圖標記、動態氣泡半徑與清冊表格
-        function updateBuffaloMapAndTable(slot) {
-            const slotData = TIME_SLOT_DATABASE[slot];
-            if (!slotData) return;
-            const buffalos = slotData.buffalos;
-
-            // 更新清冊表格 (桌機與手機)
-            const generateBuffaloRows = () => `
-                <tr class="${buffalos.cluster_a.risk > 10 ? 'bg-red-950/30' : ''} cursor-pointer hover:bg-cyan-950/40" onclick="focusCluster('cluster_a')">
-                    <td><b class="text-white">${buffalos.cluster_a.name}</b></td>
-                    <td class="font-bold ${buffalos.cluster_a.risk > 10 ? 'text-neonRed' : 'text-neonAmber'}">${buffalos.cluster_a.postureText}</td>
-                    <td class="${buffalos.cluster_a.distance < 10 ? 'text-neonRed font-bold' : 'text-slate-300'}">${buffalos.cluster_a.distance}m</td>
-                    <td class="text-neonAmber">${buffalos.cluster_a.ttc}</td>
-                    <td class="${buffalos.cluster_a.riskColor} font-bold">${buffalos.cluster_a.risk}</td>
-                </tr>
-                <tr class="cursor-pointer hover:bg-cyan-950/40" onclick="focusCluster('cluster_b')">
-                    <td><b class="text-slate-300">${buffalos.cluster_b.name}</b></td>
-                    <td class="text-purple-300 font-bold">${buffalos.cluster_b.postureText}</td>
-                    <td class="text-slate-300">${buffalos.cluster_b.distance}m</td>
-                    <td class="text-slate-400">${buffalos.cluster_b.ttc}</td>
-                    <td class="text-purple-300 font-bold">${buffalos.cluster_b.risk}</td>
-                </tr>
-                <tr class="cursor-pointer hover:bg-cyan-950/40" onclick="focusCluster('cluster_c')">
-                    <td><b class="text-slate-300">${buffalos.cluster_c.name}</b></td>
-                    <td class="text-neonGreen font-bold">${buffalos.cluster_c.postureText}</td>
-                    <td class="text-slate-300">${buffalos.cluster_c.distance}m</td>
-                    <td class="text-slate-400">${buffalos.cluster_c.ttc}</td>
-                    <td class="text-neonGreen font-bold">${buffalos.cluster_c.risk}</td>
-                </tr>
-            `;
-
-            const tbodyDesk = document.getElementById("table-buffalo-desktop");
-            const tbodyMob = document.getElementById("table-buffalo-mobile");
-            if (tbodyDesk) tbodyDesk.innerHTML = generateBuffaloRows();
-            if (tbodyMob) tbodyMob.innerHTML = generateBuffaloRows();
-
-            // 更新地圖上的標記座標與泡泡氣泡
-            const updateMapInstances = (markersStore, circlesStore) => {
-                ["cluster_a", "cluster_b", "cluster_c"].forEach(key => {
-                    const c = buffalos[key];
-                    if (markersStore[key]) {
-                        markersStore[key].setLatLng(c.coords);
-                        markersStore[key].setPopupContent(`
-                            <div class="text-xs font-mono space-y-1">
-                                <div class="font-bold ${c.risk > 10 ? 'text-neonRed' : 'text-neonCyan'}">${c.name} [${slot}]</div>
-                                <div>頭數與姿態: <b>${c.postureText}</b></div>
-                                <div>人牛間距: <b class="${c.distance < 10 ? 'text-neonRed font-bold' : 'text-white'}">${c.distance}m</b></div>
-                                <div>TTC 倒數: <b class="text-neonAmber">${c.ttc}</b></div>
-                                <div>衝突風險 R: <b class="${c.riskColor} font-bold">${c.risk}</b></div>
-                            </div>
-                        `);
-                    }
-                    if (circlesStore[key]) {
-                        circlesStore[key].setLatLng(c.coords);
-                        circlesStore[key].setRadius(c.bubbleRadius);
-                        circlesStore[key].setStyle({
-                            color: c.bubbleColor,
-                            fillColor: c.bubbleColor,
-                            fillOpacity: c.bubbleOpacity
-                        });
-                        circlesStore[key].setPopupContent(`
-                            <b>${c.name} - 時段動態泡泡圖 (${slot})</b><br>
-                            半徑: <b>${c.bubbleRadius}m</b> | 風險 R: <b>${c.risk}</b>
-                        `);
-                    }
-                });
-            };
-
-            updateMapInstances(buffaloMarkersDesktop, buffaloCirclesDesktop);
-            updateMapInstances(buffaloMarkersMobile, buffaloCirclesMobile);
-        }
-
-        // 點擊清冊聚落聚焦地圖
-        function focusCluster(clusterKey) {
-            const slotData = TIME_SLOT_DATABASE[currentTimeSlot];
-            if (!slotData) return;
-            const c = slotData.buffalos[clusterKey];
-            if (!c) return;
-
-            const targetMap = (currentDeviceMode === 'mobile' || (currentDeviceMode === 'auto' && window.matchMedia('(max-width: 1023px)').matches)) ? mapMobile : mapDesktop;
-            const markersStore = targetMap === mapMobile ? buffaloMarkersMobile : buffaloMarkersDesktop;
-
-            if (targetMap) {
-                targetMap.flyTo(c.coords, 17, { duration: 1.2 });
-                setTimeout(() => {
-                    if (markersStore[clusterKey]) markersStore[clusterKey].openPopup();
-                }, 1300);
-            }
-        }
-
-        // 點選 Canvas 矩陣切換時段
-        function handleCanvasClick(event, mode) {
-            const canvas = event.target;
-            const rect = canvas.getBoundingClientRect();
-            const clickX = event.clientX - rect.left;
-            const w = rect.width;
-
-            // X 比例分配對應時段
-            const ratio = clickX / w;
-            let targetSlot = "12:00";
-            if (ratio < 0.18) targetSlot = "08:00";
-            else if (ratio < 0.35) targetSlot = "10:00";
-            else if (ratio < 0.53) targetSlot = "12:00";
-            else if (ratio < 0.70) targetSlot = "14:00";
-            else if (ratio < 0.85) targetSlot = "16:00";
-            else targetSlot = "18:30";
-
-            setTimeSlot(targetSlot);
-        }
-
-        // 繪製時・位・險整合矩陣 (含當前選中時段指針與泡泡)
-        function drawKinematicsMatrix(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
-
-            ctx.clearRect(0, 0, w, h);
-
-            // 背景座標網格
-            ctx.strokeStyle = 'rgba(22, 43, 77, 0.4)';
-            ctx.lineWidth = 1;
-            for (let x = 30; x < w; x += 50) {
-                ctx.beginPath();
-                ctx.moveTo(x, 10);
-                ctx.lineTo(x, h - 25);
-                ctx.stroke();
-            }
-            for (let y = 20; y < h - 25; y += 30) {
-                ctx.beginPath();
-                ctx.moveTo(25, y);
-                ctx.lineTo(w - 10, y);
-                ctx.stroke();
-            }
-
-            // 人流壓力 v6 面積圖
-            const v6Points = [
-                { x: 30, y: 110, slot: "08:00" }, 
-                { x: 90, y: 75, slot: "10:00" }, 
-                { x: 170, y: 25, slot: "12:00" }, // 12:00 峰值
-                { x: 235, y: 40, slot: "14:00" }, 
-                { x: 295, y: 80, slot: "16:00" }, 
-                { x: 360, y: 115, slot: "18:30" }
-            ];
-
-            const gradient = ctx.createLinearGradient(0, 20, 0, h - 25);
-            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
-            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.02)');
-
-            ctx.beginPath();
-            ctx.moveTo(v6Points[0].x, h - 25);
-            v6Points.forEach(pt => ctx.lineTo(pt.x, pt.y));
-            ctx.lineTo(v6Points[v6Points.length - 1].x, h - 25);
-            ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
-
-            // 水牛遷移速率折線 (m/s)
-            ctx.beginPath();
-            const buffSpeeds = [
-                { x: 30, y: 100 }, { x: 90, y: 85 }, { x: 170, y: 35 },
-                { x: 235, y: 55 }, { x: 295, y: 88 }, { x: 360, y: 108 }
-            ];
-            ctx.strokeStyle = '#b026ff';
-            ctx.lineWidth = 2.5;
-            buffSpeeds.forEach((pt, idx) => {
-                if (idx === 0) ctx.moveTo(pt.x, pt.y);
-                else ctx.lineTo(pt.x, pt.y);
-            });
-            ctx.stroke();
-
-            // 繪製各時段節點氣泡
-            v6Points.forEach(pt => {
-                const isSelected = pt.slot === currentTimeSlot;
-                const slotRisk = TIME_SLOT_DATABASE[pt.slot].risk;
-                const bubbleColor = slotRisk > 10 ? '#ff2a5f' : (slotRisk > 3 ? '#ffaa00' : '#00ff88');
-
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, isSelected ? 8 : 4.5, 0, Math.PI * 2);
-                ctx.fillStyle = bubbleColor;
-                if (isSelected) {
-                    ctx.shadowColor = bubbleColor;
-                    ctx.shadowBlur = 14;
-                }
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                if (isSelected) {
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-
-                    // 垂直時間參考虛線
-                    ctx.setLineDash([3, 3]);
-                    ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
-                    ctx.beginPath();
-                    ctx.moveTo(pt.x, 15);
-                    ctx.lineTo(pt.x, h - 25);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-
-                    // 標籤提示
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 9px Orbitron';
-                    ctx.fillText(`${pt.slot} (R=${slotRisk})`, pt.x - 22, pt.y - 12);
-                }
-            });
-
-            // X 軸時間刻度
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '9px JetBrains Mono';
-            ctx.fillText('08:00', 20, h - 10);
-            ctx.fillText('10:00', 80, h - 10);
-            ctx.fillText('12:00', 160, h - 10);
-            ctx.fillText('14:00', 225, h - 10);
-            ctx.fillText('16:00', 285, h - 10);
-            ctx.fillText('18:30', 345, h - 10);
-        }
-
-        // 渲染步道路況清冊 (隨時段人流加權倍率連動)
-        function renderTrailsTable(slot = "12:00") {
-            const factor = TRAIL_PEOPLE_FACTORS[slot] || 1.0;
-
-            const generateRows = () => TRAILS_HIGHWAY_DATA.map(t => {
-                const adjPeople = Math.round(t.people * factor);
-                const adjRate = Math.min(100, Math.round((adjPeople / t.max) * 100));
-                let adjColor = "#00ff88";
-                let adjStatus = "🟢 順暢";
-                if (adjRate > 80) {
-                    adjColor = "#ff2a5f";
-                    adjStatus = "🔴 壅塞高危";
-                } else if (adjRate > 60) {
-                    adjColor = "#ffaa00";
-                    adjStatus = "🟡 繁忙警戒";
-                }
-
-                return `
-                    <tr class="cursor-pointer hover:bg-cyan-950/40 transition" onclick="flyToTrail('${t.id}')" title="點擊地圖平滑聚焦此路段並呈現即時路況">
-                        <td>
-                            <div class="font-bold text-white flex items-center gap-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${adjColor}"></span>
-                                <span class="truncate max-w-[130px] md:max-w-[170px]">${t.name}</span>
-                            </div>
-                            <div class="text-[9.5px] text-slate-400 font-mono">${t.length_km} · 路寬 ${t.width}m</div>
-                        </td>
-                        <td class="font-bold">${adjPeople} 人</td>
-                        <td>
-                            <div class="flex items-center gap-1">
-                                <div class="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                    <div class="h-full" style="width: ${adjRate}%; background-color: ${adjColor}"></div>
-                                </div>
-                                <span class="text-[10px] w-8 text-right font-bold" style="color: ${adjColor}">${adjRate}%</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge-compact-2char border" style="color: ${adjColor}; border-color: ${adjColor}60; background: ${adjColor}15">
-                                ${adjStatus}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            const tbodyDesktop = document.getElementById('table-trails-desktop');
-            const tbodyMobile = document.getElementById('table-trails-mobile');
-            if (tbodyDesktop) tbodyDesktop.innerHTML = generateRows();
-            if (tbodyMobile) tbodyMobile.innerHTML = generateRows();
-        }
-
-        // 渲染 10 大關鍵據點人流表格 (隨時段人流加權倍率連動)
-        function renderCheckpointsTables(slot = "12:00") {
-            const factor = CHECKPOINT_PEOPLE_FACTORS[slot] || 1.0;
-
-            const generateRows = () => CHECKPOINTS_DATA.map(cp => {
-                const adjPeople = Math.round(cp.people * factor);
-                const adjRate = Math.min(100, Math.round((adjPeople / cp.max) * 100));
-                const isOverload = adjRate > 85;
-                const isWarning = adjRate > 65 && adjRate <= 85;
-                const statusText = isOverload ? '🔴 破防' : (isWarning ? '🟡 警戒' : '🟢 順暢');
-                const statusColor = isOverload ? 'text-rose-400' : (isWarning ? 'text-amber-400' : 'text-emerald-400');
-                const statusBg = isOverload ? 'bg-rose-950/70 border-rose-500/50' : (isWarning ? 'bg-amber-950/70 border-amber-500/50' : 'bg-emerald-950/70 border-emerald-500/50');
-
-                return `
-                    <tr class="${isOverload ? 'bg-red-950/20' : ''} cursor-pointer hover:bg-cyan-950/40 transition" onclick="flyToCheckpoint('${cp.id}')" title="點擊地圖平滑飛躍至該據點">
-                        <td>
-                            <div class="font-bold text-white flex items-center gap-1">
-                                <i class="fa-solid fa-location-dot text-[10px] ${statusColor}"></i>
-                                ${cp.name}
-                            </div>
-                            <div class="text-[9px] text-slate-400 font-mono">${cp.trail} · ${cp.elevation}m</div>
-                        </td>
-                        <td class="font-bold">${adjPeople} 人</td>
-                        <td>
-                            <div class="flex items-center gap-1">
-                                <div class="flex-1 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                    <div class="h-full ${isOverload ? 'bg-neonRed' : (isWarning ? 'bg-neonAmber' : 'bg-neonGreen')}" style="width: ${adjRate}%"></div>
-                                </div>
-                                <span class="${statusColor} text-[10px] w-8 text-right">${adjRate}%</span>
-                            </div>
-                        </td>
-                        <td><span class="badge-compact-2char ${statusBg} ${statusColor}">${statusText}</span></td>
-                    </tr>
-                `;
-            }).join('');
-
-            const tbodyDesktop = document.getElementById('table-checkpoints-desktop');
-            if (tbodyDesktop) tbodyDesktop.innerHTML = generateRows();
-        }
-
-        // 初始化水牛多聚落動態泡泡圖與標記 (包含全時段可伸縮氣泡)
-        function renderBuffaloHabitats(mapInstance, isDesktop = true) {
-            const markersStore = isDesktop ? buffaloMarkersDesktop : buffaloMarkersMobile;
-            const circlesStore = isDesktop ? buffaloCirclesDesktop : buffaloCirclesMobile;
-
-            // 1. 聚落 A (埡口鞍部)
-            const iconA = L.divIcon({
-                className: 'custom-buffalo-a',
-                html: `
-                    <div class="relative flex items-center justify-center">
-                        <div class="w-8 h-8 rounded-full bg-red-600 border-2 border-white flex items-center justify-center shadow-lg posture-badge-pulse-red text-base cursor-pointer">
-                            🐮
-                        </div>
-                        <div id="badge-buffalo-count-a" class="absolute -top-5 whitespace-nowrap bg-black/90 text-neonRed font-mono font-bold text-[10px] px-1 rounded border border-neonRed">
-                            聚落A: 7頭
-                        </div>
-                    </div>
-                `,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
-            });
-            const markerA = L.marker(CAOLING_YAKOU, { icon: iconA }).addTo(mapInstance);
-            const circleA = L.circle(CAOLING_YAKOU, {
-                radius: 38,
-                color: '#ff2a5f',
-                weight: 2.5,
-                fillColor: '#ff2a5f',
-                fillOpacity: 0.55,
-                dashArray: '6, 4'
-            }).addTo(mapInstance);
-            markersStore["cluster_a"] = markerA;
-            circlesStore["cluster_a"] = circleA;
-
-            // 2. 聚落 B (護管所泥塘)
-            const iconB = L.divIcon({
-                className: 'custom-buffalo-b',
-                html: `
-                    <div class="relative flex items-center justify-center">
-                        <div class="w-7 h-7 rounded-full bg-purple-600 border border-purple-300 flex items-center justify-center text-sm shadow-md posture-badge-pulse-purple cursor-pointer">
-                            🦬
-                        </div>
-                        <div id="badge-buffalo-count-b" class="absolute -top-4 whitespace-nowrap bg-black/90 text-purple-300 font-mono text-[9px] px-1 rounded border border-purple-500">
-                            聚落B: 4頭
-                        </div>
-                    </div>
-                `,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            });
-            const coordsB = [24.975660, 121.926210];
-            const markerB = L.marker(coordsB, { icon: iconB }).addTo(mapInstance);
-            const circleB = L.circle(coordsB, {
-                radius: 24,
-                color: '#b026ff',
-                weight: 1.8,
-                fillColor: '#b026ff',
-                fillOpacity: 0.4,
-                dashArray: '4, 4'
-            }).addTo(mapInstance);
-            markersStore["cluster_b"] = markerB;
-            circlesStore["cluster_b"] = circleB;
-
-            // 3. 聚落 C (桃源谷稜線草坡)
-            const iconC = L.divIcon({
-                className: 'custom-buffalo-c',
-                html: `
-                    <div class="relative flex items-center justify-center">
-                        <div class="w-7 h-7 rounded-full bg-emerald-600 border border-emerald-300 flex items-center justify-center text-xs shadow-md posture-badge-pulse-green cursor-pointer">
-                            🐂
-                        </div>
-                        <div id="badge-buffalo-count-c" class="absolute -top-4 whitespace-nowrap bg-black/90 text-emerald-300 font-mono text-[9px] px-1 rounded border border-emerald-500">
-                            聚落C: 3頭
-                        </div>
-                    </div>
-                `,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            });
-            const coordsC = [24.962000, 121.908000];
-            const markerC = L.marker(coordsC, { icon: iconC }).addTo(mapInstance);
-            const circleC = L.circle(coordsC, {
-                radius: 20,
-                color: '#00ff88',
-                weight: 1.5,
-                fillColor: '#00ff88',
-                fillOpacity: 0.25
-            }).addTo(mapInstance);
-            markersStore["cluster_c"] = markerC;
-            circlesStore["cluster_c"] = circleC;
-        }
-
-        // 初始化 Leaflet GIS 戰情地圖
-        function initLeafletMap(containerId, isDesktop = true) {
+        function initLeafletMap(containerId, isDesktop) {
             const map = L.map(containerId, {
-                center: [24.970000, 121.916000],
-                zoom: 14,
-                zoomControl: false,
-                attributionControl: false
+                center: [24.970000, 121.916000], zoom: 14, zoomControl: false, attributionControl: false
             });
 
             const layers = {};
-            layers['EMAP'] = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                maxZoom: 19
-            }).addTo(map);
+            layers['EMAP'] = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 }).addTo(map);
+            layers['PHOTO2'] = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', { maxZoom: 19 });
+            layers['TOPO'] = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17 });
 
-            layers['PHOTO2'] = L.tileLayer('https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-                maxZoom: 19
-            });
+            renderHighwayTrails(map, isDesktop);
+            renderCheckpoints(map, isDesktop);
+            renderBuffaloClusters(map, isDesktop);
+            renderHMMPrediction(map);
 
-            layers['TOPO'] = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17
-            });
-
-            // 1. 繪製草嶺古道 × 桃源谷各步道路段（國道即時路況）
-            renderHighwayTrafficTrails(map, isDesktop);
-
-            // 2. 繪製 10 大關鍵據點地標圖釘
-            renderCheckpointsMarkers(map, isDesktop);
-
-            // 3. 繪製 14 頭水牛三大棲地聚落泡泡（支援時空動態連動）
-            renderBuffaloHabitats(map, isDesktop);
-
-            // 4. 繪製 HMM 險風走廊錐形帶
-            renderHMMPredictionCorridor(map);
-
-            if (isDesktop) {
-                mapDesktop = map;
-                baseLayersDesktop = layers;
-            } else {
-                mapMobile = map;
-                baseLayersMobile = layers;
-            }
+            if (isDesktop) { mapDesktop = map; baseLayersDesktop = layers; }
+            else { mapMobile = map; baseLayersMobile = layers; }
         }
 
         window.onload = function () {
-            // 初始化桌面版與手機版地圖
             initLeafletMap('leafletMapDesktop', true);
             initLeafletMap('leafletMapMobile', false);
-
-            // 預設執行 12:00 時段狀態機同步連動
             setTimeSlot('12:00');
-
-            // 啟動自適應檢測
             applyAutoDeviceDetection();
             window.addEventListener('resize', () => {
                 applyAutoDeviceDetection();
-                drawKinematicsMatrix('kinematicsCanvasDesktop');
-                drawKinematicsMatrix('kinematicsCanvasMobile');
+                drawKinematics('kinematicsCanvasDesktop');
+                drawKinematics('kinematicsCanvasMobile');
             });
-
-            // 啟動每秒時鐘
             setInterval(updateClock, 1000);
         };
     </script>
