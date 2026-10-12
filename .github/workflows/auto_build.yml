@@ -28,6 +28,8 @@ jobs:
           pip install folium numpy requests httpx pydantic fastapi uvicorn
 
       - name: Run main.py to generate index.html
+        env:
+          TGOS_API_KEY: ${{ secrets.TGOS_API_KEY }}
         run: |
           python main.py
 
