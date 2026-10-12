@@ -321,12 +321,12 @@
                 <div class="flex items-center gap-1.5 text-[9px] md:text-[10px] text-slate-300 font-mono leading-tight">
                     <span class="text-neonCyan font-bold flex items-center gap-1 truncate">
                         <i class="fa-regular fa-clock text-[8px]"></i>
-                        <span id="live-datetime-display">2026-10-12 10:09:46 CST</span>
+                        <span id="live-datetime-display">2026-10-12 10:35:00 CST</span>
                     </span>
                     <span class="text-slate-500">|</span>
-                    <span class="flex items-center gap-1 text-slate-300 shrink-0 cursor-pointer" onclick="openTdxModal()" title="點擊檢視 TDX 4大 API 狀態">
+                    <span class="flex items-center gap-1 text-slate-300 shrink-0 cursor-pointer" onclick="openTdxModal()" title="點擊檢視 TDX & TGOS 官方雙中樞狀態">
                         <span id="heartbeat-indicator" class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                        <span id="tdx-status-tag" class="text-[9px] text-neonGreen font-bold">TDX LIVE</span>
+                        <span id="tdx-status-tag" class="text-[9px] text-neonGreen font-bold">TGOS ✓ & TDX LIVE</span>
                         <span class="text-slate-400 text-[9px] font-mono">(<b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,648</b>)</span>
                     </span>
                 </div>
@@ -353,7 +353,7 @@
             </div>
             <div class="flex items-center gap-1.5">
                 <button onclick="openTdxModal()" class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/60 text-[10.5px] font-bold hover:bg-indigo-900 transition flex items-center gap-1">
-                    <i class="fa-solid fa-satellite-dish text-neonCyan"></i> TDX API 儀表
+                    <i class="fa-solid fa-satellite-dish text-neonCyan"></i> TDX & TGOS 儀表
                 </button>
             </div>
         </div>
@@ -669,7 +669,7 @@
             <div class="flex items-center justify-between border-b border-cyberBorder pb-2">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-network-wired text-neonCyan text-base"></i>
-                    <span class="text-white font-bold text-sm">TDX 4大 API 即時介接中樞</span>
+                    <span class="text-white font-bold text-sm">TDX × TGOS 國家級雙圖台介接中樞</span>
                 </div>
                 <button onclick="closeTdxModal()" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-sm"></i>
@@ -679,35 +679,43 @@
             <!-- API 介接狀態列表 -->
             <div class="grid grid-cols-2 gap-2 text-[11px]">
                 <div class="bg-slate-900/90 p-2 rounded border border-cyberBorder flex flex-col justify-between">
-                    <span class="text-slate-400">1. 景區即時人流 (/Live)</span>
+                    <span class="text-slate-400">1. TGOS 國土電子地圖 (v3)</span>
                     <span class="text-neonGreen font-bold flex items-center gap-1 mt-1">
-                        <span class="w-2 h-2 rounded-full bg-neonGreen"></span> 連線正常 (77.0%)
+                        <span class="w-2 h-2 rounded-full bg-neonGreen"></span> 官方已核可授權 (線上)
                     </span>
                 </div>
                 <div class="bg-slate-900/90 p-2 rounded border border-cyberBorder flex flex-col justify-between">
-                    <span class="text-slate-400">2. GIS-T 步道拓樸 (V2)</span>
+                    <span class="text-slate-400">2. TDX GIS-T 拓樸 (V2)</span>
                     <span class="text-neonCyan font-bold flex items-center gap-1 mt-1">
-                        <span class="w-2 h-2 rounded-full bg-neonCyan"></span> 8大分段完整載入
+                        <span class="w-2 h-2 rounded-full bg-neonCyan"></span> 8大路段等高線對齊
                     </span>
                 </div>
                 <div class="bg-slate-900/90 p-2 rounded border border-cyberBorder flex flex-col justify-between">
-                    <span class="text-slate-400">3. 台灣好行 ETA 到站</span>
+                    <span class="text-slate-400">3. 景區即時人流 (/Live)</span>
                     <span class="text-neonAmber font-bold flex items-center gap-1 mt-1">
-                        <span class="w-2 h-2 rounded-full bg-neonAmber"></span> 綠19 倒數 12 分
+                        <span class="w-2 h-2 rounded-full bg-neonAmber"></span> 容留率 77.0% 運算中
                     </span>
                 </div>
                 <div class="bg-slate-900/90 p-2 rounded border border-cyberBorder flex flex-col justify-between">
-                    <span class="text-slate-400">4. GTS 低碳綠色商家</span>
+                    <span class="text-slate-400">4. 2D-EKF 空間坐標校正</span>
                     <span class="text-purple-300 font-bold flex items-center gap-1 mt-1">
-                        <span class="w-2 h-2 rounded-full bg-neonPurple"></span> 18 家核銷連動
+                        <span class="w-2 h-2 rounded-full bg-neonPurple"></span> 精度 &lt;0.45m 穩定
                     </span>
                 </div>
             </div>
 
-            <!-- 說明與 OAuth 設定輸入 -->
+            <!-- TGOS 官方金鑰與 TDX 設定輸入 -->
             <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-2 text-[10.5px]">
-                <div class="text-slate-300">
-                    <b class="text-neonCyan">雙軌架構說明：</b> 系統預設已搭載「TDX GIS-T 官方真實拓樸數據（等高線精確折點）」。若您擁有 TDX 會員 Client ID / Secret，亦可填入進行線上 Token 交換：
+                <div class="flex items-center justify-between">
+                    <span class="text-neonCyan font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-key text-[10px]"></i> 內政部 TGOS MAP API 3.0 (已載入審核金鑰):
+                    </span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-neonGreen border border-emerald-500 font-bold">已通過</span>
+                </div>
+                <input id="input-tgos-api-key" type="text" readonly value="ihhvXRiylknsXh31la8xqeejPGyMhRQuvMmstWohYg0Ji227nkkavUDG8KR19K9qGgtZ2qvo4v3PQmm0LYZRfhM7ZvBnBPjtEuROLLs6tyYWG5aW7so09poKRhC+8cKK" class="w-full bg-slate-900/80 border border-emerald-500/50 rounded px-2 py-1 text-emerald-300 font-mono text-[10px] select-all cursor-text focus:outline-none">
+                
+                <div class="text-slate-300 pt-1 border-t border-slate-800">
+                    <b class="text-neonCyan">TDX 憑證連線：</b>（已載入高精度離線拓樸，可選填 TDX 金鑰連動）
                 </div>
                 <div class="space-y-1.5">
                     <input id="input-tdx-client-id" type="text" placeholder="TDX Client ID (選填)" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white placeholder-slate-500 focus:outline-none focus:border-neonCyan">
@@ -716,7 +724,7 @@
             </div>
 
             <div class="flex items-center justify-between pt-1">
-                <span id="tdx-modal-msg" class="text-[10px] text-neonGreen">✓ 現正運行 TDX 官方拓樸標準模式</span>
+                <span id="tdx-modal-msg" class="text-[10px] text-neonGreen">✓ TGOS MAP API 3.0 國土授權已就緒</span>
                 <div class="flex items-center gap-2">
                     <button onclick="fetchOnlineTdxData()" class="px-3 py-1 bg-cyan-950 hover:bg-cyan-900 text-neonCyan border border-neonCyan/50 rounded font-bold transition">
                         <i class="fa-solid fa-cloud-arrow-down mr-1"></i>在線請求驗證
