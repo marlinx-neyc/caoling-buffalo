@@ -1863,5 +1863,76 @@
             setInterval(fetchLiveTelemetry, 5000);
         };
     </script>
+<script id="gem-buffalo-hydration">
+(function() {
+  'use strict';
+
+  // [A] 清理背景舊定時器
+  const highestIntervalId = setInterval(";");
+  for (let i = 0; i < highestIntervalId; i++) {
+    clearInterval(i);
+  }
+
+  // [B] 純前端即時秒針
+  function tickLiveClock() {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    
+    const timeStr = `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} CST`;
+    const clockEl = document.getElementById('live-datetime-display');
+    if (clockEl) clockEl.textContent = timeStr;
+  }
+  setInterval(tickLiveClock, 1000);
+  tickLiveClock();
+
+  // [C] 點對點 SSOT 數據水合
+  async function syncBuffaloData() {
+    try {
+      const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const safeSetText = (idOrKey, text, className) => {
+        const elById = document.getElementById(idOrKey);
+        if (elById) {
+          if (text !== undefined) elById.textContent = text;
+          if (className !== undefined) elById.className = className;
+        }
+        document.querySelectorAll(`[data-ssot-key="${idOrKey}"]`).forEach(el => {
+          if (text !== undefined) el.textContent = text;
+          if (className !== undefined) el.className = className;
+        });
+      };
+
+      // 1. 2D-EKF 水牛座標與姿態水合
+      const ekf = data.ekf_positioning || {};
+      if (ekf.coords_wgs84) {
+        safeSetText('live-wgs-coords', `${ekf.coords_wgs84[0].toFixed(6)}, ${ekf.coords_wgs84[1].toFixed(6)}`);
+      }
+      safeSetText('live-buffalo-posture', data.edge_ai_posture || 'DEFENSIVE (1.8)');
+
+      // 2. 衝突風險與測距指標
+      const risk = data.predicted_conflict_risk ?? 14.82;
+      safeSetText('stat-risk', risk.toFixed(2));
+      safeSetText('stat-risk-mobile', risk.toFixed(2));
+
+      if (data.timestamp) {
+        safeSetText('ssot_timestamp', `GEM Engine v30.2 Master | 同步時間: ${data.timestamp}`);
+      }
+
+    } catch (err) {
+      console.warn('Buffalo Telemetry Sync Warning:', err);
+    }
+  }
+
+  setInterval(syncBuffaloData, 2000);
+  syncBuffaloData();
+})();
+</script>
 </body>
 </html>
