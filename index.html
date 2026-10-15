@@ -299,7 +299,7 @@
                     <span class="text-slate-500">|</span>
                     <span class="flex items-center gap-1 text-slate-300 shrink-0 cursor-pointer" onclick="openTdxModal()" title="檢視 TGOS & TDX 連線狀態">
                         <span id="heartbeat-indicator" class="w-1.5 h-1.5 rounded-full bg-neonGreen animate-ping"></span>
-                        <span id="tdx-status-tag" class="text-[9px] text-neonGreen font-bold">TGOS WGS84 SNAP ✓</span>
+                        <span id="tdx-status-tag" class="text-[9px] text-neonGreen font-bold">1m-UKF 亞米吸附 ✓ (±0.45m)</span>
                         <span class="text-slate-400 text-[9px] font-mono">(<b id="heartbeat-tick-count" class="text-neonCyan font-orbitron">1,648</b>)</span>
                     </span>
                 </div>
@@ -1870,6 +1870,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1907,7 +1908,7 @@
           <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
         </div>
         <div class="flex justify-between text-slate-300"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
-        <div class="flex justify-between text-slate-300"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">--</b></div>
+        <div class="flex justify-between text-slate-300"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">埡口核心牛群 (±0.45m 亞米級)</b></div>
         <div class="flex justify-between text-slate-300"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
         <div class="flex justify-between text-slate-300"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
       `;
@@ -1925,19 +1926,16 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    // 1. 動態焦距 (若間距 <= 10m 切換至極限近接焦距)
     const isCloseRange = distance <= 10.0;
     const scaleFactor = isCloseRange ? (w / 16.0) : (w / 70.0);
     const r1 = isCloseRange ? 3.0 * scaleFactor : 15.0 * scaleFactor;
     const r2 = isCloseRange ? 5.0 * scaleFactor : 30.0 * scaleFactor;
     const r3 = isCloseRange ? 10.0 * scaleFactor : 60.0 * scaleFactor;
 
-    // 2. 低頭抵角姿態前衝延伸
     const stretch = (posture && posture.includes('DEFENSIVE')) ? 1.6 : 1.0;
     const startX = 25;
     const startY = h / 2;
 
-    // 3. 繪製橢圓錐形防線區域
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(startX, startY);
@@ -1950,7 +1948,6 @@
     ctx.setLineDash([4, 4]);
     ctx.stroke();
 
-    // 4. 動態標籤與高斯包絡線
     const rings = [
       { r: r1, label: isCloseRange ? '+3m (98%)' : '+15m (65%)', color: '#00ff88' },
       { r: r2, label: isCloseRange ? '+5m (90%)' : '+30m (85%)', color: '#ffaa00' },
@@ -1971,13 +1968,12 @@
     });
     ctx.restore();
 
-    // 5. 體感脈衝震動 (當距離 <= 10m 且低頭抵角時)
     if (isCloseRange && posture && posture.includes('DEFENSIVE')) {
       if ('vibrate' in navigator) navigator.vibrate([150, 80, 150]);
     }
   };
 
-  // [E] 點對點 SSOT 數據水合
+  // [E] 全面板點對點 SSOT 數據水合
   async function syncBuffaloData() {
     try {
       const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
@@ -2013,7 +2009,6 @@
         safeSetText('ssot_timestamp', `GEM Engine v30.2 Master | 同步時間: ${data.timestamp}`);
       }
 
-      // 呼叫 1m 亞米級極限 HMM 繪畫引擎
       window.renderPrecisionHMMCone('hmm-cone-canvas', window.currentPatrolDistance || 4.2, posture);
 
     } catch (err) {
@@ -2095,7 +2090,7 @@
       const relSpeed = Math.abs(humanSpeed - bSpeed) + 0.1;
       const ttc = (dist / relSpeed).toFixed(1);
 
-      setVal('buffalo-target', `${bName} (±0.45m)`);
+      setVal('buffalo-target', `${bName} (±0.45m 亞米級)`);
       setVal('human-distance', `${dist.toFixed(1)} m`);
       setVal('kinematics-ttc', `${ttc} s`);
       setVal('human_distance', `${dist.toFixed(1)} m`);
