@@ -1864,6 +1864,7 @@
         };
     </script>
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1874,7 +1875,36 @@
     clearInterval(i);
   }
 
-  // [B] 純前端即時秒針
+  // [B] 自動檢查並動態掛載「巡檢員 GPS 實測與測距」懸浮 UI (手機版與桌面版雙端適用)
+  function ensurePatrolUI() {
+    if (!document.getElementById('btn-ranger-track')) {
+      const btn = document.createElement('button');
+      btn.id = 'btn-ranger-track';
+      btn.className = 'fixed bottom-16 right-4 z-[999] px-3 py-2 rounded-xl bg-cyan-950 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_15px_rgba(0,240,255,0.4)] backdrop-blur-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer';
+      btn.innerHTML = '📍 開啟巡檢測距';
+      btn.onclick = function() { window.togglePatrolTracking(); };
+      document.body.appendChild(btn);
+    }
+
+    if (!document.getElementById('patrol-hud-card')) {
+      const card = document.createElement('div');
+      card.id = 'patrol-hud-card';
+      card.className = 'hidden fixed bottom-28 right-4 z-[999] bg-cyberPanel/98 border border-neonCyan/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.3)] font-mono text-xs space-y-1.5 w-[290px] md:w-[320px] backdrop-blur-md text-slate-100';
+      card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-800 pb-1">
+          <span class="text-white font-bold flex items-center gap-1"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢員實時遙測</span>
+          <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
+        </div>
+        <div class="flex justify-between text-slate-300"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
+        <div class="flex justify-between text-slate-300"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">--</b></div>
+        <div class="flex justify-between text-slate-300"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
+        <div class="flex justify-between text-slate-300"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
+      `;
+      document.body.appendChild(card);
+    }
+  }
+
+  // [C] 純前端即時秒針
   function tickLiveClock() {
     const now = new Date();
     const yyyy = now.getFullYear();
@@ -1888,10 +1918,8 @@
     const clockEl = document.getElementById('live-datetime-display');
     if (clockEl) clockEl.textContent = timeStr;
   }
-  setInterval(tickLiveClock, 1000);
-  tickLiveClock();
 
-  // [C] 點對點 SSOT 數據水合
+  // [D] 點對點 SSOT 數據水合
   async function syncBuffaloData() {
     try {
       const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
@@ -1932,12 +1960,7 @@
     }
   }
 
-  setInterval(syncBuffaloData, 2000);
-  syncBuffaloData();
-
-  // ==========================================================================
-  // [D] 巡檢員 GPS 實時定位與 2D-EKF 水牛測距模組 (全域掛載，零改動 DOM)
-  // ==========================================================================
+  // [E] 巡檢員 GPS 實時定位與 2D-EKF 水牛測距模組
   let rangerWatchId = null;
   let rangerMarkerNode = null;
   let rangerTargetPolyline = null;
@@ -1951,9 +1974,10 @@
   }
 
   window.togglePatrolTracking = function() {
+    ensurePatrolUI();
     const btn = document.getElementById('btn-ranger-track');
     const hud = document.getElementById('patrol-hud-card');
-    const activeMap = (typeof mapDesktop !== 'undefined' && mapDesktop) ? mapDesktop : ((typeof mapMobile !== 'undefined') ? mapMobile : null);
+    const activeMap = (typeof mapMobile !== 'undefined' && mapMobile && document.body.classList.contains('mode-mobile')) ? mapMobile : ((typeof mapDesktop !== 'undefined' && mapDesktop) ? mapDesktop : (typeof mapMobile !== 'undefined' ? mapMobile : null));
 
     // 1. 關閉定位
     if (rangerWatchId !== null) {
@@ -2018,17 +2042,17 @@
       setVal('kinematics_ttc', `${ttc} s`);
 
       let color = '#00ff88';
-      let badgeText = '🟢 常態安全距離';
-      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60';
+      let badgeText = '🟢 常態安全';
+      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
 
       if (dist <= 10.0) {
         color = '#ff2a5f';
-        badgeText = '🔴 侵入 10m Flight Zone (強制避險)';
-        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60';
+        badgeText = '🔴 侵入 10m 避險';
+        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60 px-2 py-0.5 rounded text-[10px] font-bold';
       } else if (dist <= 30.0) {
         color = '#ffaa00';
-        badgeText = '🟡 進入 30m 警戒圈';
-        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60';
+        badgeText = '🟡 進入 30m 警戒';
+        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
       }
 
       setVal('defense-badge', badgeText, badgeClass);
@@ -2069,6 +2093,13 @@
       timeout: 5000
     });
   };
+
+  // 腳本初始化自動載入 UI 與對標
+  ensurePatrolUI();
+  setInterval(tickLiveClock, 1000);
+  tickLiveClock();
+  setInterval(syncBuffaloData, 2000);
+  syncBuffaloData();
 
 })();
 </script>
