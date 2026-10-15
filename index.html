@@ -1866,6 +1866,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1890,10 +1891,37 @@
     const clockEl = document.getElementById('live-datetime-display');
     if (clockEl) clockEl.textContent = timeStr;
   }
-  setInterval(tickLiveClock, 1000);
-  tickLiveClock();
 
-  // [C] 點對點 SSOT 數據水合 (同步支援桌面端與手機端視圖 ID)
+  // [C] 自動檢查並在 DOM 中動態建立測距按鈕與 HUD 卡片 (不需手動修改原 HTML)
+  function ensurePatrolUI() {
+    if (!document.getElementById('btn-ranger-track')) {
+      const btn = document.createElement('button');
+      btn.id = 'btn-ranger-track';
+      btn.className = 'fixed bottom-16 right-4 z-[999] px-3 py-2 rounded-xl bg-cyan-950 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_15px_rgba(0,240,255,0.4)] backdrop-blur-md active:scale-95 transition flex items-center gap-1.5 cursor-pointer';
+      btn.innerHTML = '📍 開啟巡檢測距';
+      btn.onclick = function() { window.togglePatrolTracking(); };
+      document.body.appendChild(btn);
+    }
+
+    if (!document.getElementById('patrol-hud-card')) {
+      const card = document.createElement('div');
+      card.id = 'patrol-hud-card';
+      card.className = 'hidden fixed bottom-28 right-4 z-[999] bg-cyberPanel/98 border border-neonCyan/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.3)] font-mono text-xs space-y-1.5 w-[290px] md:w-[320px] backdrop-blur-md text-slate-100';
+      card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-800 pb-1">
+          <span class="text-white font-bold flex items-center gap-1"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢員實時遙測</span>
+          <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
+        </div>
+        <div class="flex justify-between text-slate-300"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
+        <div class="flex justify-between text-slate-300"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">--</b></div>
+        <div class="flex justify-between text-slate-300"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
+        <div class="flex justify-between text-slate-300"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
+      `;
+      document.body.appendChild(card);
+    }
+  }
+
+  // [D] 點對點 SSOT 數據水合
   async function syncBuffaloData() {
     try {
       const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
@@ -1912,7 +1940,6 @@
         });
       };
 
-      // 1. 2D-EKF 水牛座標與姿態水合
       const ekf = data.ekf_positioning || {};
       if (ekf.coords_wgs84) {
         window.latestBuffaloCoords = ekf.coords_wgs84;
@@ -1920,7 +1947,6 @@
       }
       safeSetText('live-buffalo-posture', data.edge_ai_posture || 'DEFENSIVE (1.8)');
 
-      // 2. 衝突風險與測距指標 (同步寫入桌面端與手機端標籤)
       const risk = data.predicted_conflict_risk ?? 14.82;
       safeSetText('stat-risk', risk.toFixed(2));
       safeSetText('stat-risk-mobile', risk.toFixed(2));
@@ -1928,16 +1954,12 @@
       if (data.timestamp) {
         safeSetText('ssot_timestamp', `GEM Engine v30.2 Master | 同步時間: ${data.timestamp}`);
       }
-
     } catch (err) {
       console.warn('Buffalo Telemetry Sync Warning:', err);
     }
   }
 
-  setInterval(syncBuffaloData, 2000);
-  syncBuffaloData();
-
-  // [D] 巡檢員 GPS 實時定位與 2D-EKF 水牛測距模組 (全域掛載)
+  // [E] 巡檢員 GPS 實時定位與 2D-EKF 水牛測距模組
   let rangerWatchId = null;
   let rangerMarkerNode = null;
   let rangerTargetPolyline = null;
@@ -1951,11 +1973,11 @@
   }
 
   window.togglePatrolTracking = function() {
+    ensurePatrolUI();
     const btn = document.getElementById('btn-ranger-track');
     const hud = document.getElementById('patrol-hud-card');
     const activeMap = (typeof mapDesktop !== 'undefined' && mapDesktop && document.body.classList.contains('mode-desktop')) ? mapDesktop : ((typeof mapMobile !== 'undefined' && mapMobile) ? mapMobile : null);
 
-    // 1. 關閉定位
     if (rangerWatchId !== null) {
       navigator.geolocation.clearWatch(rangerWatchId);
       rangerWatchId = null;
@@ -1970,9 +1992,8 @@
       return;
     }
 
-    // 2. 開啟定位
     if (!navigator.geolocation) {
-      alert('此裝置不支援 GPS 定位');
+      alert('此裝置不支援 GPS 定位功能，請確認手機已關閉定位限制');
       return;
     }
 
@@ -2000,7 +2021,6 @@
       setVal('human-coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)} (±${accuracy.toFixed(1)}m)`);
       setVal('patrol_coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)}`);
 
-      // 取得最近牛隻座標
       let bLat = 24.980183, bLng = 121.926200, bSpeed = 0.35, bName = "埡口核心牛群";
       if (window.latestBuffaloCoords) {
         bLat = window.latestBuffaloCoords[0];
@@ -2018,23 +2038,22 @@
       setVal('kinematics_ttc', `${ttc} s`);
 
       let color = '#00ff88';
-      let badgeText = '🟢 常態安全距離';
-      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60';
+      let badgeText = '🟢 常態安全';
+      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
 
       if (dist <= 10.0) {
         color = '#ff2a5f';
-        badgeText = '🔴 侵入 10m Flight Zone (強制避險)';
-        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60';
+        badgeText = '🔴 侵入 10m 避險';
+        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60 px-2 py-0.5 rounded text-[10px] font-bold';
       } else if (dist <= 30.0) {
         color = '#ffaa00';
-        badgeText = '🟡 進入 30m 警戒圈';
-        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60';
+        badgeText = '🟡 進入 30m 警戒';
+        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
       }
 
       setVal('defense-badge', badgeText, badgeClass);
       setVal('defense_badge', badgeText, badgeClass);
 
-      // 地圖動態繪製巡檢點與連線
       if (activeMap && typeof L !== 'undefined') {
         if (!rangerMarkerNode) {
           const rangerIcon = L.divIcon({
@@ -2069,6 +2088,13 @@
       timeout: 5000
     });
   };
+
+  // 初始化執行
+  ensurePatrolUI();
+  setInterval(tickLiveClock, 1000);
+  tickLiveClock();
+  setInterval(syncBuffaloData, 2000);
+  syncBuffaloData();
 
 })();
 </script>
