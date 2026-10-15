@@ -1872,6 +1872,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1888,25 +1889,28 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 自動於最頂層 [AUTO] 按鈕右側掛載測距按鈕 & 頂部 HUD 面板
+  // [C] 自動掛載極簡 Emoji 按鈕 (📍) & 50% 高透明度 HUD 視窗
   function ensurePatrolUI() {
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
-      btn.className = 'px-2.5 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold hover:bg-cyan-900 transition inline-flex items-center gap-1 cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.3)] active:scale-95 ml-1.5 z-[999]';
-      btn.innerHTML = '📍 開啟巡檢測距';
+      // 極簡單一 Emoji 按鈕風格
+      btn.className = 'px-2 py-1 rounded-lg bg-cyan-950/80 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold hover:bg-cyan-800 transition inline-flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.3)] active:scale-95 ml-1 z-[9999]';
+      btn.innerHTML = '📍';
+      btn.title = '點動切換巡檢 GPS 實時測距';
       btn.onclick = function() { window.togglePatrolTracking(); };
 
-      // 尋找頂列 [AUTO] 按鈕並掛載在其旁邊
+      // 頂列 [AUTO] 按鈕尋找與雙端備用掛載
       const autoBtn = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('AUTO'));
       if (autoBtn && autoBtn.parentElement) {
         autoBtn.parentElement.insertBefore(btn, autoBtn.nextSibling);
       } else {
-        const headerContainer = document.querySelector('header') || document.getElementById('live-datetime-display')?.parentElement;
-        if (headerContainer) {
-          headerContainer.appendChild(btn);
+        const header = document.querySelector('header') || document.getElementById('live-datetime-display')?.parentElement;
+        if (header) {
+          header.appendChild(btn);
         } else {
-          btn.className = 'fixed top-2 right-36 z-[999] px-2.5 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)] cursor-pointer';
+          // 手機版/備用懸浮於頂部右側
+          btn.className = 'fixed top-2.5 right-24 z-[9999] px-2 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_10px_rgba(0,240,255,0.4)] cursor-pointer';
           document.body.appendChild(btn);
         }
       }
@@ -1915,16 +1919,17 @@
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
-      card.className = 'hidden fixed top-14 right-4 z-[999] bg-cyberPanel/98 border border-neonCyan/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.3)] font-mono text-xs space-y-1.5 w-[290px] md:w-[320px] backdrop-blur-md text-slate-100';
+      // 關鍵修正：bg-slate-950/50 (50% 高透明度) + backdrop-blur-md 玻璃質感，完全不遮擋後方資訊
+      card.className = 'hidden fixed top-14 right-2 md:right-4 z-[9999] bg-slate-950/50 border border-cyan-500/50 rounded-xl p-2.5 shadow-[0_0_20px_rgba(0,240,255,0.2)] font-mono text-xs space-y-1.5 w-[270px] md:w-[300px] backdrop-blur-md text-slate-100 transition-all';
       card.innerHTML = `
-        <div class="flex items-center justify-between border-b border-slate-800 pb-1">
-          <span class="text-white font-bold flex items-center gap-1"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢員亞米實時遙測</span>
-          <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
+        <div class="flex items-center justify-between border-b border-slate-700/50 pb-1">
+          <span class="text-white font-bold flex items-center gap-1 text-[11px]"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢員遙測</span>
+          <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950/60 text-neonGreen border border-emerald-500/50 px-1.5 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
         </div>
-        <div class="flex justify-between text-slate-300"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
-        <div class="flex justify-between text-slate-300"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">埡口核心牛群 (±0.45m 亞米級)</b></div>
-        <div class="flex justify-between text-slate-300"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
-        <div class="flex justify-between text-slate-300"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
+        <div class="flex justify-between text-slate-300 text-[11px]"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
+        <div class="flex justify-between text-slate-300 text-[11px]"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">埡口核心牛群 (±0.45m)</b></div>
+        <div class="flex justify-between text-slate-300 text-[11px]"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
+        <div class="flex justify-between text-slate-300 text-[11px]"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
       `;
       document.body.appendChild(card);
     }
@@ -2052,7 +2057,7 @@
     if (rangerWatchId !== null) {
       navigator.geolocation.clearWatch(rangerWatchId);
       rangerWatchId = null;
-      if (btn) btn.innerHTML = '📍 開啟巡檢測距';
+      if (btn) btn.innerHTML = '📍';
       if (hud) hud.classList.add('hidden');
       if (activeMap) {
         if (rangerMarkerNode) activeMap.removeLayer(rangerMarkerNode);
@@ -2068,7 +2073,7 @@
       return;
     }
 
-    if (btn) btn.innerHTML = '🛑 停止巡檢測距';
+    if (btn) btn.innerHTML = '🛑';
     if (hud) hud.classList.remove('hidden');
 
     rangerWatchId = navigator.geolocation.watchPosition((pos) => {
@@ -2104,7 +2109,7 @@
       const relSpeed = Math.abs(humanSpeed - bSpeed) + 0.1;
       const ttc = (dist / relSpeed).toFixed(1);
 
-      setVal('buffalo-target', `${bName} (±0.45m 亞米級)`);
+      setVal('buffalo-target', `${bName} (±0.45m)`);
       setVal('human-distance', `${dist.toFixed(1)} m`);
       setVal('kinematics-ttc', `${ttc} s`);
       setVal('human_distance', `${dist.toFixed(1)} m`);
@@ -2112,16 +2117,16 @@
 
       let color = '#00ff88';
       let badgeText = '🟢 常態安全';
-      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
+      let badgeClass = 'm-badge-badge bg-emerald-950/60 text-neonGreen border border-emerald-500/50 px-1.5 py-0.5 rounded text-[10px] font-bold';
 
       if (dist <= 10.0) {
         color = '#ff2a5f';
         badgeText = '🔴 侵入 10m 硬防線';
-        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60 px-2 py-0.5 rounded text-[10px] font-bold';
+        badgeClass = 'm-badge-badge bg-red-950/60 text-neonRed border border-neonRed/60 px-1.5 py-0.5 rounded text-[10px] font-bold';
       } else if (dist <= 30.0) {
         color = '#ffaa00';
         badgeText = '🟡 進入 30m 警戒';
-        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
+        badgeClass = 'm-badge-badge bg-amber-950/60 text-amber-500 border border-amber-500/50 px-1.5 py-0.5 rounded text-[10px] font-bold';
       }
 
       setVal('defense-badge', badgeText, badgeClass);
@@ -2131,9 +2136,9 @@
         if (!rangerMarkerNode) {
           const rangerIcon = L.divIcon({
             className: '',
-            html: `<div style="width:16px;height:16px;border-radius:9999px;background:#00f0ff;border:2px solid #fff;box-shadow:0 0 12px #00f0ff;"></div>`,
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            html: `<div style="width:14px;height:14px;border-radius:9999px;background:#00f0ff;border:2px solid #fff;box-shadow:0 0 10px #00f0ff;"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7]
           });
           rangerMarkerNode = L.marker([humanLat, humanLng], { icon: rangerIcon, zIndexOffset: 2000 }).addTo(activeMap);
         } else {
@@ -2143,9 +2148,9 @@
         if (!rangerTargetPolyline) {
           rangerTargetPolyline = L.polyline([[humanLat, humanLng], [bLat, bLng]], {
             color: color,
-            weight: 2.5,
-            dashArray: '6, 8',
-            opacity: 0.9
+            weight: 2.0,
+            dashArray: '5, 6',
+            opacity: 0.85
           }).addTo(activeMap);
         } else {
           rangerTargetPolyline.setLatLngs([[humanLat, humanLng], [bLat, bLng]]);
