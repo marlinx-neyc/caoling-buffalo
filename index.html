@@ -1878,11 +1878,12 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
 
-  // [A] 清理舊定時器
+  // [A] 清理背景舊定時器
   const highestIntervalId = setInterval(";");
   for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
 
@@ -1894,9 +1895,9 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 右下角懸浮按鈕 (收盒版 📍) & 右下角彈出對標表格
+  // [C] 右下角懸浮按鈕 (收盒版 📍) & 右下角彈出對標表格 (固定於按鈕正上方)
   function ensurePatrolUI() {
-    // 1. 右下角收盒按鈕
+    // 1. 右下角極簡圓形懸浮按鈕 (固定於右下角 bottom-4 right-4 z-[99999])
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
@@ -1908,15 +1909,18 @@
       document.body.appendChild(btn);
     }
 
-    // 2. 右下角對標表格 (固定於按鈕上方 bottom-20 right-4)
+    // 2. 右下角對標表格 (固定於按鈕正上方 bottom-16 right-4，預設隱藏 hidden，絕不遮擋左側與中央)
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
-      card.className = 'hidden fixed bottom-20 right-4 z-[99999] bg-slate-950/85 border border-cyan-500/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.35)] font-mono text-xs w-[280px] sm:w-[310px] backdrop-blur-md text-slate-100 transition-all';
+      card.className = 'hidden fixed bottom-16 right-4 z-[99999] bg-slate-950/90 border border-cyan-500/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.4)] font-mono text-xs w-[280px] sm:w-[310px] backdrop-blur-md text-slate-100 transition-all';
       card.innerHTML = `
         <div class="flex items-center justify-between border-b border-cyan-500/40 pb-1.5 mb-2">
           <span class="text-neonCyan font-bold flex items-center gap-1.5 text-xs"><i class="fa-solid fa-user-shield"></i> 巡檢實時對標表格</span>
-          <span id="defense-badge" data-ssot-key="defense_badge" class="bg-emerald-950/80 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
+          <div class="flex items-center gap-1.5">
+            <span id="defense-badge" data-ssot-key="defense_badge" class="bg-emerald-950/80 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
+            <button onclick="window.togglePatrolTracking()" class="text-slate-400 hover:text-white px-1 text-[11px] font-bold cursor-pointer" title="收合/關閉">▼</button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-[11px] border-collapse">
@@ -1945,7 +1949,7 @@
     }
   }
 
-  // [D] HMM 動態姿態橢圓錐形繪圖引擎
+  // [D] HMM 動態姿態橢圓錐形與 10m 極限近接 Zoom-In 繪圖引擎
   window.renderPrecisionHMMCone = function(cvsId, distance, posture) {
     const cvs = document.getElementById(cvsId);
     if (!cvs) return;
@@ -2026,7 +2030,7 @@
         window.latestBuffaloCoords = ekf.coords_wgs84;
         safeSetText('live-wgs-coords', `${ekf.coords_wgs84[0].toFixed(6)}, ${ekf.coords_wgs84[1].toFixed(6)}`);
       }
-      
+
       const posture = data.edge_ai_posture || 'DEFENSIVE (1.8)';
       safeSetText('live-buffalo-posture', posture);
 
@@ -2045,7 +2049,7 @@
     }
   }
 
-  // [F] GPS 定位與測距引擎
+  // [F] GPS 定位與測距引擎 (點擊 📍 切換開關)
   let rangerWatchId = null;
   let rangerMarkerNode = null;
   let rangerTargetPolyline = null;
