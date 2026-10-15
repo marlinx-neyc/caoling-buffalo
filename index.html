@@ -1877,6 +1877,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1893,66 +1894,54 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 自動掛載地圖右下角按鈕 (📍) & 左下方避難點下方表格 HUD 卡片
+  // [C] 右下角懸浮按鈕 (收盒版 📍) & 右下角彈出對標表格
   function ensurePatrolUI() {
+    // 1. 右下角收盒按鈕
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
-      // 關鍵修復 1：地圖右下角 (bottom-6 right-4 z-[99999])，手機與桌面 100% 可見
-      btn.className = 'fixed bottom-6 right-4 z-[99999] w-10 h-10 rounded-full bg-cyan-950/90 text-neonCyan border border-cyan-400 font-mono text-base font-bold hover:bg-cyan-800 transition flex items-center justify-center cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.6)] active:scale-90';
+      btn.className = 'fixed bottom-4 right-4 z-[99999] w-12 h-12 rounded-full bg-cyan-950/90 text-neonCyan border-2 border-cyan-400 font-mono text-lg font-bold hover:bg-cyan-800 transition flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(0,240,255,0.6)] active:scale-90';
       btn.style.touchAction = 'manipulation';
       btn.innerHTML = '📍';
-      btn.title = '點動切換巡檢 GPS 實時測距';
+      btn.title = '點擊展開/收合 巡檢對標表格';
       btn.onclick = function() { window.togglePatrolTracking(); };
       document.body.appendChild(btn);
     }
 
+    // 2. 右下角對標表格 (固定於按鈕上方 bottom-20 right-4)
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
-      // 關鍵修復 2：左下方避難點下方 (bottom-4 left-2 md:left-4 z-[99999])，半透明 (bg-slate-950/50) 表格型態
-      card.className = 'hidden fixed bottom-4 left-2 md:left-4 z-[99999] bg-slate-950/50 border border-cyan-500/50 rounded-xl p-2.5 shadow-[0_0_20px_rgba(0,240,255,0.25)] font-mono text-xs w-[280px] md:w-[310px] backdrop-blur-md text-slate-100 transition-all';
+      card.className = 'hidden fixed bottom-20 right-4 z-[99999] bg-slate-950/85 border border-cyan-500/60 rounded-xl p-3 shadow-[0_0_25px_rgba(0,240,255,0.35)] font-mono text-xs w-[280px] sm:w-[310px] backdrop-blur-md text-slate-100 transition-all';
       card.innerHTML = `
-        <div class="flex items-center justify-between border-b border-cyan-500/40 pb-1 mb-1.5">
-          <span class="text-neonCyan font-bold flex items-center gap-1 text-[11px]"><i class="fa-solid fa-user-shield"></i> 巡檢實時對標表格</span>
-          <div class="flex items-center gap-1.5">
-            <span id="defense-badge" data-ssot-key="defense_badge" class="bg-emerald-950/60 text-neonGreen border border-emerald-500/50 px-1.5 py-0.5 rounded text-[9px] font-bold">🟢 常態安全</span>
-            <button onclick="document.getElementById('patrol-hud-body').classList.toggle('hidden')" class="text-slate-400 hover:text-white px-1 text-[11px] font-bold cursor-pointer" title="折疊/展開">▼</button>
-          </div>
+        <div class="flex items-center justify-between border-b border-cyan-500/40 pb-1.5 mb-2">
+          <span class="text-neonCyan font-bold flex items-center gap-1.5 text-xs"><i class="fa-solid fa-user-shield"></i> 巡檢實時對標表格</span>
+          <span id="defense-badge" data-ssot-key="defense_badge" class="bg-emerald-950/80 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold">🟢 常態安全</span>
         </div>
-        <div id="patrol-hud-body" class="overflow-x-auto">
-          <table class="w-full text-left text-[10px] border-collapse">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-[11px] border-collapse">
             <tbody>
-              <tr class="border-b border-slate-800/60">
-                <td class="py-1 text-slate-400 w-24">巡檢員座標</td>
-                <td id="human-coords" data-ssot-key="patrol_coords" class="py-1 text-white font-bold text-right">--</td>
+              <tr class="border-b border-slate-800/80">
+                <td class="py-1.5 text-slate-400 w-28">巡檢員座標</td>
+                <td id="human-coords" data-ssot-key="patrol_coords" class="py-1.5 text-white font-bold text-right">--</td>
               </tr>
-              <tr class="border-b border-slate-800/60">
-                <td class="py-1 text-slate-400">目標水牛</td>
-                <td id="buffalo-target" class="py-1 text-neonCyan font-bold text-right">埡口核心牛群 (±0.45m)</td>
+              <tr class="border-b border-slate-800/80">
+                <td class="py-1.5 text-slate-400">目標水牛</td>
+                <td id="buffalo-target" class="py-1.5 text-neonCyan font-bold text-right">埡口核心牛群 (±0.45m)</td>
               </tr>
-              <tr class="border-b border-slate-800/60">
-                <td class="py-1 text-slate-400">實體距離</td>
-                <td id="human-distance" data-ssot-key="human_distance" class="py-1 text-white font-bold text-right">-- m</td>
+              <tr class="border-b border-slate-800/80">
+                <td class="py-1.5 text-slate-400">實體距離</td>
+                <td id="human-distance" data-ssot-key="human_distance" class="py-1.5 text-white font-bold text-right">-- m</td>
               </tr>
               <tr>
-                <td class="py-1 text-slate-400">避險倒數 (TTC)</td>
-                <td id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="py-1 text-neonAmber font-bold text-right">-- s</td>
+                <td class="py-1.5 text-slate-400">避險倒數 (TTC)</td>
+                <td id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="py-1.5 text-neonAmber font-bold text-right">-- s</td>
               </tr>
             </tbody>
           </table>
         </div>
       `;
-      
-      // 嘗試插入左側邊欄/避難點卡片下方，或浮動於左下角
-      const refugeCard = Array.from(document.querySelectorAll('div, section')).find(el => el.textContent.includes('關鍵') || el.textContent.includes('避難'));
-      if (refugeCard && refugeCard.parentElement) {
-        refugeCard.parentElement.insertBefore(card, refugeCard.nextSibling);
-        card.classList.remove('fixed', 'bottom-4', 'left-2', 'md:left-4');
-        card.classList.add('mt-2', 'mb-2');
-      } else {
-        document.body.appendChild(card);
-      }
+      document.body.appendChild(card);
     }
   }
 
@@ -2138,16 +2127,16 @@
 
       let color = '#00ff88';
       let badgeText = '🟢 安全';
-      let badgeClass = 'bg-emerald-950/60 text-neonGreen border border-emerald-500/50 px-1.5 py-0.5 rounded text-[9px] font-bold';
+      let badgeClass = 'bg-emerald-950/80 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
 
       if (dist <= 10.0) {
         color = '#ff2a5f';
         badgeText = '🔴 10m 硬防線';
-        badgeClass = 'bg-red-950/60 text-neonRed border border-neonRed/50 px-1.5 py-0.5 rounded text-[9px] font-bold';
+        badgeClass = 'bg-red-950/80 text-neonRed border border-neonRed/60 px-2 py-0.5 rounded text-[10px] font-bold';
       } else if (dist <= 30.0) {
         color = '#ffaa00';
         badgeText = '🟡 30m 警戒';
-        badgeClass = 'bg-amber-950/60 text-amber-500 border border-amber-500/50 px-1.5 py-0.5 rounded text-[9px] font-bold';
+        badgeClass = 'bg-amber-950/80 text-amber-500 border border-amber-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
       }
 
       setVal('defense-badge', badgeText, badgeClass);
