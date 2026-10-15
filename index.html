@@ -1873,6 +1873,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1889,28 +1890,27 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 自動掛載極簡 Emoji 按鈕 (📍) & 50% 高透明度 HUD 視窗
+  // [C] 自動掛載極簡 Emoji 按鈕 (📍) & 左側 50% 高透明度 HUD 視窗
   function ensurePatrolUI() {
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
-      // 極簡單一 Emoji 按鈕風格
       btn.className = 'px-2 py-1 rounded-lg bg-cyan-950/80 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold hover:bg-cyan-800 transition inline-flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.3)] active:scale-95 ml-1 z-[9999]';
       btn.innerHTML = '📍';
       btn.title = '點動切換巡檢 GPS 實時測距';
       btn.onclick = function() { window.togglePatrolTracking(); };
 
-      // 頂列 [AUTO] 按鈕尋找與雙端備用掛載
+      // 1. 尋找頂列 [AUTO] 按鈕旁邊
       const autoBtn = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('AUTO'));
       if (autoBtn && autoBtn.parentElement) {
         autoBtn.parentElement.insertBefore(btn, autoBtn.nextSibling);
       } else {
+        // 2. 手機版/通用備用：掛載於頂部頁首或固定於頂部右上角
         const header = document.querySelector('header') || document.getElementById('live-datetime-display')?.parentElement;
         if (header) {
           header.appendChild(btn);
         } else {
-          // 手機版/備用懸浮於頂部右側
-          btn.className = 'fixed top-2.5 right-24 z-[9999] px-2 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_10px_rgba(0,240,255,0.4)] cursor-pointer';
+          btn.className = 'fixed top-2.5 right-16 z-[9999] px-2 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_10px_rgba(0,240,255,0.4)] cursor-pointer';
           document.body.appendChild(btn);
         }
       }
@@ -1919,8 +1919,8 @@
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
-      // 關鍵修正：bg-slate-950/50 (50% 高透明度) + backdrop-blur-md 玻璃質感，完全不遮擋後方資訊
-      card.className = 'hidden fixed top-14 right-2 md:right-4 z-[9999] bg-slate-950/50 border border-cyan-500/50 rounded-xl p-2.5 shadow-[0_0_20px_rgba(0,240,255,0.2)] font-mono text-xs space-y-1.5 w-[270px] md:w-[300px] backdrop-blur-md text-slate-100 transition-all';
+      // 關鍵修正：桌面版定位於左側賁卦算子下方 (md:left-4 md:top-[260px])，50% 半透明 (bg-slate-950/50) + backdrop-blur-md
+      card.className = 'hidden fixed top-14 left-2 right-2 md:right-auto md:left-4 md:top-[260px] z-[9999] bg-slate-950/50 border border-cyan-500/50 rounded-xl p-2.5 shadow-[0_0_20px_rgba(0,240,255,0.2)] font-mono text-xs space-y-1.5 w-auto md:w-[290px] backdrop-blur-md text-slate-100 transition-all';
       card.innerHTML = `
         <div class="flex items-center justify-between border-b border-slate-700/50 pb-1">
           <span class="text-white font-bold flex items-center gap-1 text-[11px]"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢員遙測</span>
