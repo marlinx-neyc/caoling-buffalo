@@ -1867,6 +1867,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1886,13 +1887,13 @@
     const hh = String(now.getHours()).padStart(2, '0');
     const mi = String(now.getMinutes()).padStart(2, '0');
     const ss = String(now.getSeconds()).padStart(2, '0');
-    
+
     const timeStr = `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss} CST`;
     const clockEl = document.getElementById('live-datetime-display');
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 自動檢查並在 DOM 中動態建立測距按鈕與 HUD 卡片 (不需手動修改原 HTML)
+  // [C] 自動懸浮巡檢 UI 檢查與掛載
   function ensurePatrolUI() {
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
@@ -1993,7 +1994,7 @@
     }
 
     if (!navigator.geolocation) {
-      alert('此裝置不支援 GPS 定位功能，請確認手機已關閉定位限制');
+      alert('此裝置不支援 GPS 定位功能，請確認手機已允許權限');
       return;
     }
 
@@ -2089,7 +2090,7 @@
     });
   };
 
-  // 初始化執行
+  // 腳本載入時自動初始化
   ensurePatrolUI();
   setInterval(tickLiveClock, 1000);
   tickLiveClock();
