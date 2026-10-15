@@ -1875,6 +1875,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1891,50 +1892,38 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 自動掛載極簡 Emoji 按鈕 (📍) & 45% 透明度可折疊 HUD 視窗
+  // [C] 全域最高層級極簡 Emoji 按鈕 (📍) & 35% 透光率可折疊 HUD 視窗
   function ensurePatrolUI() {
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
-      btn.className = 'px-2 py-1 rounded-lg bg-cyan-950/80 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold hover:bg-cyan-800 transition inline-flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.3)] active:scale-95 ml-1 z-[99999]';
+      // 關鍵修復：固定於 viewport 最上層右側 (top: 10px, right: 12px, z-index: 999999)，手機與桌面 100% 可見
+      btn.className = 'fixed top-2.5 right-3 z-[999999] w-9 h-9 rounded-full bg-cyan-950/90 text-neonCyan border border-cyan-400 font-mono text-sm font-bold hover:bg-cyan-800 transition flex items-center justify-center cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.6)] active:scale-90';
+      btn.style.touchAction = 'manipulation';
       btn.innerHTML = '📍';
       btn.title = '點動切換巡檢 GPS 實時測距';
       btn.onclick = function() { window.togglePatrolTracking(); };
-
-      // 1. 尋找頂列 [AUTO] 按鈕旁邊
-      const autoBtn = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('AUTO'));
-      if (autoBtn && autoBtn.parentElement) {
-        autoBtn.parentElement.insertBefore(btn, autoBtn.nextSibling);
-      } else {
-        // 2. 手機版/備用掛載：尋找 header 或固定於頂部右側
-        const header = document.querySelector('header') || document.querySelector('.top-bar') || document.getElementById('live-datetime-display')?.parentElement;
-        if (header) {
-          header.appendChild(btn);
-        } else {
-          btn.className = 'fixed top-2.5 right-20 z-[99999] px-2 py-1 rounded-lg bg-cyan-950/90 text-neonCyan border border-cyan-500/60 font-mono text-xs font-bold shadow-[0_0_10px_rgba(0,240,255,0.4)] cursor-pointer';
-          document.body.appendChild(btn);
-        }
-      }
+      document.body.appendChild(btn);
     }
 
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
-      // 45% 透明度 (bg-slate-950/45) + backdrop-blur-md，且具備可折疊巡檢身體 (#patrol-hud-body)
-      card.className = 'hidden fixed top-12 left-2 right-2 md:left-auto md:right-4 md:top-14 z-[99999] bg-slate-950/45 border border-cyan-500/40 rounded-xl p-2 shadow-[0_0_15px_rgba(0,240,255,0.2)] font-mono text-xs w-auto md:w-[270px] backdrop-blur-md text-slate-100 transition-all';
+      // 關鍵修復：35% 超高透光 (bg-slate-950/35) + backdrop-blur-md，徹底解決遮擋雷達矩陣卡片問題
+      card.className = 'hidden fixed top-14 right-3 z-[999998] bg-slate-950/35 border border-cyan-500/40 rounded-xl p-2 shadow-[0_0_15px_rgba(0,240,255,0.2)] font-mono text-xs w-[260px] md:w-[280px] backdrop-blur-md text-slate-100 transition-all pointer-events-auto';
       card.innerHTML = `
-        <div class="flex items-center justify-between border-b border-slate-700/40 pb-1">
-          <span class="text-white font-bold flex items-center gap-1 text-[11px]"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢遙測</span>
+        <div class="flex items-center justify-between border-b border-slate-700/30 pb-1">
+          <span class="text-white font-bold flex items-center gap-1 text-[10px]"><i class="fa-solid fa-user-shield text-neonCyan"></i> 巡檢遙測 (1m亞米)</span>
           <div class="flex items-center gap-1">
-            <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950/50 text-neonGreen border border-emerald-500/40 px-1 py-0.5 rounded text-[9px] font-bold">🟢 常態安全</span>
-            <button onclick="document.getElementById('patrol-hud-body').classList.toggle('hidden')" class="text-slate-400 hover:text-white px-1 text-[10px] font-bold cursor-pointer" title="收合/展開">—</button>
+            <span id="defense-badge" data-ssot-key="defense_badge" class="m-badge-badge bg-emerald-950/40 text-neonGreen border border-emerald-500/40 px-1 py-0.2 rounded text-[9px] font-bold">🟢 安全</span>
+            <button onclick="document.getElementById('patrol-hud-body').classList.toggle('hidden')" class="text-slate-300 hover:text-white px-1 text-[11px] font-bold cursor-pointer" title="收合/展開">—</button>
           </div>
         </div>
         <div id="patrol-hud-body" class="space-y-1 pt-1">
-          <div class="flex justify-between text-slate-300 text-[10px]"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
-          <div class="flex justify-between text-slate-300 text-[10px]"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">埡口核心牛群 (±0.45m)</b></div>
-          <div class="flex justify-between text-slate-300 text-[10px]"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
-          <div class="flex justify-between text-slate-300 text-[10px]"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
+          <div class="flex justify-between text-slate-200 text-[10px]"><span>巡檢座標：</span><b id="human-coords" data-ssot-key="patrol_coords" class="text-white font-bold">--</b></div>
+          <div class="flex justify-between text-slate-200 text-[10px]"><span>目標水牛：</span><b id="buffalo-target" class="text-neonCyan">埡口核心牛群 (±0.45m)</b></div>
+          <div class="flex justify-between text-slate-200 text-[10px]"><span>實體距離：</span><b id="human-distance" data-ssot-key="human_distance" class="text-white font-bold">-- m</b></div>
+          <div class="flex justify-between text-slate-200 text-[10px]"><span>避險倒數 (TTC)：</span><b id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="text-neonAmber font-bold">-- s</b></div>
         </div>
       `;
       document.body.appendChild(card);
@@ -2122,17 +2111,17 @@
       setVal('kinematics_ttc', `${ttc} s`);
 
       let color = '#00ff88';
-      let badgeText = '🟢 常態安全';
-      let badgeClass = 'm-badge-badge bg-emerald-950/60 text-neonGreen border border-emerald-500/50 px-1.5 py-0.5 rounded text-[10px] font-bold';
+      let badgeText = '🟢 安全';
+      let badgeClass = 'm-badge-badge bg-emerald-950/40 text-neonGreen border border-emerald-500/40 px-1 py-0.2 rounded text-[9px] font-bold';
 
       if (dist <= 10.0) {
         color = '#ff2a5f';
-        badgeText = '🔴 侵入 10m 硬防線';
-        badgeClass = 'm-badge-badge bg-red-950/60 text-neonRed border border-neonRed/60 px-1.5 py-0.5 rounded text-[10px] font-bold';
+        badgeText = '🔴 10m 硬防線';
+        badgeClass = 'm-badge-badge bg-red-950/50 text-neonRed border border-neonRed/50 px-1 py-0.2 rounded text-[9px] font-bold';
       } else if (dist <= 30.0) {
         color = '#ffaa00';
-        badgeText = '🟡 進入 30m 警戒';
-        badgeClass = 'm-badge-badge bg-amber-950/60 text-amber-500 border border-amber-500/50 px-1.5 py-0.5 rounded text-[10px] font-bold';
+        badgeText = '🟡 30m 警戒';
+        badgeClass = 'm-badge-badge bg-amber-950/40 text-amber-500 border border-amber-500/40 px-1 py-0.2 rounded text-[9px] font-bold';
       }
 
       setVal('defense-badge', badgeText, badgeClass);
