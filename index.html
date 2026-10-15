@@ -1863,6 +1863,7 @@
             setInterval(fetchLiveTelemetry, 5000);
         };
     </script>
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1912,6 +1913,7 @@
       // 1. 2D-EKF 水牛座標與姿態水合
       const ekf = data.ekf_positioning || {};
       if (ekf.coords_wgs84) {
+        window.latestBuffaloCoords = ekf.coords_wgs84;
         safeSetText('live-wgs-coords', `${ekf.coords_wgs84[0].toFixed(6)}, ${ekf.coords_wgs84[1].toFixed(6)}`);
       }
       safeSetText('live-buffalo-posture', data.edge_ai_posture || 'DEFENSIVE (1.8)');
@@ -1932,6 +1934,142 @@
 
   setInterval(syncBuffaloData, 2000);
   syncBuffaloData();
+
+  // ==========================================================================
+  // [D] 巡檢員 GPS 實時定位與 2D-EKF 水牛測距模組 (全域掛載，零改動 DOM)
+  // ==========================================================================
+  let rangerWatchId = null;
+  let rangerMarkerNode = null;
+  let rangerTargetPolyline = null;
+
+  function getHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  window.togglePatrolTracking = function() {
+    const btn = document.getElementById('btn-ranger-track');
+    const hud = document.getElementById('patrol-hud-card');
+    const activeMap = (typeof mapDesktop !== 'undefined' && mapDesktop) ? mapDesktop : ((typeof mapMobile !== 'undefined') ? mapMobile : null);
+
+    // 1. 關閉定位
+    if (rangerWatchId !== null) {
+      navigator.geolocation.clearWatch(rangerWatchId);
+      rangerWatchId = null;
+      if (btn) btn.innerHTML = '📍 開啟巡檢測距';
+      if (hud) hud.classList.add('hidden');
+      if (activeMap) {
+        if (rangerMarkerNode) activeMap.removeLayer(rangerMarkerNode);
+        if (rangerTargetPolyline) activeMap.removeLayer(rangerTargetPolyline);
+      }
+      rangerMarkerNode = null;
+      rangerTargetPolyline = null;
+      return;
+    }
+
+    // 2. 開啟定位
+    if (!navigator.geolocation) {
+      alert('此裝置不支援 GPS 定位');
+      return;
+    }
+
+    if (btn) btn.innerHTML = '🛑 停止巡檢測距';
+    if (hud) hud.classList.remove('hidden');
+
+    rangerWatchId = navigator.geolocation.watchPosition((pos) => {
+      const humanLat = pos.coords.latitude;
+      const humanLng = pos.coords.longitude;
+      const accuracy = pos.coords.accuracy || 0;
+      const humanSpeed = pos.coords.speed || 0;
+
+      const setVal = (idOrKey, text, className) => {
+        const elById = document.getElementById(idOrKey);
+        if (elById) {
+          if (text !== undefined) elById.innerText = text;
+          if (className !== undefined) elById.className = className;
+        }
+        document.querySelectorAll(`[data-ssot-key="${idOrKey}"]`).forEach(el => {
+          if (text !== undefined) el.innerText = text;
+          if (className !== undefined) el.className = className;
+        });
+      };
+
+      setVal('human-coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)} (±${accuracy.toFixed(1)}m)`);
+      setVal('patrol_coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)}`);
+
+      // 取得最近牛隻座標
+      let bLat = 24.980183, bLng = 121.926200, bSpeed = 0.35, bName = "埡口核心牛群";
+      if (window.latestBuffaloCoords) {
+        bLat = window.latestBuffaloCoords[0];
+        bLng = window.latestBuffaloCoords[1];
+      }
+
+      const dist = getHaversineDistance(humanLat, humanLng, bLat, bLng);
+      const relSpeed = Math.abs(humanSpeed - bSpeed) + 0.1;
+      const ttc = (dist / relSpeed).toFixed(1);
+
+      setVal('buffalo-target', `${bName} (±0.5m)`);
+      setVal('human-distance', `${dist.toFixed(1)} m`);
+      setVal('kinematics-ttc', `${ttc} s`);
+      setVal('human_distance', `${dist.toFixed(1)} m`);
+      setVal('kinematics_ttc', `${ttc} s`);
+
+      let color = '#00ff88';
+      let badgeText = '🟢 常態安全距離';
+      let badgeClass = 'm-badge-badge bg-emerald-950 text-neonGreen border border-emerald-500/60';
+
+      if (dist <= 10.0) {
+        color = '#ff2a5f';
+        badgeText = '🔴 侵入 10m Flight Zone (強制避險)';
+        badgeClass = 'm-badge-badge bg-red-950 text-neonRed border border-neonRed/60';
+      } else if (dist <= 30.0) {
+        color = '#ffaa00';
+        badgeText = '🟡 進入 30m 警戒圈';
+        badgeClass = 'm-badge-badge bg-amber-950 text-amber-500 border border-amber-500/60';
+      }
+
+      setVal('defense-badge', badgeText, badgeClass);
+      setVal('defense_badge', badgeText, badgeClass);
+
+      // 地圖動態繪製巡檢點與連線
+      if (activeMap && typeof L !== 'undefined') {
+        if (!rangerMarkerNode) {
+          const rangerIcon = L.divIcon({
+            className: '',
+            html: `<div style="width:16px;height:16px;border-radius:9999px;background:#00f0ff;border:2px solid #fff;box-shadow:0 0 12px #00f0ff;"></div>`,
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+          rangerMarkerNode = L.marker([humanLat, humanLng], { icon: rangerIcon, zIndexOffset: 2000 }).addTo(activeMap);
+        } else {
+          rangerMarkerNode.setLatLng([humanLat, humanLng]);
+        }
+
+        if (!rangerTargetPolyline) {
+          rangerTargetPolyline = L.polyline([[humanLat, humanLng], [bLat, bLng]], {
+            color: color,
+            weight: 2.5,
+            dashArray: '6, 8',
+            opacity: 0.9
+          }).addTo(activeMap);
+        } else {
+          rangerTargetPolyline.setLatLngs([[humanLat, humanLng], [bLat, bLng]]);
+          rangerTargetPolyline.setStyle({ color: color });
+        }
+      }
+
+    }, (err) => {
+      console.warn('GPS 測距定位失敗:', err.message);
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 5000
+    });
+  };
+
 })();
 </script>
 </body>
