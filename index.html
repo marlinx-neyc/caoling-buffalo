@@ -1881,15 +1881,14 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
 
-  // [A] 清理背景舊定時器
   const highestIntervalId = setInterval(";");
   for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
 
-  // [B] 純前端秒針
   function tickLiveClock() {
     const now = new Date();
     const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')} CST`;
@@ -1897,9 +1896,7 @@
     if (clockEl) clockEl.textContent = timeStr;
   }
 
-  // [C] 右下角懸浮按鈕 (收盒版 📍) & 右下角彈出對標表格 (固定於按鈕正上方)
   function ensurePatrolUI() {
-    // 1. 右下角極簡圓形懸浮按鈕 (固定於右下角 bottom-4 right-4 z-[99999])
     if (!document.getElementById('btn-ranger-track')) {
       const btn = document.createElement('button');
       btn.id = 'btn-ranger-track';
@@ -1911,7 +1908,6 @@
       document.body.appendChild(btn);
     }
 
-    // 2. 右下角對標表格 (固定於按鈕正上方 bottom-16 right-4，預設隱藏 hidden，絕不遮擋左側與中央)
     if (!document.getElementById('patrol-hud-card')) {
       const card = document.createElement('div');
       card.id = 'patrol-hud-card';
@@ -1951,7 +1947,6 @@
     }
   }
 
-  // [D] HMM 動態姿態橢圓錐形與 10m 極限近接 Zoom-In 繪圖引擎
   window.renderPrecisionHMMCone = function(cvsId, distance, posture) {
     const cvs = document.getElementById(cvsId);
     if (!cvs) return;
@@ -2008,7 +2003,6 @@
     }
   };
 
-  // [E] 全面板點對點 SSOT 數據水合
   async function syncBuffaloData() {
     try {
       const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
@@ -2051,7 +2045,6 @@
     }
   }
 
-  // [F] GPS 定位與測距引擎 (點擊 📍 切換開關)
   let rangerWatchId = null;
   let rangerMarkerNode = null;
   let rangerTargetPolyline = null;
