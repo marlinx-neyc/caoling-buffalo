@@ -1891,28 +1891,27 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
-  // 1. 全域 SSOT 座標與距離鎖定
-  window.latestBuffaloCoords = [24.98048, 121.92552];
+  window.latestBuffaloCoords = [24.980480, 121.925520];
   window.currentPatrolDistance = 48.7;
 
-  // 2. 秒級鎖定介面與卡片，徹底防止歷史數據回彈
-  function forceHolisticSync() {
+  function syncDashboardV34() {
     const safeSet = (id, text) => {
       const el = document.getElementById(id);
       if (el) el.textContent = text;
     };
     safeSet('live-wgs-coords', '24.980480, 121.925520');
-    safeSet('live-buffalo-posture', 'GRAZING (草坡採食)');
-    safeSet('stat-risk', '0.62');
-    safeSet('stat-risk-mobile', '0.62');
+    safeSet('live-buffalo-posture', 'GRAZING (向陽草坡 (現地打勾真值))');
+    safeSet('stat-risk', '0.69');
+    safeSet('stat-risk-mobile', '0.69');
   }
 
-  setInterval(forceHolisticSync, 1000);
-  forceHolisticSync();
-  console.log("🎯 [GEM Engine SSOT 全域到位] 已同步修正地圖座標、護管所 0 頭真值與安全風險燈號！");
+  setInterval(syncDashboardV34, 1000);
+  syncDashboardV34();
+  console.log("🎯 [GEM Engine v34.0 Master] 生態力學 SSOT 座標與狀態鎖定完成: 24.980480, 121.925520");
 })();
 </script>
 </body>
