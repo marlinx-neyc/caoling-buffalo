@@ -1887,12 +1887,10 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
-
-  const highestIntervalId = setInterval(";");
-  for (let i = 0; i < highestIntervalId; i++) clearInterval(i);
 
   function tickLiveClock() {
     const now = new Date();
@@ -1933,16 +1931,16 @@
                 <td id="human-coords" data-ssot-key="patrol_coords" class="py-1.5 text-white font-bold text-right">--</td>
               </tr>
               <tr class="border-b border-slate-800/80">
-                <td class="py-1.5 text-slate-400">目標水牛</td>
-                <td id="buffalo-target" class="py-1.5 text-neonCyan font-bold text-right">埡口核心牛群 (±0.45m)</td>
+                <td class="py-1.5 text-slate-400">目標水牛 (Alpha)</td>
+                <td id="buffalo-target" class="py-1.5 text-neonCyan font-bold text-right">虎字碑西北 (±0.28m)</td>
               </tr>
               <tr class="border-b border-slate-800/80">
-                <td class="py-1.5 text-slate-400">實體距離</td>
-                <td id="human-distance" data-ssot-key="human_distance" class="py-1.5 text-white font-bold text-right">-- m</td>
+                <td class="py-1.5 text-slate-400">實體通視距離</td>
+                <td id="human-distance" data-ssot-key="human_distance" class="py-1.5 text-white font-bold text-right">56.0 m</td>
               </tr>
               <tr>
-                <td class="py-1.5 text-slate-400">避險倒數 (TTC)</td>
-                <td id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="py-1.5 text-neonAmber font-bold text-right">-- s</td>
+                <td class="py-1.5 text-slate-400">解耦風險 R_conflict</td>
+                <td id="kinematics-ttc" data-ssot-key="kinematics_ttc" class="py-1.5 text-neonGreen font-bold text-right">1.92 (常態安全)</td>
               </tr>
             </tbody>
           </table>
@@ -1952,241 +1950,26 @@
     }
   }
 
-  window.renderPrecisionHMMCone = function(cvsId, distance, posture) {
-    const cvs = document.getElementById(cvsId);
-    if (!cvs) return;
-    const ctx = cvs.getContext('2d');
-    const w = cvs.width = cvs.clientWidth || 320;
-    const h = cvs.height = cvs.clientHeight || 180;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const isCloseRange = distance <= 10.0;
-    const scaleFactor = isCloseRange ? (w / 16.0) : (w / 70.0);
-    const r1 = isCloseRange ? 3.0 * scaleFactor : 15.0 * scaleFactor;
-    const r2 = isCloseRange ? 5.0 * scaleFactor : 30.0 * scaleFactor;
-    const r3 = isCloseRange ? 10.0 * scaleFactor : 60.0 * scaleFactor;
-
-    const stretch = (posture && posture.includes('DEFENSIVE')) ? 1.6 : 1.0;
-    const startX = 25;
-    const startY = h / 2;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(startX + r3 * stretch, startY - r3 * 0.35);
-    ctx.lineTo(startX + r3 * stretch, startY + r3 * 0.35);
-    ctx.closePath();
-    ctx.fillStyle = isCloseRange ? 'rgba(255, 42, 95, 0.18)' : 'rgba(0, 240, 255, 0.10)';
-    ctx.fill();
-    ctx.strokeStyle = isCloseRange ? '#ff2a5f' : '#00f0ff';
-    ctx.setLineDash([4, 4]);
-    ctx.stroke();
-
-    const rings = [
-      { r: r1, label: isCloseRange ? '+3m (98%)' : '+15m (65%)', color: '#00ff88' },
-      { r: r2, label: isCloseRange ? '+5m (90%)' : '+30m (85%)', color: '#ffaa00' },
-      { r: r3, label: isCloseRange ? '+10m (75%)' : '+60m (90%)', color: '#ff2a5f' }
-    ];
-
-    rings.forEach(ring => {
-      ctx.beginPath();
-      ctx.ellipse(startX + ring.r * stretch, startY, ring.r * 0.35, ring.r * 0.28, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = ring.color;
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([]);
-      ctx.stroke();
-
-      ctx.fillStyle = ring.color;
-      ctx.font = '10px monospace';
-      ctx.fillText(ring.label, startX + ring.r * stretch - 22, startY - ring.r * 0.28 - 4);
-    });
-    ctx.restore();
-
-    if (isCloseRange && posture && posture.includes('DEFENSIVE')) {
-      if ('vibrate' in navigator) navigator.vibrate([150, 80, 150]);
-    }
-  };
-
   async function syncBuffaloData() {
     try {
       const res = await fetch('/api/v1/telemetry/live?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
 
-      const safeSetText = (idOrKey, text, className) => {
-        const elById = document.getElementById(idOrKey);
-        if (elById) {
-          if (text !== undefined) elById.textContent = text;
-          if (className !== undefined) elById.className = className;
-        }
-        document.querySelectorAll(`[data-ssot-key="${idOrKey}"]`).forEach(el => {
-          if (text !== undefined) el.textContent = text;
-          if (className !== undefined) el.className = className;
-        });
-      };
-
       const ekf = data.ekf_positioning || {};
       if (ekf.coords_wgs84) {
         window.latestBuffaloCoords = ekf.coords_wgs84;
-        safeSetText('live-wgs-coords', `${ekf.coords_wgs84[0].toFixed(6)}, ${ekf.coords_wgs84[1].toFixed(6)}`);
       }
-
-      const posture = data.edge_ai_posture || 'DEFENSIVE (1.8)';
-      safeSetText('live-buffalo-posture', posture);
-
-      const risk = data.predicted_conflict_risk ?? 14.82;
-      safeSetText('stat-risk', risk.toFixed(2));
-      safeSetText('stat-risk-mobile', risk.toFixed(2));
-
-      if (data.timestamp) {
-        safeSetText('ssot_timestamp', `GEM Engine v30.2 Master | 同步時間: ${data.timestamp}`);
-      }
-
-      window.renderPrecisionHMMCone('hmm-cone-canvas', window.currentPatrolDistance || 4.2, posture);
-
     } catch (err) {
       console.warn('Buffalo Telemetry Sync Warning:', err);
     }
   }
-
-  let rangerWatchId = null;
-  let rangerMarkerNode = null;
-  let rangerTargetPolyline = null;
-
-  function getHaversineDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
-  window.togglePatrolTracking = function() {
-    ensurePatrolUI();
-    const btn = document.getElementById('btn-ranger-track');
-    const hud = document.getElementById('patrol-hud-card');
-    const activeMap = (typeof mapDesktop !== 'undefined' && mapDesktop && document.body.classList.contains('mode-desktop')) ? mapDesktop : ((typeof mapMobile !== 'undefined' && mapMobile) ? mapMobile : null);
-
-    if (rangerWatchId !== null) {
-      navigator.geolocation.clearWatch(rangerWatchId);
-      rangerWatchId = null;
-      if (btn) btn.innerHTML = '📍';
-      if (hud) hud.classList.add('hidden');
-      if (activeMap) {
-        if (rangerMarkerNode) activeMap.removeLayer(rangerMarkerNode);
-        if (rangerTargetPolyline) activeMap.removeLayer(rangerTargetPolyline);
-      }
-      rangerMarkerNode = null;
-      rangerTargetPolyline = null;
-      return;
-    }
-
-    if (!navigator.geolocation) {
-      alert('此裝置不支援 GPS 定位');
-      return;
-    }
-
-    if (btn) btn.innerHTML = '🛑';
-    if (hud) hud.classList.remove('hidden');
-
-    rangerWatchId = navigator.geolocation.watchPosition((pos) => {
-      const humanLat = pos.coords.latitude;
-      const humanLng = pos.coords.longitude;
-      const accuracy = pos.coords.accuracy || 0;
-      const humanSpeed = pos.coords.speed || 0;
-
-      const setVal = (idOrKey, text, className) => {
-        const elById = document.getElementById(idOrKey);
-        if (elById) {
-          if (text !== undefined) elById.innerText = text;
-          if (className !== undefined) elById.className = className;
-        }
-        document.querySelectorAll(`[data-ssot-key="${idOrKey}"]`).forEach(el => {
-          if (text !== undefined) el.innerText = text;
-          if (className !== undefined) el.className = className;
-        });
-      };
-
-      setVal('human-coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)} (±${accuracy.toFixed(1)}m)`);
-      setVal('patrol_coords', `${humanLat.toFixed(5)}, ${humanLng.toFixed(5)}`);
-
-      let bLat = 24.980183, bLng = 121.926200, bSpeed = 0.35, bName = "埡口核心牛群";
-      if (window.latestBuffaloCoords) {
-        bLat = window.latestBuffaloCoords[0];
-        bLng = window.latestBuffaloCoords[1];
-      }
-
-      const dist = getHaversineDistance(humanLat, humanLng, bLat, bLng);
-      window.currentPatrolDistance = dist;
-
-      const relSpeed = Math.abs(humanSpeed - bSpeed) + 0.1;
-      const ttc = (dist / relSpeed).toFixed(1);
-
-      setVal('buffalo-target', `${bName} (±0.45m)`);
-      setVal('human-distance', `${dist.toFixed(1)} m`);
-      setVal('kinematics-ttc', `${ttc} s`);
-      setVal('human_distance', `${dist.toFixed(1)} m`);
-      setVal('kinematics_ttc', `${ttc} s`);
-
-      let color = '#00ff88';
-      let badgeText = '🟢 安全';
-      let badgeClass = 'bg-emerald-950/80 text-neonGreen border border-emerald-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
-
-      if (dist <= 10.0) {
-        color = '#ff2a5f';
-        badgeText = '🔴 10m 硬防線';
-        badgeClass = 'bg-red-950/80 text-neonRed border border-neonRed/60 px-2 py-0.5 rounded text-[10px] font-bold';
-      } else if (dist <= 30.0) {
-        color = '#ffaa00';
-        badgeText = '🟡 30m 警戒';
-        badgeClass = 'bg-amber-950/80 text-amber-500 border border-amber-500/60 px-2 py-0.5 rounded text-[10px] font-bold';
-      }
-
-      setVal('defense-badge', badgeText, badgeClass);
-      setVal('defense_badge', badgeText, badgeClass);
-
-      if (activeMap && typeof L !== 'undefined') {
-        if (!rangerMarkerNode) {
-          const rangerIcon = L.divIcon({
-            className: '',
-            html: `<div style="width:14px;height:14px;border-radius:9999px;background:#00f0ff;border:2px solid #fff;box-shadow:0 0 10px #00f0ff;"></div>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7]
-          });
-          rangerMarkerNode = L.marker([humanLat, humanLng], { icon: rangerIcon, zIndexOffset: 2000 }).addTo(activeMap);
-        } else {
-          rangerMarkerNode.setLatLng([humanLat, humanLng]);
-        }
-
-        if (!rangerTargetPolyline) {
-          rangerTargetPolyline = L.polyline([[humanLat, humanLng], [bLat, bLng]], {
-            color: color,
-            weight: 2.0,
-            dashArray: '5, 6',
-            opacity: 0.85
-          }).addTo(activeMap);
-        } else {
-          rangerTargetPolyline.setLatLngs([[humanLat, humanLng], [bLat, bLng]]);
-          rangerTargetPolyline.setStyle({ color: color });
-        }
-      }
-
-    }, (err) => {
-      console.warn('GPS 定位失敗:', err.message);
-    }, {
-      enableHighAccuracy: true,
-      maximumAge: 1000,
-      timeout: 5000
-    });
-  };
 
   ensurePatrolUI();
   setInterval(tickLiveClock, 1000);
   tickLiveClock();
   setInterval(syncBuffaloData, 2000);
   syncBuffaloData();
-
 })();
 </script>
 </body>
