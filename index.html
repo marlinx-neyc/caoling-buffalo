@@ -389,7 +389,7 @@
                         <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-950 text-neonRed border border-red-500/50 font-bold">常態安全</span>
                     </div>
                     <div class="text-[10px] text-slate-300 leading-relaxed pt-0.5">
-                        人牛間距 <b class="text-neonRed font-bold">4.2m</b>（跨溪谷高差 18m 防禦屏障），TTC 碰撞倒數 <b class="text-neonAmber font-bold">4.2s</b>！自動扣除離根懲罰分，啟動大溪/內寮低碳分流。
+                        人牛間距 <b class="text-neonRed font-bold">4.2m</b>（跨溪谷高差 18m 防禦屏障），TTC 避險倒數 > 60s<b class="text-neonAmber font-bold">4.2s</b>！自動扣除離根懲罰分，啟動大溪/內寮低碳分流。
                     </div>
                 </div>
             </div>
@@ -1540,7 +1540,7 @@
                         </div>
                         <div class="text-[11px] text-slate-300">姿態: <b class="text-white">${bData.postureText}</b></div>
                         <div class="text-[11px] text-slate-300">人牛間距: <b class="${bData.distance < 10 ? 'text-neonRed font-bold' : 'text-neonGreen'}">${bData.distance}m (10m防線)</b></div>
-                        <div class="text-[11px] text-slate-300">TTC 碰撞倒數: <b class="text-neonAmber">${bData.ttc}</b></div>
+                        <div class="text-[11px] text-slate-300">TTC 避險倒數 > 60s: <b class="text-neonAmber">${bData.ttc}</b></div>
                         <div class="text-[11px] text-slate-300">衝突風險值 R: <b class="${bData.riskColor} font-bold">${bData.risk}</b> | 防線半徑: <b>${bData.bubbleRadius}m</b></div>
                     </div>
                 `;
@@ -1895,6 +1895,7 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
@@ -1917,7 +1918,7 @@
   }
   setInterval(syncDashboardV35, 2000);
   syncDashboardV35();
-  console.log("🎯 [GEM Engine v35.0] 全頁面數據修正完畢");
+  console.log("🎯 [GEM Engine v35.0 Master] JSON SSOT 異步解耦鏈路同步啟動");
 })();
 </script>
 </body>
