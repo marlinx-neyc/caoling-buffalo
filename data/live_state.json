@@ -1,0 +1,51 @@
+{
+  "engine_version": "v35.0",
+  "timestamp": "2026-10-19T10:01:13.217036+00:00",
+  "active_mode": "MEADOW_GRAZING",
+  "primary_coords": [
+    24.98066211368763,
+    121.92508117703855
+  ],
+  "uncertainty_radius_m": 0.25,
+  "adjusted_risk_R": 0.69,
+  "herds": {
+    "alpha_herd": {
+      "name": "聚落 A (虎字碑西南草坡)",
+      "count": 10,
+      "poi": "向陽草坡 (現地打勾真值)",
+      "state": "GRAZING",
+      "coords": [
+        24.98048,
+        121.92552
+      ],
+      "risk": 0.62
+    },
+    "beta_herd": {
+      "name": "聚落 B (護管所平坦保線道)",
+      "count": 0,
+      "poi": "無牛隻集結 (風冷舒適無泥浴)",
+      "state": "EMPTY",
+      "coords": [
+        24.97582,
+        121.92585
+      ],
+      "risk": 0.0
+    },
+    "gamma_herd": {
+      "name": "聚落 C (背風林緣休養/天公廟避寒區)",
+      "count": 4,
+      "poi": "背風坡伏臥/下遷避寒",
+      "state": "LYING_REST",
+      "coords": [
+        24.98012,
+        121.92518
+      ],
+      "risk": 0.45
+    }
+  },
+  "environment": {
+    "temp_c": 22.0,
+    "rh_percent": 75.0,
+    "wind_speed_ms": 5.8
+  }
+}
