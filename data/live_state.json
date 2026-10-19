@@ -1,6 +1,6 @@
 {
   "engine_version": "v35.0",
-  "timestamp": "2026-10-19T10:07:08.792060+00:00",
+  "timestamp": "2026-10-19T10:14:59.572134+00:00",
   "active_mode": "MEADOW_GRAZING",
   "primary_coords": [
     24.98066211368763,
@@ -21,7 +21,7 @@
       "risk": 0.62
     },
     "beta_herd": {
-      "name": "聚落 B (護管所平坦保線道)",
+      "name": "聚落 B (護管所後側平土道)",
       "count": 0,
       "poi": "無牛隻集結 (風冷舒適無泥浴)",
       "state": "EMPTY",
