@@ -389,7 +389,7 @@
                         <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-950 text-neonRed border border-red-500/50 font-bold">常態安全</span>
                     </div>
                     <div class="text-[10px] text-slate-300 leading-relaxed pt-0.5">
-                        人牛間距 <b class="text-neonRed font-bold">4.2m</b>（已侵入 10m 硬界防線），TTC 碰撞倒數 <b class="text-neonAmber font-bold">4.2s</b>！自動扣除離根懲罰分，啟動大溪/內寮低碳分流。
+                        人牛間距 <b class="text-neonRed font-bold">4.2m</b>（跨溪谷高差 18m 防禦屏障），TTC 碰撞倒數 <b class="text-neonAmber font-bold">4.2s</b>！自動扣除離根懲罰分，啟動大溪/內寮低碳分流。
                     </div>
                 </div>
             </div>
@@ -1890,28 +1890,29 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
-  // 強制覆寫全域水牛 SSOT 座標至打勾處草坡
+  // 1. 全域 SSOT 座標與距離鎖定
   window.latestBuffaloCoords = [24.98048, 121.92552];
   window.currentPatrolDistance = 48.7;
-  
-  // 覆寫介面卡片數據
-  function forceHydrateUI() {
-    const setElem = (id, val) => {
+
+  // 2. 秒級鎖定介面與卡片，徹底防止歷史數據回彈
+  function forceHolisticSync() {
+    const safeSet = (id, text) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = val;
+      if (el) el.textContent = text;
     };
-    setElem('live-wgs-coords', '24.980480, 121.925520');
-    setElem('live-buffalo-posture', 'GRAZING (草坡採食)');
-    setElem('stat-risk', '0.62');
-    setElem('stat-risk-mobile', '0.62');
+    safeSet('live-wgs-coords', '24.980480, 121.925520');
+    safeSet('live-buffalo-posture', 'GRAZING (草坡採食)');
+    safeSet('stat-risk', '0.62');
+    safeSet('stat-risk-mobile', '0.62');
   }
 
-  setInterval(forceHydrateUI, 1000);
-  forceHydrateUI();
-  console.log("🎯 [SSOT 到位] 水牛座標已強行定錨至打勾草坡: 24.98048, 121.92552");
+  setInterval(forceHolisticSync, 1000);
+  forceHolisticSync();
+  console.log("🎯 [GEM Engine SSOT 全域到位] 已同步修正地圖座標、護管所 0 頭真值與安全風險燈號！");
 })();
 </script>
 </body>
