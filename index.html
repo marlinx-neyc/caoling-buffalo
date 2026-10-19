@@ -1892,26 +1892,30 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
-  window.latestBuffaloCoords = [24.980480, 121.925520];
+  window.latestBuffaloCoords = [24.980662, 121.925081];
   window.currentPatrolDistance = 48.7;
 
-  function syncDashboardV34() {
-    const safeSet = (id, text) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = text;
-    };
-    safeSet('live-wgs-coords', '24.980480, 121.925520');
-    safeSet('live-buffalo-posture', 'GRAZING (向陽草坡 (現地打勾真值))');
-    safeSet('stat-risk', '0.69');
-    safeSet('stat-risk-mobile', '0.69');
+  function syncDashboardV35() {
+    fetch('./data/live_state.json?t=' + Date.now())
+      .then(res => res.json())
+      .then(data => {
+        const safeSet = (id, text) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = text;
+        };
+        safeSet('live-wgs-coords', data.primary_coords[0].toFixed(6) + ', ' + data.primary_coords[1].toFixed(6));
+        safeSet('live-buffalo-posture', data.herds.alpha_herd.state + ' (' + data.herds.alpha_herd.poi + ')');
+        safeSet('stat-risk', data.adjusted_risk_R.toFixed(2));
+        safeSet('stat-risk-mobile', data.adjusted_risk_R.toFixed(2));
+      }).catch(() => {});
   }
-
-  setInterval(syncDashboardV34, 1000);
-  syncDashboardV34();
-  console.log("🎯 [GEM Engine v34.0 Master] 生態力學 SSOT 座標與狀態鎖定完成: 24.980480, 121.925520");
+  setInterval(syncDashboardV35, 2000);
+  syncDashboardV35();
+  console.log("🎯 [GEM Engine v35.0 Master] JSON SSOT 異步解耦鏈路同步啟動");
 })();
 </script>
 </body>
