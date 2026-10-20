@@ -1898,11 +1898,37 @@
 
 
 
+
 <script id="gem-buffalo-hydration">
 (function() {
   'use strict';
   window.latestBuffaloCoords = [24.980662, 121.925081];
   window.currentPatrolDistance = 48.7;
+  let userMarker = null, userCircle = null;
+
+  function initGPSWatcher() {
+    if (!('geolocation' in navigator)) return;
+    const geoOptions = { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 };
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        const uLat = pos.coords.latitude;
+        const uLng = pos.coords.longitude;
+        const uAcc = pos.coords.accuracy;
+        if (window.mapInstance) {
+          if (!userMarker) {
+            userMarker = L.circleMarker([uLat, uLng], { radius: 8, fillColor: '#00f0ff', color: '#ffffff', weight: 2, fillOpacity: 0.9 }).addTo(window.mapInstance);
+            userCircle = L.circle([uLat, uLng], { radius: uAcc, color: '#00f0ff', fillColor: '#00f0ff', fillOpacity: 0.15, weight: 1 }).addTo(window.mapInstance);
+          } else {
+            userMarker.setLatLng([uLat, uLng]);
+            userCircle.setLatLng([uLat, uLng]);
+            userCircle.setRadius(uAcc);
+          }
+        }
+      },
+      (err) => { console.warn('GPS 讀取中/失敗: ' + err.message); },
+      geoOptions
+    );
+  }
 
   function syncDashboardV35() {
     fetch('./data/live_state.json?t=' + Date.now())
@@ -1918,9 +1944,11 @@
         safeSet('stat-risk-mobile', data.adjusted_risk_R.toFixed(2));
       }).catch(() => {});
   }
+
   setInterval(syncDashboardV35, 2000);
   syncDashboardV35();
-  console.log("🎯 [GEM Engine v35.0] DOM 全面清洗與動態 Hydration 鎖定完成");
+  initGPSWatcher();
+  console.log("🎯 [GEM Engine v35.0 Master] DOM 全面清洗、GPS 注入與 JSON SSOT 異步解耦鏈路同步啟動");
 })();
 </script>
 </body>
