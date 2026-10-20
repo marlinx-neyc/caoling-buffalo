@@ -1,13 +1,14 @@
 {
   "engine_version": "v35.0",
-  "timestamp": "2026-10-19T10:20:47.186705+00:00",
+  "timestamp": "2026-10-20T03:01:42.804042+00:00",
   "active_mode": "MEADOW_GRAZING",
   "primary_coords": [
-    24.98066211368763,
-    121.92508117703855
+    24.980662,
+    121.925081
   ],
   "uncertainty_radius_m": 0.25,
   "adjusted_risk_R": 0.69,
+  "status_label": "🟢 常態安全綠燈 (雙軌解耦)",
   "herds": {
     "alpha_herd": {
       "name": "聚落 A (虎字碑西南草坡)",
@@ -23,7 +24,7 @@
     "beta_herd": {
       "name": "聚落 B (護管所後側平土道)",
       "count": 0,
-      "poi": "無牛隻集結 (風冷舒適無泥浴)",
+      "poi": "無牛隻集結 (風冷無泥浴)",
       "state": "EMPTY",
       "coords": [
         24.97582,
@@ -46,6 +47,8 @@
   "environment": {
     "temp_c": 22.0,
     "rh_percent": 75.0,
-    "wind_speed_ms": 5.8
-  }
+    "wind_speed_ms": 5.8,
+    "trail_mud_index": 0.2
+  },
+  "hitl_active": false
 }
